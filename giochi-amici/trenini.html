@@ -1,0 +1,209 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+<title>Trenini</title>
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--scrim:rgba(31,29,43,.55);--display:Impact,'Arial Black',sans-serif;--body:'Trebuchet MS',system-ui,sans-serif;color-scheme:light}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#cfe8c4;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;display:block}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px 20px;box-sizing:border-box;touch-action:pan-y;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:540px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:12px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05}
+h1{font-size:clamp(30px,8vw,44px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.5}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+#hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;display:flex;justify-content:space-between;pointer-events:none;z-index:2}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink)}
+#ctls{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:12px;padding:0 12px calc(env(safe-area-inset-bottom,0px) + 12px);z-index:3}
+.ctl{flex:1;max-width:260px;min-height:64px;font-family:var(--display);font-size:20px;background:var(--sun);border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);color:var(--ink);cursor:pointer}
+.ctl:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.ctl:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+</style></head><body>
+<canvas id="game" aria-label="Rete ferroviaria"></canvas>
+<div id="hud" hidden><div class="pill" id="hScore">Treni: 0</div><div class="pill" id="hTime">60</div></div>
+<div id="ctls" hidden>
+  <button class="ctl" id="bA" type="button">Scambio 1 ⇅</button>
+  <button class="ctl" id="bB" type="button">Scambio 2 ⇅</button>
+</div>
+<div class="overlay" id="start"><div class="panel">
+  <h1>🚂 <span>Trenini</span></h1>
+  <p>La città dei treni ti aspetta: tu sei il capostazione!</p>
+  <ul>
+    <li>Ogni treno ha un colore.</li>
+    <li>Tocca gli <b>scambi</b> (o i due bottoni) per mandarlo alla stazione dello <b>stesso colore</b>.</li>
+    <li>Da tastiera: freccia ⬆ = scambio 1, freccia ⬇ = scambio 2.</li>
+  </ul>
+  <button class="btn" id="go" type="button">Via!</button>
+</div></div>
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="eTitle">Che bravo capostazione!</h2>
+  <p id="eText"></p>
+  <button class="btn" id="again" type="button">Ancora!</button>
+</div></div>
+<script>
+(function(){
+"use strict";
+var W=800,H=500,cv=document.getElementById('game'),cx=cv.getContext('2d');
+var COLS=[{n:'rosso',c:'#e63946',d:'#a8232f'},{n:'giallo',c:'#ffc93c',d:'#c49210'},{n:'verde',c:'#2fa84f',d:'#1c7433'}];
+var LANE=[90,250,410],SWX=250,ENTRY=[150,350],STX=715;
+var sw=[0,0]; // 0 = verso l'alto, 1 = verso il basso
+var trains,score,missed,timeLeft,spawnT,running=false,last=0,scale=1,ox=0,oy=0,fx=[],tick=0,houses=[];
+function $(i){return document.getElementById(i)}
+function rnd(n){return Math.floor(Math.random()*n)}
+
+function resize(){
+  var dpr=window.devicePixelRatio||1,w=innerWidth,h=innerHeight;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
+  var top=56,bot=running?90:0;
+  scale=Math.min(w/W,(h-top-bot)/H);if(scale<=0)scale=.1;
+  ox=(w-W*scale)/2;oy=top+(h-top-bot-H*scale)/2;
+  cx.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener('resize',resize);
+
+// città decorativa
+(function(){var s=7;function r(){s=(s*9301+49297)%233280;return s/233280}
+  var spots=[[80,40],[170,40],[330,20],[470,20],[560,170],[560,320],[330,470],[470,470],[90,470],[170,260],[90,260],[630,170],[650,330],[30,250]];
+  spots.forEach(function(p){houses.push({x:p[0],y:p[1],w:44+r()*20,h:36+r()*18,c:['#f4a261','#e9c46a','#f7b7c3','#9ad0f5','#c3e6a1'][Math.floor(r()*5)]})});
+})();
+
+function pathFor(t){
+  var lane=ENTRY[t.entry]<250?(sw[0]?1:0):(sw[1]?2:1);
+  return lane;
+}
+function spawn(){
+  var e=rnd(2),col=rnd(3);
+  // niente treni sovrapposti all'ingresso
+  for(var i=0;i<trains.length;i++){var t=trains[i];if(t.entry===e&&t.phase===0&&t.x<40)return}
+  trains.push({entry:e,col:col,x:-70,y:ENTRY[e],phase:0,lane:0,ang:0,s:0,seg:null,done:0});
+}
+function lerp(a,b,k){return a+(b-a)*k}
+function update(dt){
+  var speed=95+Math.min(70,(60-timeLeft)*1.4);
+  spawnT-=dt;
+  if(spawnT<=0){spawn();spawnT=Math.max(1.5,3.4-(60-timeLeft)*.03)}
+  for(var i=trains.length-1;i>=0;i--){
+    var t=trains[i];
+    if(t.phase===0){
+      t.x+=speed*dt;t.ang=0;
+      if(t.x>=SWX){t.x=SWX;t.lane=pathFor(t);t.phase=1;t.s=0;t.y0=t.y}
+    }else if(t.phase===1){
+      // diagonale da (SWX,y0) a (SWX+100,LANE)
+      t.s+=speed*dt;
+      var dx=100,dy=LANE[t.lane]-t.y0,len=Math.sqrt(dx*dx+dy*dy);
+      if(t.s>=len){t.phase=2;t.x=SWX+100;t.y=LANE[t.lane];t.ang=0}
+      else{var k=t.s/len;t.x=SWX+dx*k;t.y=t.y0+dy*k;t.ang=Math.atan2(dy,dx)}
+    }else{
+      t.x+=speed*dt;t.ang=0;
+      if(t.x>=STX){
+        var ok=(t.lane===t.col);
+        if(ok){score++;fx.push({x:STX+30,y:t.y,t:0,txt:'+1 ⭐',c:'#1c7433'})}
+        else{missed++;fx.push({x:STX+10,y:t.y,t:0,txt:'Ops!',c:'#a8232f'})}
+        trains.splice(i,1);
+      }
+    }
+  }
+  for(var j=fx.length-1;j>=0;j--){fx[j].t+=dt;if(fx[j].t>1)fx.splice(j,1)}
+  timeLeft-=dt;
+  $('hScore').textContent='Treni: '+score;$('hTime').textContent=Math.max(0,Math.ceil(timeLeft));
+  if(timeLeft<=0)finish();
+}
+
+function rail(x1,y1,x2,y2){
+  var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy),n=Math.floor(len/16),a=Math.atan2(dy,dx);
+  cx.save();cx.translate(x1,y1);cx.rotate(a);
+  cx.strokeStyle='#8b5a3c';cx.lineWidth=5;
+  for(var i=0;i<=n;i++){cx.beginPath();cx.moveTo(i*len/n,-11);cx.lineTo(i*len/n,11);cx.stroke()}
+  cx.strokeStyle='#777';cx.lineWidth=3;
+  cx.beginPath();cx.moveTo(0,-6);cx.lineTo(len,-6);cx.moveTo(0,6);cx.lineTo(len,6);cx.stroke();
+  cx.restore();
+}
+function drawTrain(t){
+  var c=COLS[t.col];
+  cx.save();cx.translate(t.x,t.y);cx.rotate(t.ang);
+  cx.lineWidth=3;cx.strokeStyle='#1f1d2b';
+  // vagone
+  cx.fillStyle=c.c;rr(-62,-14,38,28,6);
+  cx.fillStyle='#bfe6f5';cx.fillRect(-56,-6,10,10);cx.fillRect(-40,-6,10,10);
+  // locomotiva
+  cx.fillStyle=c.d;rr(-20,-15,40,30,7);
+  cx.fillStyle='#bfe6f5';cx.fillRect(-12,-8,12,10);
+  cx.fillStyle='#1f1d2b';cx.beginPath();cx.arc(12,0,5,0,6.3);cx.fill();
+  // ruote
+  cx.fillStyle='#1f1d2b';[-54,-34,-10,10].forEach(function(x){cx.beginPath();cx.arc(x,15,4,0,6.3);cx.fill()});
+  cx.restore();
+}
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();cx.fill();cx.stroke()}
+function station(i){
+  var y=LANE[i],c=COLS[i];
+  cx.lineWidth=3;cx.strokeStyle='#1f1d2b';
+  cx.fillStyle=c.c;rr(STX+8,y-34,64,68,10);
+  cx.fillStyle='#fffdf6';cx.fillRect(STX+18,y-24,44,20);
+  cx.fillStyle='#1f1d2b';cx.font='bold 13px Trebuchet MS,sans-serif';cx.textAlign='center';cx.fillText(c.n.toUpperCase(),STX+40,y-9);
+  cx.fillStyle=c.d;cx.fillRect(STX+30,y+4,20,30);
+}
+function arrow(i){
+  var y=ENTRY[i],up=sw[i]===0,tx=SWX,ty=y+(up?-26:26);
+  cx.fillStyle='#fffdf6';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  cx.beginPath();cx.arc(tx,ty,19,0,6.3);cx.fill();cx.stroke();
+  cx.fillStyle='#1f1d2b';cx.font='bold 22px Trebuchet MS,sans-serif';cx.textAlign='center';cx.textBaseline='middle';
+  cx.fillText(up?'↗':'↘',tx,ty+1);cx.textBaseline='alphabetic';
+  cx.font='bold 14px Trebuchet MS,sans-serif';cx.fillText(String(i+1),tx-34,y-12);
+}
+function draw(){
+  var w=innerWidth,h=innerHeight;
+  cx.fillStyle='#cfe8c4';cx.fillRect(0,0,w,h);
+  cx.save();cx.translate(ox,oy);cx.scale(scale,scale);
+  cx.fillStyle='#d9efcf';cx.fillRect(0,0,W,H);
+  cx.lineWidth=3;cx.strokeStyle='#1f1d2b';
+  houses.forEach(function(b){cx.fillStyle=b.c;rr(b.x,b.y,b.w,b.h,4);cx.fillStyle='#e63946';cx.beginPath();cx.moveTo(b.x-4,b.y);cx.lineTo(b.x+b.w/2,b.y-16);cx.lineTo(b.x+b.w+4,b.y);cx.closePath();cx.fill();cx.stroke()});
+  // binari
+  rail(0,ENTRY[0],SWX,ENTRY[0]);rail(0,ENTRY[1],SWX,ENTRY[1]);
+  [[0,0],[0,1],[1,1],[1,2]].forEach(function(p){rail(SWX,ENTRY[p[0]],SWX+100,LANE[p[1]])});
+  LANE.forEach(function(y){rail(SWX+100,y,STX+10,y)});
+  for(var i=0;i<3;i++)station(i);
+  arrow(0);arrow(1);
+  trains.forEach(drawTrain);
+  fx.forEach(function(f){cx.globalAlpha=1-f.t;cx.fillStyle=f.c;cx.font='bold 26px Trebuchet MS,sans-serif';cx.textAlign='center';cx.fillText(f.txt,f.x,f.y-30-f.t*30);cx.globalAlpha=1});
+  cx.restore();
+}
+function loop(ts){
+  if(!running)return;
+  var dt=Math.min(.05,(ts-last)/1000||0);last=ts;tick++;
+  update(dt);draw();
+  if(running)requestAnimationFrame(loop);
+}
+function toggle(i){if(!running)return;sw[i]=sw[i]?0:1}
+function startGame(){
+  trains=[];score=0;missed=0;timeLeft=60;spawnT=.3;sw=[0,0];fx=[];running=true;
+  $('start').hidden=true;$('end').hidden=true;$('hud').hidden=false;$('ctls').hidden=false;
+  resize();last=performance.now();requestAnimationFrame(loop);
+}
+function finish(){
+  running=false;$('hud').hidden=true;$('ctls').hidden=true;resize();draw();
+  var t,m;
+  if(score>=12){t='Capostazione campione! 🏆';m='Hai portato '+score+' treni alla stazione giusta. Incredibile!'}
+  else if(score>=6){t='Che bravo capostazione! 🚂';m='Hai portato '+score+' treni alla stazione giusta. Bravissimo!'}
+  else{t='Bel viaggio! 🌈';m='Hai portato '+score+(score===1?' treno':' treni')+' alla stazione giusta. Riprova: i treni ti aspettano!'}
+  $('eTitle').textContent=t;$('eText').textContent=m;$('end').hidden=false;
+}
+$('go').onclick=startGame;$('again').onclick=startGame;
+$('bA').onclick=function(){toggle(0)};$('bB').onclick=function(){toggle(1)};
+addEventListener('keydown',function(e){
+  if(e.key==='ArrowUp'||e.key==='1'){toggle(0);e.preventDefault()}
+  else if(e.key==='ArrowDown'||e.key==='2'){toggle(1);e.preventDefault()}
+  else if((e.key==='Enter'||e.key===' ')&&!running&&document.activeElement.tagName!=='BUTTON'){startGame()}
+});
+cv.addEventListener('pointerdown',function(e){
+  if(!running)return;
+  var x=(e.clientX-ox)/scale,y=(e.clientY-oy)/scale;
+  var d0=Math.abs(x-SWX)+Math.abs(y-ENTRY[0]),d1=Math.abs(x-SWX)+Math.abs(y-ENTRY[1]);
+  if(x<SWX+80&&x>SWX-120)toggle(d0<=d1?0:1);else toggle(y<250?0:1);
+});
+trains=[];score=0;timeLeft=60;resize();draw();
+window.__trenini={state:function(){return {score:score,missed:missed,running:running,trains:trains.length,sw:sw.slice()}}};
+})();
+</script></body></html>
