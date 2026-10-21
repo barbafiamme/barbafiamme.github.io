@@ -56,6 +56,14 @@ textarea{min-height:140px;resize:vertical}
 .done .btn{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:8px 16px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);text-decoration:none}
 .copyrow{display:flex;gap:8px;width:100%}
 .copyrow input{flex:1;min-width:0;font-size:14px}
+.voice{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.mic{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-size:18px;background:var(--sky);color:var(--ink);border:3px solid var(--ink);border-radius:999px;padding:10px 18px;box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+.mic .dot{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
+.mic[aria-pressed="true"]{background:var(--red);color:#fff}
+.mic[aria-pressed="true"] .dot{background:#fff;animation:rec 1s ease-in-out infinite}
+@keyframes rec{50%{transform:scale(.5);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.mic[aria-pressed="true"] .dot{animation:none}}
+.vhint{font-size:14px;color:var(--muted);font-weight:600}
 .rules{margin:0;padding-left:20px;font-size:15px;color:var(--muted)}
 </style>
 </head>
@@ -107,6 +115,10 @@ textarea{min-height:140px;resize:vertical}
 
     <fieldset>
       <label class="lbl" for="idea">Racconta la tua idea</label>
+      <div class="voice" id="voiceBox" hidden>
+        <button type="button" class="mic" id="mic" aria-pressed="false"><span class="dot" aria-hidden="true"></span><span id="micLabel">🎤 Parla, scrivo io!</span></button>
+        <span class="vhint" id="vhint">Tocca il microfono e racconta il gioco a voce.</span>
+      </div>
       <textarea id="idea" maxlength="1500" placeholder="Es. Il drago verde vola tra le nuvole e deve raccogliere le stelle. Se tocca le nuvole nere perde una vita…"></textarea>
       <p class="hint" id="count">0 / 1500</p>
     </fieldset>
@@ -155,6 +167,20 @@ textarea{min-height:140px;resize:vertical}
     if(!list.length)return;const grp=document.createElement('optgroup');grp.label='Giochi dei Piccoli Inventori';
     list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');grp.append(o)});$('gioco').prepend(grp);$('gioco').selectedIndex=0}).catch(()=>{});
   form.addEventListener('change',e=>{if(e.target.name==='tipo')$('gameBox').hidden=form.tipo.value!=='modifica'});
+  // dettatura: il bambino racconta l'idea a voce
+  (()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+    const box=$('voiceBox'),mic=$('mic'),lab=$('micLabel'),hint=$('vhint'),ta=$('idea');box.hidden=false;
+    let rec=null,on=false,base='';
+    function stop(){on=false;mic.setAttribute('aria-pressed','false');lab.textContent='🎤 Parla, scrivo io!';try{rec&&rec.stop()}catch(e){}}
+    mic.addEventListener('click',()=>{if(on){stop();hint.textContent='Fatto! Puoi correggere il testo o parlare ancora.';return}
+      rec=new SR();rec.lang='it-IT';rec.continuous=true;rec.interimResults=true;
+      base=ta.value.trim();if(base)base+=' ';
+      rec.onresult=e=>{let fin='',tmp='';for(let i=0;i<e.results.length;i++){const t=e.results[i][0].transcript;e.results[i].isFinal?fin+=t:tmp+=t}
+        let txt=fin+tmp;txt=txt.charAt(0).toUpperCase()+txt.slice(1);ta.value=(base+txt).slice(0,1500);ta.dispatchEvent(new Event('input'))};
+      rec.onerror=e=>{stop();hint.textContent=e.error==='not-allowed'||e.error==='service-not-allowed'?'Il microfono è bloccato: permetti l\'uso del microfono al sito e riprova.':e.error==='no-speech'?'Non ho sentito niente. Riprova parlando vicino al telefono.':'La dettatura non ha funzionato. Puoi scrivere con la tastiera.'};
+      rec.onend=()=>{if(on)stop()};
+      try{rec.start();on=true;mic.setAttribute('aria-pressed','true');lab.textContent='⏹ Ho finito';hint.textContent='Ti ascolto… parla piano e chiaro.'}catch(e){hint.textContent='La dettatura non è disponibile adesso.'}});
+    form.addEventListener('submit',()=>{if(on)stop()},true)})();
   $('idea').addEventListener('input',()=>{$('count').textContent=$('idea').value.length+' / 1500'});
   function say(t,kind){status.hidden=false;status.textContent=t;status.className='status '+kind}
   // shrink the photo in the browser: long side 1600px, JPEG
