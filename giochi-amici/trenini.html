@@ -41,9 +41,12 @@ h2{font-size:clamp(26px,6vw,36px)}
 <div class="overlay" id="end" hidden><div class="panel">
   <h2 id="eTitle">Che bravo capostazione!</h2>
   <p id="eText"></p>
+  <div id="board"></div>
   <button class="btn" id="again" type="button">Ancora!</button>
 </div></div>
+<script src="../classifica.js"></script>
 <script>
+if(window.Classifica&&Classifica.register)Classifica.register('trenini',{title:'Trenini',unit:'treni'});
 (function(){
 "use strict";
 var W=800,H=500,cv=document.getElementById('game'),cx=cv.getContext('2d');
@@ -189,6 +192,7 @@ function finish(){
   else if(score>=6){t='Che bravo capostazione! 🚂';m='Hai portato '+score+' treni alla stazione giusta. Bravissimo!'}
   else{t='Bel viaggio! 🌈';m='Hai portato '+score+(score===1?' treno':' treni')+' alla stazione giusta. Riprova: i treni ti aspettano!'}
   $('eTitle').textContent=t;$('eText').textContent=m;$('end').hidden=false;
+  if(window.Classifica)Classifica.mount($('board'),'trenini',score);
 }
 $('go').onclick=startGame;$('again').onclick=startGame;
 $('bA').onclick=function(){toggle(0)};$('bB').onclick=function(){toggle(1)};
