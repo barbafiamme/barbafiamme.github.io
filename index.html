@@ -32,7 +32,7 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 @keyframes flick{from{transform:scale(1,1)}to{transform:scale(1.05,1.09) skewX(-2deg)}}
 @media (prefers-reduced-motion:reduce){.logo .fl{animation:none}}
 .lead{margin:0;font-size:20px;font-weight:600;color:var(--muted);max-width:52ch}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:26px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:26px}
 .card{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:7px 8px 0 var(--ink);display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .card:nth-child(1){transform:rotate(-.6deg)}
 .card:nth-child(2){transform:rotate(.7deg)}
@@ -44,6 +44,9 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .chip{font-size:14px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:1px 10px;background:#fff}
 .play{margin-top:auto;align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:10px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
 .card.space .play{background:var(--sky)}
+.card.pirate .play{background:#ff8a5c}
+#player.pirate .close{left:max(206px,calc(50% - 26px));bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:52px;height:52px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
+#player.pirate .close::after{content:"⌂";font-size:26px;line-height:1}
 .play:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .play:focus-visible,.close:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 .gallery{display:flex;flex-direction:column;gap:18px;padding-top:10px}
@@ -186,12 +189,40 @@ body.playing{overflow:hidden}
         <button class="play" type="button" data-game="giochi/squadriglia.html" data-kind="space">Gioca!</button>
       </div>
     </article>
+    <article class="card pirate">
+      <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Nave pirata a righe marroni sul mare blu">
+        <rect width="320" height="180" fill="#cfe8f5"/>
+        <circle cx="275" cy="35" r="16" fill="#ffd23f" stroke="#ffb000" stroke-width="3"/>
+        <g stroke="#1f1d2b" stroke-width="2">
+          <rect x="118" y="30" width="8" height="90" fill="#5a3416"/><rect x="168" y="52" width="8" height="70" fill="#5a3416"/>
+          <path d="M96 30Q150 22 206 30L198 40 208 50Q150 46 96 52Z" fill="#fffdf6"/>
+          <path d="M150 58L210 59 204 68 211 77 150 76Z" fill="#fffdf6"/>
+          <path d="M70 120V96Q72 84 92 84Q110 84 110 96V120Z" fill="#e9d6b4"/>
+          <path d="M62 120H248Q240 150 210 158H96Q68 150 62 120Z" fill="#7a4a22"/>
+          <rect x="66" y="126" width="178" height="9" fill="#f6ead2"/>
+        </g>
+        <g fill="#1f1d2b"><circle cx="80" cy="130.5" r="2.5"/><circle cx="100" cy="130.5" r="2.5"/><circle cx="120" cy="130.5" r="2.5"/><circle cx="140" cy="130.5" r="2.5"/><circle cx="160" cy="130.5" r="2.5"/><circle cx="180" cy="130.5" r="2.5"/><circle cx="200" cy="130.5" r="2.5"/><circle cx="220" cy="130.5" r="2.5"/></g>
+        <circle cx="151" cy="40" r="5" fill="#fff" stroke="#1f1d2b" stroke-width="1.5"/>
+        <g><rect x="128" y="104" width="8" height="12" fill="#b3202a"/><circle cx="132" cy="100" r="4" fill="#f2c79b"/><path d="M125 97Q132 90 139 97Z" fill="#1f1d2b"/>
+        <rect x="216" y="104" width="9" height="16" fill="#4f8de0"/><circle cx="220" cy="100" r="4" fill="#f2c79b"/><path d="M215 99Q220 92 225 99" fill="#ffd23f"/></g>
+        <circle cx="108" cy="24" r="5" fill="#ff8a1f"/><circle cx="196" cy="22" r="5" fill="#3fa34d"/>
+        <path d="M0 150Q40 138 80 150T160 150T240 150T320 150V180H0Z" fill="#2846b8"/>
+        <path d="M268 152Q276 128 288 126Q282 140 290 152Z" fill="#7d8a99" stroke="#1f1d2b" stroke-width="2"/>
+        <g transform="translate(36 128)" stroke="#5a3416" stroke-width="2.5"><line x1="-12" y1="0" x2="-12" y2="-26"/><line x1="-4" y1="0" x2="-4" y2="-26"/><line x1="4" y1="0" x2="4" y2="-26"/><line x1="12" y1="0" x2="12" y2="-26"/><line x1="-15" y1="-26" x2="15" y2="-26"/></g>
+      </svg>
+      <div class="body">
+        <h2>Pirati all'Arrembaggio</h2>
+        <p>Il capitano e sua moglie contro 10 navi pirata che combattono anche tra loro. Libera i pirati nelle gabbie e attento agli squali!</p>
+        <div class="chips"><span class="chip">10 navi</span><span class="chip">Squali</span><span class="chip">Facile</span></div>
+        <button class="play" type="button" data-game="giochi/pirati.html" data-kind="pirate">Gioca!</button>
+      </div>
+    </article>
   </main>
 
   <section class="gallery" aria-labelledby="gal-title">
     <div class="gal-head">
       <h2 id="gal-title">I disegni di Agostino</h2>
-      <p>Da qui è partito tutto: le auto della corsa e gli aerei della squadriglia sono nati da questi fogli. Scorri con le frecce o con il dito, e tocca un disegno per vederlo grande.</p>
+      <p>Da qui è partito tutto: le auto della corsa, gli aerei della squadriglia e le navi dei pirati sono nati da questi fogli. Scorri con le frecce o con il dito, e tocca un disegno per vederlo grande.</p>
     </div>
     <div class="carousel" aria-roledescription="carosello" aria-label="Disegni di Agostino">
       <button class="nav prev" id="prev" type="button" aria-label="Disegno precedente">◀</button>
@@ -206,6 +237,8 @@ body.playing{overflow:hidden}
         <figcaption><b>Viola e arancione</b><span>→ Viola Arancio</span></figcaption></figure></div>
       <div class="slide"><figure class="pin"><button type="button" data-full="disegni/aerei.jpg" data-cap="La squadriglia di aerei colorati che scappa dal buio che avanza. Da qui è nato Squadriglia contro il Buio."><img src="disegni/aerei.jpg" alt="Disegno pieno di colori con aerei verdi, azzurri e rossi e una grande macchia nera" loading="lazy" style="object-position:50% 85%"></button>
         <figcaption><b>Gli aerei e il Buio</b><span>→ Squadriglia contro il Buio</span></figcaption></figure></div>
+      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/pirati.jpg" data-cap="La nave pirata a righe con il capitano, la moglie vestita di blu, i pappagalli, il fuoco e il mare. Da qui è nato Pirati all'Arrembaggio."><img src="disegni/pirati.jpg" alt="Disegno di una nave pirata marrone a righe con vele bianche, teschio, pirati, pappagalli, fuoco rosso e mare blu" loading="lazy"></button>
+        <figcaption><b>La nave dei pirati</b><span>→ Pirati all'Arrembaggio</span></figcaption></figure></div>
       <div class="slide"><figure class="pin"><button type="button" data-full="disegni/rossa-95.jpg" data-cap="Auto rossa e gialla con il numero 95."><img src="disegni/rossa-95.jpg" alt="Disegno di un'auto rossa con una fascia gialla e il numero 95" loading="lazy"></button>
         <figcaption><b>Rossa col 95</b><span>disegno</span></figcaption></figure></div>
       <div class="slide"><figure class="pin"><button type="button" data-full="disegni/azzurra-43.jpg" data-cap="Auto azzurra con un grande alettone e il numero 43."><img src="disegni/azzurra-43.jpg" alt="Disegno di un'auto azzurra con alettone e il numero 43" loading="lazy"></button>

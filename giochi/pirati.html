@@ -1,0 +1,398 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+<title>Pirati all'Arrembaggio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: full-screen sea canvas drawn in marker style; paper overlays like the other Barbafiamme games */
+:root{
+  --ink:#1f1d2b; --paper:#fffdf6; --sun:#ffc93c; --sea:#2846b8; --scrim:rgba(31,29,43,.55); --muted:#6b6880; --red:#e63946;
+  --display:'Bungee',Impact,'Arial Black',sans-serif; --body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#cfe8f5;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;display:block}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;touch-action:pan-y;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:12px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(28px,7vw,42px)}
+h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.4}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.ctl:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stats span{border:2px solid var(--ink);border-radius:999px;padding:2px 12px;background:#fff;font-weight:800;font-size:16px}
+#hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none;z-index:2}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill small{font-family:var(--body);font-weight:700;font-size:12px;display:block;line-height:1;color:var(--muted)}
+.col{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.colr{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+#hearts{color:var(--red);letter-spacing:2px}
+#banner{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 130px);text-align:center;font-family:var(--display);font-size:clamp(20px,5.5vw,38px);color:var(--sun);-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink);pointer-events:none;padding:0 16px;z-index:2}
+#banner.pop{animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(1.5)}to{transform:scale(1)}}
+#controls{position:fixed;left:0;right:0;bottom:0;padding:0 14px calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:2}
+#controls .grp{display:flex;gap:12px;pointer-events:auto}
+.ctl{width:84px;height:84px;border-radius:50%;border:3px solid var(--ink);background:rgba(255,253,246,.85);font-family:var(--display);font-size:26px;color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 var(--ink);touch-action:none;padding:0}
+.ctl.fire{width:112px;height:112px;background:rgba(230,57,70,.95);color:#fff;font-size:18px}
+.ctl.on{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);filter:brightness(.9)}
+@media (prefers-reduced-motion:reduce){#banner.pop{animation:none}}
+</style>
+
+</head><body>
+<canvas id="game"></canvas>
+
+<div id="hud" hidden>
+  <div class="col">
+    <div class="pill"><small>VITE</small><span id="hearts">♥♥♥♥♥</span></div>
+    <div class="pill"><small>MONETE</small><span id="coins">0</span></div>
+  </div>
+  <div class="colr">
+    <div class="pill"><small>NAVI AFFONDATE</small><span id="sunk">0/10</span></div>
+    <div class="pill"><small>PIRATI LIBERATI</small><span id="saved">0</span></div>
+  </div>
+</div>
+<div id="banner" hidden></div>
+<div id="controls" hidden>
+  <div class="grp"><button class="ctl" data-k="left" aria-label="Vai a sinistra">◀</button><button class="ctl" data-k="right" aria-label="Vai a destra">▶</button></div>
+  <div class="grp"><button class="ctl fire" data-k="fire">FUOCO!</button></div>
+</div>
+
+<section id="menu" class="overlay">
+  <div class="panel">
+    <h1>Pirati <span>all'Arrembaggio</span></h1>
+    <p>Il capitano e sua moglie navigano sulla nave di Agostino. Arrivano 10 navi pirata nemiche, e combattono anche tra di loro!</p>
+    <ul>
+      <li><b>◀ ▶</b> muovi la nave e schivi le palle di cannone.</li>
+      <li><b>FUOCO!</b> spara col cannone: mira da solo.</li>
+      <li>Passa sopra le <b>gabbie</b> per liberare i pirati intrappolati.</li>
+      <li>Attento agli <b>squali</b>: mordono la nave! Una cannonata li fa scappare.</li>
+      <li>Affonda tutte le <b>10 navi</b> per vincere.</li>
+    </ul>
+    <button class="btn" id="go" type="button">All'arrembaggio! ☠</button>
+    <p style="font-size:14px;color:var(--muted)">Sul computer: frecce ← → e barra spaziatrice per sparare.</p>
+  </div>
+</section>
+
+<section id="end" class="overlay" hidden>
+  <div class="panel">
+    <h2 id="endTitle"></h2>
+    <p id="endText"></p>
+    <div class="stats" id="endStats"></div>
+    <button class="btn" id="again" type="button">Gioca ancora!</button>
+  </div>
+</section>
+
+<script>
+(()=>{
+const cvs=document.getElementById('game'),ctx=cvs.getContext('2d');
+let W=0,H=0,DPR=1,S=1,WW=900,WH=600,SEA=450,KS=1;
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cvs.width=Math.round(W*DPR);cvs.height=Math.round(H*DPR);cvs.style.width=W+'px';cvs.style.height=H+'px';
+  S=Math.min(H/600,W/640);WW=W/S;WH=H/S;SEA=WH*(WH>WW?.56:.7);KS=WW<820?.82:1}
+addEventListener('resize',resize);resize();
+const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let T=0;
+const wave=(x,t=T)=>SEA+Math.sin(x*.011+t*1.5)*9+Math.sin(x*.027-t*2.1)*4;
+const slope=x=>Math.atan2(wave(x+20)-wave(x-20),40);
+
+/* ---------- the 10 enemy ships ---------- */
+const FLEET=[
+  {name:'Il Granchio Rosso',hull:'#8a3b1e',stripe:'#5a2210',sail:'#f3e1c2',flag:'#c0392b'},
+  {name:'Lo Squalo Grigio',hull:'#6b6f78',stripe:'#3f434a',sail:'#e8eaee',flag:'#222'},
+  {name:'La Medusa Viola',hull:'#5b3a8e',stripe:'#3a2360',sail:'#f1e6ff',flag:'#7cc934'},
+  {name:'Il Polpo Verde',hull:'#2f6b3a',stripe:'#1c4524',sail:'#fff6d8',flag:'#f39025'},
+  {name:'La Balena Blu',hull:'#24508e',stripe:'#173360',sail:'#ffffff',flag:'#ffc93c'},
+  {name:'Il Corvo Nero',hull:'#2a2630',stripe:'#141218',sail:'#3a3640',flag:'#e63946',darkSail:true},
+  {name:'La Tigre Arancione',hull:'#c4621c',stripe:'#7a3a0e',sail:'#fff1d6',flag:'#222'},
+  {name:'Il Teschio Giallo',hull:'#b38f1d',stripe:'#6e5710',sail:'#fffbe6',flag:'#5b3a8e'},
+  {name:'La Sirena Rosa',hull:'#b8457a',stripe:'#7a2550',sail:'#ffe6f1',flag:'#24508e'},
+  {name:'Il Drago dei Mari',hull:'#1f1c26',stripe:'#000',sail:'#2b2733',flag:'#ff7a1a',darkSail:true,boss:true}
+];
+
+/* ---------- drawing helpers ---------- */
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function hullPath(c){c.beginPath();c.moveTo(-165,-6);c.lineTo(168,-6);c.quadraticCurveTo(152,58,92,80);c.lineTo(-112,80);c.quadraticCurveTo(-158,62,-165,-6);c.closePath()}
+function skull(c,x,y,s,col){c.save();c.translate(x,y);c.scale(s,s);c.strokeStyle=col;c.lineWidth=4;c.lineCap='round';
+  c.beginPath();c.moveTo(-16,-12);c.lineTo(16,12);c.moveTo(16,-12);c.lineTo(-16,12);c.stroke();
+  [[-16,-12],[16,12],[16,-12],[-16,12]].forEach(([a,b])=>{c.beginPath();c.arc(a,b,3.5,0,7);c.stroke()});
+  c.fillStyle=col==='#fff'?'#fff':'#fffdf6';c.strokeStyle=col;c.lineWidth=2.5;c.beginPath();c.arc(0,-2,9,0,7);c.fill();c.stroke();
+  c.fillStyle=col;c.beginPath();c.arc(-3.5,-3,2.2,0,7);c.arc(3.5,-3,2.2,0,7);c.fill();c.restore()}
+// a person standing with feet at (x,0); facing the viewer
+function person(c,x,o){const y=o.y||0;c.save();c.translate(x,y);c.lineCap='round';c.lineJoin='round';
+  const s=o.s||1;c.scale(s,s);
+  // legs
+  c.strokeStyle='#2a2230';c.lineWidth=4;c.beginPath();c.moveTo(-4,0);c.lineTo(-4,-12);c.moveTo(4,0);c.lineTo(4,-12);c.stroke();
+  if(o.dress){c.fillStyle=o.dress;c.beginPath();c.moveTo(-12,-2);c.lineTo(12,-2);c.lineTo(7,-30);c.lineTo(-7,-30);c.closePath();c.fill();c.strokeStyle='#1f1d2b';c.lineWidth=1.5;c.stroke()}
+  else{rr(c,-9,-30,18,20,4);c.fillStyle=o.shirt;c.fill();c.lineWidth=1.5;c.strokeStyle='#1f1d2b';c.stroke();
+    if(o.stripe){c.save();rr(c,-9,-30,18,20,4);c.clip();c.fillStyle=o.stripe;for(let k=-27;k<-10;k+=5)c.fillRect(-9,k,18,2.3);c.restore()}}
+  // arms
+  c.strokeStyle=o.arm||o.shirt||o.dress;c.lineWidth=5;c.beginPath();
+  if(o.wave){c.moveTo(-8,-26);c.lineTo(-17,-38);c.moveTo(8,-26);c.lineTo(15,-16)}else{c.moveTo(-8,-26);c.lineTo(-14,-14);c.moveTo(8,-26);c.lineTo(14,-14)}c.stroke();
+  c.fillStyle='#f2c79b';[[o.wave?-17:-14,o.wave?-38:-14],[14,o.wave?-16:-14]].forEach(([a,b])=>{c.beginPath();c.arc(a,b,3,0,7);c.fill()});
+  if(o.sword){c.strokeStyle='#9aa0aa';c.lineWidth=2.5;c.beginPath();c.moveTo(14,-14);c.lineTo(24,-28);c.stroke()}
+  if(o.spy){c.strokeStyle='#8a5a2b';c.lineWidth=4;c.beginPath();c.moveTo(-14,-14);c.lineTo(-24,-38);c.stroke()}
+  // head
+  if(o.hair){c.fillStyle=o.hair;c.beginPath();c.ellipse(0,-34,11,13,0,0,7);c.fill()}
+  c.fillStyle='#f2c79b';c.beginPath();c.arc(0,-38,8,0,7);c.fill();c.strokeStyle='#1f1d2b';c.lineWidth=1.2;c.stroke();
+  c.fillStyle='#1f1d2b';c.beginPath();c.arc(-3,-39,1.4,0,7);c.arc(3,-39,1.4,0,7);c.fill();
+  if(o.glasses){c.strokeStyle='#1f1d2b';c.lineWidth=1.5;c.beginPath();c.arc(-3,-39,3,0,7);c.moveTo(6,-39);c.arc(3,-39,3,0,7);c.stroke()}
+  if(o.beard){c.fillStyle=o.beard;c.beginPath();c.moveTo(-7,-36);c.quadraticCurveTo(0,-24,7,-36);c.closePath();c.fill()}
+  if(o.lips){c.fillStyle='#d62828';c.beginPath();c.arc(0,-34,1.8,0,7);c.fill()}
+  // hats
+  c.fillStyle=o.hatCol||'#1f1d2b';
+  if(o.hat==='tricorn'){c.beginPath();c.moveTo(-16,-44);c.quadraticCurveTo(0,-62,16,-44);c.quadraticCurveTo(0,-49,-16,-44);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(0,-50,2.5,0,7);c.fill();c.fillStyle='#ffc93c';c.fillRect(-16,-45,32,1.5)}
+  else if(o.hat==='bandana'){c.beginPath();c.moveTo(-9,-41);c.quadraticCurveTo(0,-52,9,-41);c.closePath();c.fill();c.beginPath();c.moveTo(8,-43);c.lineTo(14,-40);c.lineTo(9,-38);c.fill()}
+  else if(o.hat==='ears'){c.beginPath();c.moveTo(-8,-42);c.lineTo(-7,-52);c.lineTo(-2,-45);c.lineTo(2,-45);c.lineTo(7,-52);c.lineTo(8,-42);c.closePath();c.fill()}
+  else if(o.hat==='crown'){c.fillStyle='#ffc93c';c.beginPath();c.moveTo(-7,-45);c.lineTo(-7,-52);c.lineTo(-3,-48);c.lineTo(0,-54);c.lineTo(3,-48);c.lineTo(7,-52);c.lineTo(7,-45);c.closePath();c.fill()}
+  c.restore()}
+function parrot(c,x,y,col,flap){c.save();c.translate(x,y);c.fillStyle=col;c.beginPath();c.ellipse(0,0,9,11,0,0,7);c.fill();c.strokeStyle='#1f1d2b';c.lineWidth=1.2;c.stroke();
+  c.beginPath();c.ellipse(-2,-12,6,6,0,0,7);c.fill();c.stroke();c.fillStyle='#ffc93c';c.beginPath();c.moveTo(3,-13);c.lineTo(10,-10);c.lineTo(3,-8);c.fill();
+  c.fillStyle='#1f1d2b';c.beginPath();c.arc(-1,-13,1.5,0,7);c.fill();
+  c.fillStyle=col;c.save();c.rotate(flap);c.beginPath();c.ellipse(-8,0,12,5,-.6,0,7);c.fill();c.stroke();c.restore();
+  c.strokeStyle='#ffc93c';c.lineWidth=2;c.beginPath();c.moveTo(-3,11);c.lineTo(-3,16);c.moveTo(3,11);c.lineTo(3,16);c.stroke();c.restore()}
+function scribbleFire(c,t,x0,x1,y0,y1,seed){c.save();c.lineCap='round';
+  for(let k=0;k<3;k++){c.strokeStyle=k?'#ff8a1f':'#e0262b';c.lineWidth=k?2.5:3.5;c.beginPath();
+    for(let i=0;i<14;i++){const u=i/13,x=x0+(x1-x0)*((u*1.7+seed*.1+k*.17)%1),yy=y1-(y1-y0)*(.3+.7*Math.abs(Math.sin(i*1.9+k+t*9+seed)));
+      i?c.lineTo(x+Math.sin(t*20+i)*3,yy):c.moveTo(x,yy)}c.stroke()}
+  c.restore()}
+
+/* ships: dir 1 faces right, -1 faces left */
+function drawShip(sh){const c=ctx,d=sh.def,k=sh.k;c.save();c.translate(sh.x,sh.y);c.rotate(sh.tilt);c.scale(sh.dir*k,k);
+  const alpha=sh.sinkT>0?Math.max(0,1-sh.sinkT/3):1;c.globalAlpha=alpha;
+  // masts
+  c.fillStyle='#5a3416';c.strokeStyle='#2a1808';c.lineWidth=2;
+  [[-15,-215],[72,-165]].forEach(([mx,top])=>{c.fillRect(mx-8,top,16,-top);c.strokeRect(mx-8,top,16,-top)});
+  // crow's nest + ladder
+  c.strokeStyle='#5a3416';c.lineWidth=2.5;c.strokeRect(-30,-150,30,14);for(let i=-27;i<0;i+=6){c.beginPath();c.moveTo(i,-150);c.lineTo(i,-136);c.stroke()}
+  // sails: long pennants like the drawing
+  const sailFill=d.sail,ink=d.darkSail?'#cfc8d8':'#1f1d2b';
+  c.lineWidth=3;c.strokeStyle='#1f1d2b';c.fillStyle=sailFill;
+  c.beginPath();c.moveTo(-70,-228);c.quadraticCurveTo(40,-246,150,-232);c.lineTo(132,-210);c.lineTo(155,-188);c.quadraticCurveTo(40,-196,-70,-184);c.closePath();c.fill();c.stroke();
+  skull(c,30,-210,.9,ink);c.strokeStyle=ink;c.lineWidth=2.5;c.beginPath();c.arc(110,-212,8,0,Math.PI);c.stroke();
+  c.fillStyle=sailFill;c.strokeStyle='#1f1d2b';c.lineWidth=3;
+  c.beginPath();c.moveTo(30,-172);c.lineTo(150,-170);c.lineTo(138,-152);c.lineTo(152,-134);c.lineTo(30,-136);c.closePath();c.fill();c.stroke();
+  c.strokeStyle=ink;c.lineWidth=2;c.beginPath();c.moveTo(45,-166);c.lineTo(85,-142);c.moveTo(85,-166);c.lineTo(45,-142);c.moveTo(55,-168);c.lineTo(95,-140);c.stroke();
+  c.beginPath();c.arc(120,-156,7,0,Math.PI);c.stroke();
+  // flag
+  c.fillStyle=d.flag;c.beginPath();c.moveTo(-15,-215);c.lineTo(-15,-250);c.lineTo(-55,-243+Math.sin(T*6)*3);c.lineTo(-15,-236);c.fill();c.strokeStyle='#1f1d2b';c.lineWidth=1.5;c.stroke();
+  // stern cabin (striped dome)
+  c.save();c.beginPath();c.moveTo(-160,-4);c.lineTo(-160,-55);c.quadraticCurveTo(-158,-84,-110,-84);c.quadraticCurveTo(-62,-84,-60,-55);c.lineTo(-60,-4);c.closePath();
+  c.fillStyle=d.cabin||'#e9d6b4';c.fill();c.clip();c.strokeStyle=d.stripe;c.lineWidth=2.5;for(let yy=-80;yy<0;yy+=8){c.beginPath();c.moveTo(-162,yy);c.lineTo(-58,yy+1);c.stroke()}
+  c.fillStyle='#fff';c.fillRect(-128,-50,34,18);c.strokeRect(-128,-50,34,18);c.fillStyle=d.stripe;c.beginPath();c.arc(-111,-42,8,Math.PI,0);c.fill();c.restore();
+  c.strokeStyle=d.stripe;c.lineWidth=3;c.beginPath();c.moveTo(-160,-4);c.lineTo(-160,-55);c.quadraticCurveTo(-158,-84,-110,-84);c.quadraticCurveTo(-62,-84,-60,-55);c.lineTo(-60,-4);c.stroke();
+  // crew
+  sh.crew.forEach(p=>person(c,p.x,Object.assign({wave:p.wave&&Math.sin(T*6+p.x)>0},p)));
+  // hull
+  hullPath(c);c.fillStyle=d.hull;c.fill();
+  c.save();hullPath(c);c.clip();c.strokeStyle=d.stripe;c.lineWidth=3;for(let yy=4;yy<82;yy+=13){c.beginPath();c.moveTo(-170,yy);c.lineTo(170,yy);c.stroke()}
+  c.fillStyle='#f6ead2';c.fillRect(-170,14,340,20);c.strokeStyle=d.stripe;c.strokeRect(-170,14,340,20);
+  for(let px=-140;px<150;px+=26){c.strokeRect(px,15,20,18);c.fillStyle=sh.flash>0&&px>40?'#ff8a1f':'#1f1d2b';c.beginPath();c.arc(px+10,24,5,0,7);c.fill();c.fillStyle='#f6ead2'}
+  c.restore();hullPath(c);c.strokeStyle='#1f1d2b';c.lineWidth=3;c.stroke();
+  // fire on the hull, like the drawing
+  if(sh.fire>0)scribbleFire(c,T,-60,110,-4,78,sh.seed);
+  if(sh.hitFlash>0){hullPath(c);c.fillStyle='rgba(255,255,255,'+sh.hitFlash*2+')';c.fill()}
+  c.restore()}
+
+/* ---------- state ---------- */
+let state='menu',player,enemies,balls,parts,cages,sharks,birds,fleetIdx,sunk,coins,saved,hearts,spawnT,cageT,shake=0,hitCool=0;
+const input={left:false,right:false,fire:false};let fireCd=0;
+const CREW=[
+  {x:-36,shirt:'#b3202a',hat:'tricorn',beard:'#5a3416',spy:true,captain:true},
+  {x:12,shirt:'#ff7a2e',stripe:'#d62828',hat:'ears',sword:true},
+  {x:40,shirt:'#5aa93a',stripe:'#e8f7d6',hat:'bandana',sword:true},
+  {x:102,shirt:'#d62828',hat:'bandana',glasses:true,sword:true},
+  {x:134,dress:'#4f8de0',arm:'#4f8de0',hair:'#ffd23f',lips:true,hat:'crown'}
+];
+const RESCUE_SLOTS=[{x:-140,y:-84},{x:-112,y:-84},{x:-84,y:-84},{x:70,y:0},{x:-56,y:0},{x:155,y:-6}];
+const RESCUE_LOOK=[{shirt:'#4cc9e0',stripe:'#1d4fd6',hat:'bandana'},{shirt:'#ffc93c',stripe:'#f39025',hat:'ears'},{shirt:'#9c9ca3',stripe:'#5a5a62',hat:'bandana'},{shirt:'#b8457a',stripe:'#ffe6f1',hat:'ears'},{shirt:'#7cc934',stripe:'#2f6b3a',hat:'bandana'},{shirt:'#f1f1f4',stripe:'#e63946',hat:'ears'}];
+function newGame(){T=0;
+  player={x:WW*.25,y:0,tilt:0,dir:1,k:.62*KS,def:{hull:'#7a4a22',stripe:'#3d2210',sail:'#fffdf6',flag:'#1f1d2b'},crew:CREW.map(p=>Object.assign({},p)),fire:0,flash:0,hitFlash:0,seed:1,inv:0,sinkT:0};
+  enemies=[];balls=[];parts=[];cages=[];sharks=[];fleetIdx=0;sunk=0;coins=0;saved=0;hearts=5;spawnT=1.5;cageT=6;
+  for(let i=0;i<2;i++)sharks.push(newShark(rnd(WW*.3,WW),i));
+  birds=[{col:'#ff8a1f',ph:0},{col:'#3fa34d',ph:Math.PI}];updHud()}
+function newShark(x,i){return{x,dir:Math.random()<.5?-1:1,sp:rnd(55,85),jump:-1,jumpCd:rnd(4,9),flee:0,bite:0,id:i}}
+function enemyStations(){const n=enemies.filter(e=>!e.sinking).length;return n}
+function spawnEnemy(){if(fleetIdx>=FLEET.length)return;const d=FLEET[fleetIdx++];
+  const used=enemies.filter(e=>!e.sinking).map(e=>e.station);let st=rnd(WW*.64,WW-95*KS);
+  for(let tries=0;tries<10&&used.some(u=>Math.abs(u-st)<190);tries++)st=rnd(WW*.58,WW-95*KS);
+  enemies.push({def:d,x:WW+260,station:st,dir:-1,k:(d.boss?.66:.56)*KS,hp:d.boss?6:3,max:d.boss?6:3,cd:rnd(2.5,3.5),fire:0,flash:0,hitFlash:0,tilt:0,y:0,seed:Math.random()*9,sinking:false,sinkT:0,
+    crew:[{x:-36,shirt:'#3a3640',hat:'tricorn',hatCol:'#1f1d2b',beard:'#2a1808',captain:true},{x:20,shirt:d.hull,stripe:'#1f1d2b',hat:'bandana',sword:true},{x:100,shirt:'#4a4a52',stripe:d.flag,hat:'ears',sword:true}]});
+  banner('Arriva: '+d.name+'!')}
+function updHud(){document.getElementById('hearts').textContent='♥'.repeat(Math.max(0,hearts))+'♡'.repeat(Math.max(0,5-hearts));
+  document.getElementById('coins').textContent=coins;document.getElementById('sunk').textContent=sunk+'/10';document.getElementById('saved').textContent=saved}
+const bannerEl=document.getElementById('banner');let bannerT;
+function banner(t){bannerEl.hidden=false;bannerEl.textContent=t;bannerEl.classList.remove('pop');void bannerEl.offsetWidth;bannerEl.classList.add('pop');clearTimeout(bannerT);bannerT=setTimeout(()=>bannerEl.hidden=true,1800)}
+
+/* ---------- audio ---------- */
+let AC=null;
+function beep(f,d,type='square',v=.07){if(!AC)return;try{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function noise(dur,freq,vol,type='lowpass'){if(!AC)return;try{const len=Math.floor(AC.sampleRate*dur),b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+  const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();f.type=type;f.frequency.value=freq;g.gain.value=vol;s.buffer=b;s.connect(f).connect(g).connect(AC.destination);s.start()}catch(e){}}
+const boom=(v=1)=>noise(.5,420,.5*v),splash=()=>noise(.4,1500,.18,'highpass'),coinS=()=>{beep(988,.08,'square',.05);setTimeout(()=>beep(1318,.12,'square',.05),70)};
+
+/* ---------- shooting ---------- */
+const G=520;
+function shoot(from,tx,ty,flight,team){const sx=from.x+from.dir*from.k*120,sy=from.y+24*from.k;
+  balls.push({x:sx,y:sy,vx:(tx-sx)/flight,vy:(ty-sy-.5*G*flight*flight)/flight,team,from});
+  from.flash=.15;for(let i=0;i<8;i++)parts.push({x:sx,y:sy,vx:from.dir*rnd(20,90),vy:rnd(-50,10),life:.7,r:rnd(6,12),smoke:true});
+  boom(team==='p'?1:.6)}
+function playerFire(){if(fireCd>0||state!=='play')return;fireCd=.5;
+  const live=enemies.filter(e=>!e.sinking&&e.x<WW+40);const sh=sharks.filter(s=>s.flee<=0&&s.x>player.x+60&&s.x<WW);
+  let tx,ty;if(live.length){const e=live.sort((a,b)=>Math.abs(a.x-player.x)-Math.abs(b.x-player.x))[0];tx=e.x+rnd(-15,15);ty=e.y+10*e.k}
+  else if(sh.length){tx=sh[0].x;ty=wave(sh[0].x)}else{tx=player.x+420;ty=wave(player.x+420)}
+  shoot(player,tx,ty,clamp(Math.abs(tx-player.x)/620,.55,1.1),'p')}
+
+/* ---------- update ---------- */
+function update(dt){T+=dt;fireCd-=dt;hitCool-=dt;shake=Math.max(0,shake-dt*30);
+  parts.forEach(p=>{p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.grav)p.vy+=G*dt;if(p.smoke){p.vx*=.97;p.vy-=20*dt}});parts=parts.filter(p=>p.life>0);
+  birds.forEach(b=>b.ph+=dt*1.6);
+  const pl=player;
+  if(state==='play'){
+    const mv=(input.right?1:0)-(input.left?1:0);pl.x=clamp(pl.x+mv*230*dt,110*KS,WW*.48);
+    if(input.fire)playerFire();
+    spawnT-=dt;const live=enemies.filter(e=>!e.sinking).length,maxLive=fleetIdx<3?1:fleetIdx<7?2:3;
+    if(spawnT<=0&&live<maxLive&&fleetIdx<FLEET.length){spawnEnemy();spawnT=rnd(3,5)}
+    cageT-=dt;if(cageT<=0){cageT=rnd(8,13);cages.push({x:WW+60,bob:Math.random()*6,pushed:0})}
+  }
+  // ships float on the waves
+  [pl,...enemies].forEach(s=>{s.y=wave(s.x)-44*s.k+(s.sinkT>0?s.sinkT*70:0);s.tilt=slope(s.x)*.8+(s.sinkT>0?s.sinkT*.25*(s.dir):0);
+    s.flash=Math.max(0,s.flash-dt);s.hitFlash=Math.max(0,s.hitFlash-dt);s.fire=Math.max(0,s.fire-dt);
+    if(s.fire>0&&Math.random()<.5)parts.push({x:s.x+rnd(-60,60)*s.k,y:s.y+rnd(-10,30)*s.k,vx:rnd(-10,10),vy:-rnd(30,60),life:.8,r:rnd(5,10),smoke:true,dark:true})});
+  pl.inv=Math.max(0,pl.inv-dt);
+  // enemies
+  enemies.forEach(e=>{
+    if(e.sinking){e.sinkT+=dt;return}
+    if(e.x>e.station)e.x-=Math.min(120*dt,e.x-e.station);else e.x+=Math.sin(T*.6+e.seed)*12*dt;
+    if(state!=='play'||e.x>WW-40)return;
+    e.cd-=dt;if(e.cd<=0){e.cd=rnd(3.6,5.2)*(e.def.boss?.75:1);
+      const rivals=enemies.filter(o=>o!==e&&!o.sinking&&o.x<WW-40);
+      if(rivals.length&&Math.random()<.4){const o=rivals[0];e.dir=o.x>e.x?1:-1;shoot(e,o.x+rnd(-20,20),o.y+10*o.k,clamp(Math.abs(o.x-e.x)/500,.6,1.2),'e');e.dir=-1;
+        if(Math.random()<.5)banner(e.def.name.split(' ').slice(1).join(' ')+' attacca '+o.def.name.split(' ').slice(1).join(' ')+'!')}
+      else shoot(e,pl.x+rnd(-110,110),pl.y+10*pl.k,1.7,'e')}});
+  enemies=enemies.filter(e=>e.sinkT<3.2);
+  // cannonballs
+  balls.forEach(b=>{b.vy+=G*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(Math.random()<.6)parts.push({x:b.x,y:b.y,vx:0,vy:0,life:.35,r:4,smoke:true});
+    if(b.vy>0){
+      const targets=b.team==='p'?enemies.filter(e=>!e.sinking):[pl,...enemies.filter(e=>!e.sinking&&e!==b.from)];
+      for(const s of targets){if(Math.abs(b.x-s.x)<150*s.k&&b.y>s.y-30*s.k&&b.y<s.y+70*s.k){b.dead=true;hitShip(s,b);return}}
+      if(b.team==='p')for(const sh of sharks){if(sh.flee<=0&&Math.abs(b.x-sh.x)<40&&b.y>wave(sh.x)-30){b.dead=true;sh.flee=4;sh.dir=1;coins+=5;updHud();banner('Squalo scappato!');splashAt(b.x);return}}
+    }
+    if(b.y>wave(b.x)+8){b.dead=true;splashAt(b.x)}
+    if(b.x<-100||b.x>WW+300)b.dead=true});
+  balls=balls.filter(b=>!b.dead);
+  // trapped pirates in cages
+  cages.forEach(c=>{c.x-=(45+c.pushed*120)*dt;c.pushed=Math.max(0,c.pushed-dt);
+    if(state==='play'&&Math.abs(c.x-pl.x)<95*pl.k*1.6){c.dead=true;rescue(c)}
+    if(c.x<-80)c.dead=true});
+  cages=cages.filter(c=>!c.dead);
+  // sharks
+  sharks.forEach(sh=>{
+    sh.flee=Math.max(0,sh.flee-dt);sh.bite=Math.max(0,sh.bite-dt);
+    if(sh.flee>0){sh.x+=200*dt}
+    else{const cage=cages.find(c=>c.x>0&&c.x<WW);
+      if(cage){sh.dir=cage.x>sh.x?1:-1;if(Math.abs(cage.x-sh.x)<30){cage.pushed=1.2;sh.dir=-sh.dir;sh.x+=sh.dir*40}}
+            sh.x+=sh.dir*sh.sp*dt;if(sh.x<60)sh.dir=1;if(sh.x>WW-30)sh.dir=-1;
+      if(state==='play'&&sh.bite<=0&&Math.abs(sh.x-pl.x)<80*pl.k&&pl.inv<=0&&Math.random()<.02){sh.bite=9;hurtPlayer('Morso di squalo!');for(let i=0;i<8;i++)parts.push({x:sh.x,y:wave(sh.x),vx:rnd(-80,80),vy:rnd(-160,-60),life:.6,r:4,grav:true,drop:true})}}
+    if(sh.x>WW+150){sh.x=-80;sh.flee=0;sh.dir=1}
+    sh.jumpCd-=dt;if(sh.jumpCd<=0&&sh.jump<0){sh.jump=0;sh.jumpCd=rnd(6,12)}
+    if(sh.jump>=0){sh.jump+=dt;if(sh.jump>1.1){sh.jump=-1;splashAt(sh.x)}}});
+}
+function splashAt(x){splash();const y=wave(x);for(let i=0;i<12;i++)parts.push({x,y,vx:rnd(-90,90),vy:rnd(-260,-90),life:.7,r:rnd(3,6),grav:true,drop:true})}
+function hitShip(s,b){s.hitFlash=.25;boom(.8);for(let i=0;i<10;i++)parts.push({x:b.x,y:b.y,vx:rnd(-160,160),vy:rnd(-200,-40),life:.6,r:rnd(3,5),grav:true,wood:true});
+  if(s===player){hurtPlayer('Colpito!');return}
+  s.hp-=1;s.fire=Math.max(s.fire,2.5);
+  if(s.hp<=0){s.sinking=true;s.sinkT=.01;sunk++;coins+=s.def.boss?100:30;coinS();
+    for(let i=0;i<16;i++)parts.push({x:s.x,y:s.y,vx:rnd(-140,140),vy:rnd(-320,-120),life:1,r:6,grav:true,coin:true});
+    banner(s.def.name+' affondata!'+(b.team==='e'?' (dai pirati nemici)':''));updHud();
+    if(sunk>=FLEET.length)setTimeout(()=>{if(state==='play')win()},2200)}}
+function hurtPlayer(msg){const pl=player;if(pl.inv>0||state!=='play')return;hearts--;pl.inv=2.6;pl.fire=2.5;pl.hitFlash=.3;shake=10;banner(msg);updHud();
+  if(navigator.vibrate)try{navigator.vibrate(60)}catch(e){}
+  if(hearts<=0)lose()}
+function rescue(c){saved++;coins+=10;hearts=Math.min(5,hearts+1);coinS();
+  if(player.crew.length<CREW.length+RESCUE_SLOTS.length){const i=player.crew.length-CREW.length;player.crew.push(Object.assign({},RESCUE_SLOTS[i],RESCUE_LOOK[i],{wave:true}))}
+  banner('Pirata liberato!');updHud()}
+
+/* ---------- draw ---------- */
+function drawSky(){const c=ctx;const g=c.createLinearGradient(0,0,0,SEA);g.addColorStop(0,'#bfe3f7');g.addColorStop(1,'#fff6dc');c.fillStyle=g;c.fillRect(0,0,WW,SEA+40);
+  // sun
+  c.save();c.translate(WW-110,90);c.strokeStyle='#ffb000';c.lineWidth=4;c.lineCap='round';for(let i=0;i<12;i++){const a=i/12*Math.PI*2+T*.2;c.beginPath();c.moveTo(Math.cos(a)*42,Math.sin(a)*42);c.lineTo(Math.cos(a)*58,Math.sin(a)*58);c.stroke()}
+  c.fillStyle='#ffd23f';c.beginPath();c.arc(0,0,34,0,7);c.fill();c.stroke();c.restore();
+  // clouds
+  c.fillStyle='#fff';[[.15,80,1],[.5,60,.8],[.8,140,.7]].forEach(([u,y,s],i)=>{const x=((u*WW+T*12*(i+1))%(WW+200))-100;c.beginPath();c.arc(x,y,26*s,0,7);c.arc(x+28*s,y-10*s,30*s,0,7);c.arc(x+60*s,y,24*s,0,7);c.fill()});
+  // seagull
+  const gx=((T*60)%(WW+200))-100,gy=120+Math.sin(T)*20;c.strokeStyle='#1f1d2b';c.lineWidth=3;c.beginPath();c.moveTo(gx-16,gy-6*Math.sin(T*8));c.quadraticCurveTo(gx-6,gy-10,gx,gy);c.quadraticCurveTo(gx+6,gy-10,gx+16,gy-6*Math.sin(T*8));c.stroke()}
+function drawSea(front){const c=ctx;const col=front?'#2846b8':'#1d3594',off=front?18:-6;
+  c.fillStyle=col;c.beginPath();c.moveTo(-10,WH+10);for(let x=-10;x<=WW+10;x+=12)c.lineTo(x,wave(x,T+(front?.3:0))+off);c.lineTo(WW+10,WH+10);c.closePath();c.fill();
+  // marker scribbles
+  c.strokeStyle=front?'rgba(120,160,255,.55)':'rgba(70,100,200,.6)';c.lineWidth=3;c.lineCap='round';
+  for(let i=0;i<(front?26:16);i++){const x=((i*97+T*(front?30:15))%(WW+120))-60,y=wave(x)+off+12+((i*37)%Math.max(40,WH-SEA-30));c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x+14,y-8,x+28,y);c.quadraticCurveTo(x+42,y+8,x+56,y);c.stroke()}
+  if(front){c.strokeStyle='#fff';c.lineWidth=3;c.beginPath();for(let x=-10;x<=WW+10;x+=12){const y=wave(x,T+.3)+off;x<0?c.moveTo(x,y):c.lineTo(x,y)}c.stroke()}}
+function drawCage(cg){const c=ctx,x=cg.x,y=wave(x)-6+Math.sin(T*3+cg.bob)*3;c.save();c.translate(x,y);c.rotate(slope(x));
+  c.fillStyle='#8a5a2b';c.fillRect(-34,0,68,10);c.strokeStyle='#3d2210';c.lineWidth=2;c.strokeRect(-34,0,68,10);
+  person(c,0,{shirt:'#ff7a2e',stripe:'#fff',hat:'bandana',wave:Math.sin(T*8)>0,s:.95});
+  c.strokeStyle='#5a3416';c.lineWidth=3.5;for(let i=-24;i<=24;i+=8){c.beginPath();c.moveTo(i,0);c.lineTo(i,-56);c.stroke()}
+  c.beginPath();c.moveTo(-28,-56);c.lineTo(28,-56);c.stroke();
+  // speech bubble
+  c.fillStyle='#fff';c.strokeStyle='#1f1d2b';c.lineWidth=2;rr(c,10,-96,62,26,10);c.fill();c.stroke();c.fillStyle='#1f1d2b';c.font='bold 14px '+getComputedStyle(document.documentElement).getPropertyValue('--display');c.textAlign='center';c.fillText('AIUTO!',41,-78);
+  c.restore()}
+function drawShark(sh){const c=ctx;let x=sh.x,y=wave(x)+4;c.save();
+  if(sh.jump>=0){const u=sh.jump/1.1,h=Math.sin(u*Math.PI)*90;c.translate(x+sh.dir*u*60,y-h);c.rotate(sh.dir*(u-.5)*1.4);c.scale(sh.dir,1);
+    c.fillStyle='#7d8a99';c.strokeStyle='#1f1d2b';c.lineWidth=2.5;c.beginPath();c.moveTo(-40,0);c.quadraticCurveTo(0,-22,40,0);c.quadraticCurveTo(0,18,-40,0);c.fill();c.stroke();
+    c.beginPath();c.moveTo(-40,0);c.lineTo(-56,-14);c.lineTo(-52,0);c.lineTo(-56,14);c.closePath();c.fill();c.stroke();
+    c.beginPath();c.moveTo(-4,-12);c.lineTo(6,-30);c.lineTo(14,-10);c.fill();c.stroke();
+    c.fillStyle='#fff';c.beginPath();c.moveTo(18,4);c.lineTo(36,2);c.lineTo(20,10);c.fill();c.fillStyle='#1f1d2b';c.beginPath();c.arc(26,-4,2.5,0,7);c.fill()}
+  else{c.translate(x,y);c.scale(sh.dir,1);c.fillStyle='#7d8a99';c.strokeStyle='#1f1d2b';c.lineWidth=2.5;c.beginPath();c.moveTo(-14,4);c.quadraticCurveTo(-4,-30,14,-34);c.quadraticCurveTo(6,-12,16,4);c.closePath();c.fill();c.stroke();
+    c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=2;c.beginPath();c.moveTo(-26,6);c.quadraticCurveTo(-18,0,-10,6);c.stroke()}
+  c.restore()}
+function render(){const c=ctx;c.setTransform(DPR,0,0,DPR,0,0);c.clearRect(0,0,W,H);c.save();c.scale(S,S);
+  if(shake>0&&!reduce)c.translate(rnd(-shake,shake),rnd(-shake,shake));
+  drawSky();drawSea(false);
+  sharks.forEach(sh=>{if(sh.jump<0)drawShark(sh)});
+  enemies.forEach(drawShip);if(state!=='menu'||true){if(!(player.inv>0&&Math.floor(player.inv*10)%2))drawShip(player)}
+  // parrots flying around the player's sails
+  birds.forEach((b,i)=>{const px=player.x+Math.cos(b.ph)*90*player.k*1.6+(i?20:-20),py=player.y-250*player.k+Math.sin(b.ph*1.3)*30;parrot(c,px,py,b.col,Math.sin(T*14+i)*.6)});
+  cages.forEach(drawCage);
+  drawSea(true);
+  sharks.forEach(sh=>{if(sh.jump>=0)drawShark(sh)});
+  balls.forEach(b=>{c.fillStyle='#1f1d2b';c.beginPath();c.arc(b.x,b.y,7,0,7);c.fill();c.fillStyle='rgba(255,255,255,.5)';c.beginPath();c.arc(b.x-2,b.y-2,2,0,7);c.fill()});
+  parts.forEach(p=>{c.globalAlpha=Math.min(1,p.life*1.6);
+    c.fillStyle=p.coin?'#ffc93c':p.wood?'#7a4a22':p.drop?'#bfe3ff':p.dark?'#3a3438':p.smoke?'#e8e4dc':'#fff';
+    c.beginPath();if(p.coin){c.ellipse(p.x,p.y,p.r,p.r*Math.abs(Math.cos(T*10+p.x)),0,0,7)}else c.arc(p.x,p.y,p.smoke?p.r*(2-p.life):p.r,0,7);c.fill();
+    if(p.coin){c.strokeStyle='#b07a00';c.lineWidth=1.5;c.stroke()}});
+  c.globalAlpha=1;c.restore()}
+
+/* ---------- loop & flow ---------- */
+let last=0;function loop(t){const dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);render();requestAnimationFrame(loop)}
+const menu=document.getElementById('menu'),end=document.getElementById('end'),hud=document.getElementById('hud'),controls=document.getElementById('controls');
+const touch=matchMedia('(pointer:coarse)').matches;
+function start(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){AC=null}
+  newGame();state='play';menu.hidden=true;end.hidden=true;hud.hidden=false;controls.hidden=false;Object.keys(input).forEach(k=>input[k]=false);
+  banner('Salpiamo!');beep(523,.12,'triangle');setTimeout(()=>beep(784,.2,'triangle'),140)}
+function finish(title,text){state='over';controls.hidden=true;Object.keys(input).forEach(k=>input[k]=false);
+  document.getElementById('endTitle').textContent=title;document.getElementById('endText').textContent=text;
+  document.getElementById('endStats').innerHTML='';[['Navi affondate',sunk+'/10'],['Pirati liberati',saved],['Monete',coins]].forEach(([a,b])=>{const s=document.createElement('span');s.textContent=a+': '+b;document.getElementById('endStats').append(s)});
+  setTimeout(()=>{end.hidden=false},900)}
+function win(){finish('HAI VINTO! 🏴‍☠️','Il capitano e sua moglie hanno sconfitto tutte le 10 navi pirata. Il tesoro è vostro!');[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.25,'triangle'),i*170))}
+function lose(){player.sinkT=.01;finish('La nave è affondata!','Bravo, hai combattuto da vero pirata! Riprova a sconfiggere tutte le navi.')}
+document.getElementById('go').addEventListener('click',start);
+document.getElementById('again').addEventListener('click',start);
+const KEYS={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',' ':'fire',ArrowUp:'fire'};
+addEventListener('keydown',e=>{if(KEYS[e.key]){input[KEYS[e.key]]=true;e.preventDefault()}if(e.key==='Enter'&&state!=='play')start()});
+addEventListener('keyup',e=>{if(KEYS[e.key])input[KEYS[e.key]]=false});
+addEventListener('blur',()=>Object.keys(input).forEach(k=>input[k]=false));
+cvs.addEventListener('pointerdown',()=>{if(state==='play')playerFire()});
+document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
+  b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}input[k]=true;b.classList.add('on');if(k==='fire')playerFire()});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>{input[k]=false;b.classList.remove('on')}));
+  b.addEventListener('contextmenu',e=>e.preventDefault())});
+// demo scene behind the menu
+newGame();spawnEnemy();bannerEl.hidden=true;enemies[0].x=WW*.75;cages.push({x:WW*.5,bob:0,pushed:0});
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>
