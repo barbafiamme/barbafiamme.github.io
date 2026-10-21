@@ -32,7 +32,7 @@
 .bfcl label{font-weight:700;font-size:16px}
 .bfcl input{width:5.2em;font:inherit;font-size:24px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;text-align:center;padding:6px 4px;border:3px solid currentColor;border-radius:10px;background:transparent;color:inherit}
 .bfcl button{font:inherit;font-weight:800;font-size:16px;padding:8px 16px;border:3px solid currentColor;border-radius:10px;background:#ffc93c;color:#1f1d2b;cursor:pointer}
-.bfcl ol{margin:0;padding:0 4px 0 0;list-style:none;display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums;max-height:300px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
+.bfcl ol{margin:0;padding:0 4px 0 0;list-style:none;display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums}
 .bfcl li{display:grid;grid-template-columns:2.2em 1fr auto;gap:8px;align-items:center;padding:4px 10px;border:2px solid currentColor;border-radius:10px;font-size:16px}
 .bfcl li.me{background:#ffc93c;color:#1f1d2b;font-weight:800}
 .bfcl li b{letter-spacing:.15em}
