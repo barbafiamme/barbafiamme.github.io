@@ -101,7 +101,7 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .lb{border:3px solid var(--c);border-radius:14px;padding:12px 12px 14px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px;min-width:0}
 .lb h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1;color:var(--c)}
 .lb small{font-size:13px;font-weight:700;color:#a99fd0;text-transform:uppercase;letter-spacing:.08em}
-.lb ol{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lb ol{list-style:none;margin:6px 0 0;padding:0 4px 0 0;display:flex;flex-direction:column;gap:6px;max-height:430px;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:var(--c) transparent}
 .lb li{display:grid;grid-template-columns:2em 1fr auto;align-items:center;gap:8px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:12px;padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.06)}
 .lb li:first-child{background:rgba(255,201,60,.18);font-size:13px}
 .lb li .m{font-size:18px;font-family:system-ui,sans-serif;text-align:center}
@@ -250,9 +250,9 @@ body.playing{overflow:hidden}
       </div>
     </div>
     <div class="boards">
-      <div class="lb" data-g="pirati" style="--c:#ff8a5c"><h3>Pirati</h3><small>più monete</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
-      <div class="lb" data-g="granpremio" style="--c:#ffc93c"><h3>Gran Premio</h3><small>tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
-      <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="pirati" style="--c:#ff8a5c"><h3>Pirati</h3><small>primi 20 · più monete</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="granpremio" style="--c:#ffc93c"><h3>Gran Premio</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>primi 20 · più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
     </div>
     <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
   </section>
@@ -352,7 +352,7 @@ body.playing{overflow:hidden}
 <script>
 (()=>{const C=window.Classifica;if(!C)return;
   document.querySelectorAll('.lb').forEach(async lb=>{const g=lb.dataset.g,ol=lb.querySelector('ol');
-    try{const rows=await C.top(g,5);ol.innerHTML='';
+    try{const rows=await C.top(g,20);ol.innerHTML='';
       if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
       rows.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
         li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g].fmt(r.score);ol.append(li)})}

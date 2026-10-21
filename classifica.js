@@ -32,7 +32,7 @@
 .bfcl label{font-weight:700;font-size:16px}
 .bfcl input{width:5.2em;font:inherit;font-size:24px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;text-align:center;padding:6px 4px;border:3px solid currentColor;border-radius:10px;background:transparent;color:inherit}
 .bfcl button{font:inherit;font-weight:800;font-size:16px;padding:8px 16px;border:3px solid currentColor;border-radius:10px;background:#ffc93c;color:#1f1d2b;cursor:pointer}
-.bfcl ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums}
+.bfcl ol{margin:0;padding:0 4px 0 0;list-style:none;display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums;max-height:300px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
 .bfcl li{display:grid;grid-template-columns:2.2em 1fr auto;gap:8px;align-items:center;padding:4px 10px;border:2px solid currentColor;border-radius:10px;font-size:16px}
 .bfcl li.me{background:#ffc93c;color:#1f1d2b;font-weight:800}
 .bfcl li b{letter-spacing:.15em}
@@ -40,7 +40,7 @@
 .bfcl .err{color:#e63946;font-weight:700;margin:0}`;document.head.append(s)}
   function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
   async function renderList(box,g,mine){const ol=document.createElement('ol');box.querySelectorAll('ol,.err,.empty').forEach(n=>n.remove());
-    try{const rows=await top(g,10);
+    try{const rows=await top(g,20);
       if(!rows.length){const p=document.createElement('p');p.className='note empty';p.textContent='Ancora nessun punteggio: sii il primo!';box.append(p);return}
       let marked=false;rows.forEach((r,i)=>{const li=document.createElement('li');if(mine&&!marked&&r.name===mine.name&&r.score===mine.score){li.className='me';marked=true}
         li.innerHTML='<span class="rank">'+(i+1)+'°</span><b>'+esc(r.name)+'</b><span>'+esc(GAMES[g].fmt(r.score))+'</span>';ol.append(li)});box.append(ol)}
