@@ -113,12 +113,14 @@ h2{font-size:clamp(26px,6vw,38px)}
     <p class="stars" id="stars"></p>
     <div id="podium"></div>
     <ol id="results"></ol>
+    <div id="board"></div>
     <div class="row"><button class="btn" id="again">Gioca ancora!</button><button class="btn ghost" id="change">Cambia auto</button></div>
   </div>
 </section>
 
 <div id="toast" hidden></div>
 <canvas id="confetti" hidden></canvas>
+<script src="../classifica.js"></script>
 <script>
 (()=>{
 const ROSTER=[
@@ -493,6 +495,7 @@ function showEnd(){const r=ranking(),me=r.indexOf(player)+1;
     const p=document.createElement('span');p.className='p';p.textContent=(i+1)+'°';
     const n=document.createElement('span');const sw=document.createElement('i');sw.style.background=c.d.body;n.append(sw,c.d.name+(c===player?' (tu)':''));
     const t=document.createElement('span');t.className='t';t.textContent=c.done?c.time.toFixed(2)+' s':'in arrivo';li.append(p,n,t);ol.append(li)});
+  if(window.Classifica&&player.done)Classifica.mount(document.getElementById('board'),'granpremio',Math.round(player.time*100));
   end.hidden=false;controls.hidden=true}
 document.getElementById('go').addEventListener('click',start);
 document.getElementById('again').addEventListener('click',start);

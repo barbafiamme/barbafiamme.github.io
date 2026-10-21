@@ -32,6 +32,7 @@ canvas{display:block;width:100%;height:100%}
 .colori button{width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;box-shadow:0 0 12px currentColor}
 .colori button[aria-pressed="true"]{border-color:#fff;transform:scale(1.12)}
 .btn{font-family:var(--display);font-size:20px;letter-spacing:.06em;background:linear-gradient(180deg,#ffd769,#f0a61e);color:#1a1000;border:none;border-radius:4px;padding:12px 16px;cursor:pointer;box-shadow:0 0 18px rgba(255,201,74,.45)}
+#fine{overflow-y:auto;align-items:flex-start;touch-action:pan-y}#fine .sheet{margin:auto 0}
 .record{font-family:var(--display);color:var(--holo);font-size:15px}
 </style>
 
@@ -69,6 +70,7 @@ canvas{display:block;width:100%;height:100%}
       <p id="fineTesto"></p>
       <div class="record" id="recordFine"></div>
       <button class="btn" id="ancora" type="button">Nuova missione</button>
+      <div id="board"></div>
     </div>
   </div>
 
@@ -81,6 +83,7 @@ canvas{display:block;width:100%;height:100%}
   </div>
 </div>
 
+<script src="../classifica.js"></script>
 <script>
 (()=>{
 const cv=document.getElementById('c'), ctx=cv.getContext('2d');
@@ -448,7 +451,7 @@ function loop(ts){
 function start(){newGame();$('start').hidden=true;$('fine').hidden=true;running=true;paused=false;last=performance.now();hud()}
 function gameOver(){running=false;const best=Math.max(loadBest(),state.score);saveBest(best);
   $('fineTesto').textContent=`Hai fatto ${state.score} punti e sei arrivato all'ondata ${state.level}.`+(state.dragons?` Draghi sconfitti: ${state.dragons}.`:'');
-  $('recordFine').textContent='Record: '+best;setTimeout(()=>{$('fine').hidden=false},900)}
+  $('recordFine').textContent='Record: '+best;if(window.Classifica)Classifica.mount(document.getElementById('board'),'squadriglia',state.score);setTimeout(()=>{$('fine').hidden=false},900)}
 
 $('via').onclick=start;$('ancora').onclick=start;
 $('pausa').onclick=()=>{if(!running)return;paused=true;$('pausaOv').hidden=false};
