@@ -82,26 +82,35 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 #zoom img{display:block;width:auto;height:auto;max-width:100%;max-height:72vh;border:4px solid var(--paper);box-shadow:6px 6px 0 #000}
 #zoom p{margin:0;color:var(--paper);font-size:18px;font-weight:700;text-align:center;max-width:52ch}
 #zoom .close{position:static}
-.board-sec{display:flex;flex-direction:column;gap:12px;max-width:560px;width:100%;align-self:center}
-.board-sec h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,6vw,36px);line-height:1.05;margin:0}
-.board-sec>p{margin:0;font-size:17px;font-weight:600;color:var(--muted)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap}
-.tabs button{font:inherit;font-weight:800;font-size:16px;padding:6px 14px;border:3px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
-.tabs button[aria-selected="true"]{background:var(--sun)}
-.tabs button:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
-.board-box{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 6px 0 var(--ink);padding:14px 16px 16px;color:var(--ink)}
-.arcade{align-self:center;width:100%;max-width:520px;background:#14111f;border:4px solid var(--ink);border-radius:18px;box-shadow:6px 7px 0 var(--ink);padding:14px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:12px;color:#ffe9a8;font-family:'Press Start 2P',ui-monospace,monospace}
-.arcade .screen{position:relative;width:100%;box-sizing:border-box;background:radial-gradient(ellipse at center,#1d1838 0%,#07060d 85%);border:3px solid #3a3360;border-radius:12px;padding:16px 10px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;overflow:hidden}
-.arcade .screen::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px);pointer-events:none}
-.arcade .hi{font-size:clamp(11px,3.2vw,14px);letter-spacing:.12em;color:#ff4f6d;text-shadow:0 0 6px rgba(255,79,109,.8)}
-.arcade .digits{display:flex;gap:6px;flex-wrap:nowrap}
-.arcade .digits span{width:clamp(30px,9vw,46px);height:clamp(42px,12vw,62px);display:flex;align-items:center;justify-content:center;background:#0b0a12;border:2px solid #2c2748;border-radius:6px;font-size:clamp(18px,6vw,30px);color:#ffb400;text-shadow:0 0 8px rgba(255,180,0,.9),0 0 18px rgba(255,120,0,.6);font-variant-numeric:tabular-nums}
-.arcade .digits.off span{color:#5a4a20;text-shadow:none}
-.arcade .msg{font-size:clamp(8px,2.4vw,11px);line-height:1.6;text-align:center;color:#7fe3ff;text-shadow:0 0 6px rgba(127,227,255,.7)}
-.arcade .blink{animation:blink 1s steps(2,start) infinite}
+.sec-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1;margin:6px 0 -8px}
+.hof{position:relative;background:#14111f;color:#ffe9a8;border:4px solid var(--ink);border-radius:22px;box-shadow:7px 8px 0 var(--ink);padding:22px clamp(14px,3vw,26px) 16px;display:flex;flex-direction:column;gap:18px;overflow:hidden}
+.hof::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 4px);pointer-events:none;border-radius:18px}
+.hof-top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between}
+.hof-head{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 280px}
+.hof-title{margin:0;font-family:'Press Start 2P',ui-monospace,monospace;font-weight:400;font-size:clamp(18px,4.4vw,30px);line-height:1.2;color:#ff4f6d;text-shadow:0 0 10px rgba(255,79,109,.75),3px 3px 0 #000}
+.hof-sub{margin:0;font-size:17px;font-weight:700;color:#cfc6ff;max-width:46ch}
+.counter{display:flex;flex-direction:column;align-items:center;gap:8px;background:#07060d;border:3px solid #3a3360;border-radius:14px;padding:10px 14px;flex:0 1 auto}
+.hi{font-family:'Press Start 2P',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;color:#ff4f6d;text-shadow:0 0 6px rgba(255,79,109,.8)}
+.digits{display:flex;gap:5px}
+.digits span{width:clamp(26px,7vw,40px);height:clamp(38px,10vw,54px);display:flex;align-items:center;justify-content:center;background:#0b0a12;border:2px solid #2c2748;border-radius:6px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:clamp(16px,4.6vw,24px);color:#ffb400;text-shadow:0 0 8px rgba(255,180,0,.9),0 0 18px rgba(255,120,0,.6)}
+.digits.off span{color:#5a4a20;text-shadow:none}
+.msg{font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;line-height:1.6;text-align:center;color:#7fe3ff;text-shadow:0 0 6px rgba(127,227,255,.7);max-width:280px}
+.blink{animation:blink 1s steps(2,start) infinite}
 @keyframes blink{to{visibility:hidden}}
-.arcade .coin{font-size:9px;color:#a99fd0;letter-spacing:.1em}
-@media (prefers-reduced-motion:reduce){.arcade .blink{animation:none}}
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.lb{border:3px solid var(--c);border-radius:14px;padding:12px 12px 14px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px;min-width:0}
+.lb h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1;color:var(--c)}
+.lb small{font-size:13px;font-weight:700;color:#a99fd0;text-transform:uppercase;letter-spacing:.08em}
+.lb ol{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lb li{display:grid;grid-template-columns:2em 1fr auto;align-items:center;gap:8px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:12px;padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.06)}
+.lb li:first-child{background:rgba(255,201,60,.18);font-size:13px}
+.lb li .m{font-size:18px;font-family:system-ui,sans-serif;text-align:center}
+.lb li b{font-weight:400;letter-spacing:.12em;color:#fff}
+.lb li .v{color:#ffb400;text-shadow:0 0 6px rgba(255,180,0,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lb li.empty{display:block;text-align:center;font-size:10px;line-height:1.7;color:#7fe3ff;background:none}
+.coin{position:relative;z-index:1;font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;color:#a99fd0;letter-spacing:.08em;text-align:center}
+@media (prefers-reduced-motion:reduce){.blink{animation:none}}
+@media (max-width:560px){.counter{width:100%;box-sizing:border-box}}
 footer{font-size:15px;color:var(--muted);font-weight:600}
 /* player */
 #player{position:fixed;inset:0;background:#000;z-index:10;display:flex;flex-direction:column}
@@ -142,6 +151,7 @@ body.playing{overflow:hidden}
     <p class="lead">I videogiochi nati dai disegni di Agostino. Scegline uno e premi Gioca: funzionano sul telefono e sul computer.</p>
   </header>
 
+  <h2 class="sec-title">Scegli il tuo gioco</h2>
   <main class="grid">
     <article class="card">
       <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Pista ovale con le auto in gara">
@@ -227,6 +237,27 @@ body.playing{overflow:hidden}
     </article>
   </main>
 
+  <section class="hof" aria-labelledby="hof-title">
+    <div class="hof-top">
+      <div class="hof-head">
+        <h2 class="hof-title" id="hof-title">SALA DEI RECORD</h2>
+        <p class="hof-sub">Fai una partita e scrivi le tue iniziali: entri nella classifica di tutto il mondo!</p>
+      </div>
+      <div class="counter">
+        <div class="hi">VISITE</div>
+        <div class="digits off" id="visits" role="status" aria-live="polite" aria-label="Numero di visite"><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div>
+        <div class="msg" id="visitMsg"><span class="blink">CARICAMENTO...</span></div>
+      </div>
+    </div>
+    <div class="boards">
+      <div class="lb" data-g="pirati" style="--c:#ff8a5c"><h3>Pirati</h3><small>più monete</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="granpremio" style="--c:#ffc93c"><h3>Gran Premio</h3><small>tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+    </div>
+    <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
+  </section>
+
+
   <section class="gallery" aria-labelledby="gal-title">
     <div class="gal-head">
       <h2 id="gal-title">I disegni di Agostino</h2>
@@ -255,26 +286,6 @@ body.playing{overflow:hidden}
       <button class="nav next" id="next" type="button" aria-label="Disegno successivo">▶</button>
       <div class="dots" id="dots"></div>
     </div>
-  </section>
-
-  <section class="board-sec" aria-labelledby="board-title">
-    <h2 id="board-title">Classifica dei campioni</h2>
-    <p>Chi è stato il più bravo? Alla fine di ogni partita scrivi le tue iniziali per entrare in classifica.</p>
-    <div class="tabs" role="tablist">
-      <button type="button" role="tab" data-g="pirati" aria-selected="true">Pirati</button>
-      <button type="button" role="tab" data-g="granpremio" aria-selected="false">Gran Premio</button>
-      <button type="button" role="tab" data-g="squadriglia" aria-selected="false">Squadriglia</button>
-    </div>
-    <div class="board-box" id="hubBoard" role="tabpanel"></div>
-  </section>
-
-  <section class="arcade" aria-labelledby="hi-title">
-    <div class="screen">
-      <div class="hi" id="hi-title">HI-SCORE VISITE</div>
-      <div class="digits off" id="visits" role="status" aria-live="polite" aria-label="Numero di visite"><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div>
-      <div class="msg" id="visitMsg"><span class="blink">CARICAMENTO...</span></div>
-    </div>
-    <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
   </section>
 
   <footer>Disegni e idee di Agostino, giochi costruiti insieme a papà.</footer>
@@ -339,9 +350,13 @@ body.playing{overflow:hidden}
 
 <script src="classifica.js"></script>
 <script>
-(()=>{const box=document.getElementById('hubBoard'),tabs=[...document.querySelectorAll('.tabs [data-g]')];
-  function show(g){tabs.forEach(t=>t.setAttribute('aria-selected',t.dataset.g===g));if(window.Classifica)Classifica.mount(box,g,null)}
-  tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.g)));show('pirati')})();
+(()=>{const C=window.Classifica;if(!C)return;
+  document.querySelectorAll('.lb').forEach(async lb=>{const g=lb.dataset.g,ol=lb.querySelector('ol');
+    try{const rows=await C.top(g,5);ol.innerHTML='';
+      if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
+      rows.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
+        li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g].fmt(r.score);ol.append(li)})}
+    catch(e){ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA<br>RIPROVA PIÙ TARDI</li>'}})})();
 </script>
 </body>
 </html>
