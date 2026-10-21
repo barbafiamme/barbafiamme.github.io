@@ -3,8 +3,8 @@
    altrimenti usa una classifica solo su questo dispositivo. */
 (function(){
   const CONFIG={
-    url:'',      // es. https://xxxx.supabase.co
-    key:''       // chiave pubblica "anon" del progetto
+    url:'https://fpiyvbkfmdparvhljbgf.supabase.co',
+    key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwaXl2YmtmbWRwYXJ2aGxqYmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MDI3MzYsImV4cCI6MjEwODE3ODczNn0.iDh3xal5H3UcXld0GJy4q6zu8cnnqLOk34JMa3Ofwbw' // chiave pubblica "anon": va bene che sia visibile
   };
   const GAMES={
     granpremio:{title:'Gran Premio dei Disegni',unit:'tempo',asc:true,fmt:v=>(v/100).toFixed(2)+' s'},
