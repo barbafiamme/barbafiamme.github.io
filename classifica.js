@@ -11,12 +11,16 @@
     squadriglia:{title:'Squadriglia contro il Buio',unit:'punti',asc:false,fmt:v=>v+' punti'},
     pirati:{title:"Pirati all'Arrembaggio",unit:'monete',asc:false,fmt:v=>v+' monete'}
   };
+  // giochi dei Piccoli Inventori: si registrano da soli con il loro slug
+  function register(g,o){o=o||{};if(!/^[a-z0-9-]{1,60}$/.test(g))return;const u=o.unit||'punti';
+    GAMES[g]={title:o.title||g,unit:u,asc:!!o.asc,fmt:u==='tempo'?(v=>(v/100).toFixed(2)+' s'):(v=>v+' '+u)}}
+  const ensure=g=>{if(!GAMES[g])register(g,{})};
   const online=!!(CONFIG.url&&CONFIG.key);
   const LS='bf_classifica_';
   function localGet(g){try{return JSON.parse(localStorage.getItem(LS+g)||'[]')}catch(e){return[]}}
   function localSet(g,a){try{localStorage.setItem(LS+g,JSON.stringify(a))}catch(e){}}
-  function sortRows(g,a){const asc=GAMES[g].asc;return a.slice().sort((x,y)=>asc?x.score-y.score:y.score-x.score)}
-  async function top(g,n=10){
+  function sortRows(g,a){ensure(g);const asc=GAMES[g].asc;return a.slice().sort((x,y)=>asc?x.score-y.score:y.score-x.score)}
+  async function top(g,n=10){ensure(g);
     if(online){const r=await fetch(CONFIG.url+'/rest/v1/scores?select=name,score,created_at&game=eq.'+g+'&order=score.'+(GAMES[g].asc?'asc':'desc')+'&limit='+n,
         {headers:{apikey:CONFIG.key,Authorization:'Bearer '+CONFIG.key}});if(!r.ok)throw new Error('lettura');return r.json()}
     return sortRows(g,localGet(g)).slice(0,n)}
@@ -45,7 +49,7 @@
       let marked=false;rows.forEach((r,i)=>{const li=document.createElement('li');if(mine&&!marked&&r.name===mine.name&&r.score===mine.score){li.className='me';marked=true}
         li.innerHTML='<span class="rank">'+(i+1)+'°</span><b>'+esc(r.name)+'</b><span>'+esc(GAMES[g].fmt(r.score))+'</span>';ol.append(li)});box.append(ol)}
     catch(e){const p=document.createElement('p');p.className='err';p.textContent='La classifica non risponde. Riprova più tardi.';box.append(p)}}
-  function mount(el,g,score){css();if(!el||!GAMES[g])return;el.innerHTML='';const box=document.createElement('div');box.className='bfcl';el.append(box);
+  function mount(el,g,score){css();ensure(g);if(!el||!GAMES[g])return;el.innerHTML='';const box=document.createElement('div');box.className='bfcl';el.append(box);
     box.innerHTML='<h3>'+(online?'Classifica mondiale':'Classifica')+'</h3>'+(online?'':'<p class="note">Per ora la classifica è salvata solo su questo dispositivo.</p>');
     if(score!=null&&score>0){const f=document.createElement('form');const id='bfcl-'+g;
       f.innerHTML='<label for="'+id+'">Le tue iniziali</label><input id="'+id+'" maxlength="3" autocomplete="off" autocapitalize="characters" spellcheck="false" required placeholder="AAA"><button type="submit">Salva '+esc(GAMES[g].fmt(score))+'</button>';
@@ -59,5 +63,5 @@
         catch(err){btn.disabled=false;btn.textContent='Riprova';}});
       box.append(f)}
     renderList(box,g,null)}
-  window.Classifica={mount,top,submit,GAMES,online,config:{url:CONFIG.url,key:CONFIG.key}};
+  window.Classifica={mount,top,submit,register,GAMES,online,config:{url:CONFIG.url,key:CONFIG.key}};
 })();
