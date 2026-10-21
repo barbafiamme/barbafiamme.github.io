@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Piccoli Inventori · Barbafiamme</title>
+<meta name="description" content="I videogiochi nati dai disegni dei bambini amici di Barbafiamme.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: a second corkboard, greener than Barbafiamme's, with one cartridge-like card per child's game */
+:root{
+  --paper:#fffdf6; --ink:#1f1d2b; --sun:#ffc93c; --leaf:#7cc934; --red:#e63946; --muted:#5f5b74; --board:#e3eccb; --dot:#cbd9a8;
+  --display:'Bungee',Impact,'Arial Black',sans-serif; --body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--board);background-image:radial-gradient(var(--dot) 1.4px,transparent 1.6px);background-size:22px 22px;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.4}
+body.playing{overflow:hidden}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:22px}
+.toplinks{display:flex;gap:10px;flex-wrap:wrap}
+.back,.btn{font:inherit;font-weight:800;color:var(--ink);text-decoration:none;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;display:inline-block}
+.btn.big{font-family:var(--display);font-weight:400;font-size:20px;background:var(--red);color:#fff;padding:10px 20px}
+.back:focus-visible,.btn:focus-visible,.play:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+header{display:flex;flex-direction:column;gap:8px}
+.tag{align-self:flex-start;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:3px 12px;border-radius:999px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(36px,10vw,72px);line-height:.95;margin:0;text-wrap:balance}
+h1 .a{color:#2f7a3a;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
+h1 .b{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-block;transform:rotate(-2deg)}
+.lead{margin:0;font-size:19px;font-weight:600;color:var(--muted);max-width:58ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:24px}
+.card{background:var(--paper);border:3px solid var(--ink);border-radius:20px 16px 22px 14px;box-shadow:6px 7px 0 var(--ink);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.card .shot{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-bottom:3px solid var(--ink);background:#fff}
+.card .body{padding:14px 16px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h2{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.05;margin:0}
+.card .by{margin:0;font-weight:800;color:#2f7a3a}
+.card p.desc{margin:0}
+.play{margin-top:auto;align-self:flex-start;font-family:var(--display);font-size:20px;background:var(--leaf);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:10px 20px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.empty{background:var(--paper);border:3px dashed var(--ink);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.empty h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,5vw,30px);margin:0;line-height:1.05}
+.empty p{margin:0}
+.maker{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;background:var(--sun);border:4px solid var(--ink);border-radius:20px 16px 22px 18px;box-shadow:6px 7px 0 var(--ink);padding:16px 20px}
+.maker h2{font-family:var(--display);font-weight:400;font-size:clamp(20px,4.5vw,28px);margin:0;line-height:1.05}
+.maker p{margin:4px 0 0;font-weight:600}
+.maker div:first-child{flex:1 1 280px;min-width:0}
+#player{position:fixed;inset:0;background:#000;z-index:10;display:flex}
+#player iframe{flex:1;width:100%;height:100%;border:0;background:#000}
+#player .close{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 8px);width:48px;height:48px;border-radius:50%;border:3px solid var(--ink);background:var(--paper);box-shadow:3px 3px 0 var(--ink);font-size:24px;line-height:1;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
+footer{font-size:15px;color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="toplinks"><a class="back" href="./">← Barbafiamme</a><a class="back" href="anteprima.html">I miei giochi</a></div>
+  <header>
+    <span class="tag">I giochi degli amici di Barbafiamme</span>
+    <h1><span class="a">Piccoli</span> <span class="b">Inventori</span></h1>
+    <p class="lead">Ogni gioco qui è nato dal disegno di un bambino o di una bambina. Scegline uno e premi Gioca!</p>
+  </header>
+
+  <main class="grid" id="grid" aria-live="polite"></main>
+
+  <section class="maker" aria-labelledby="mk">
+    <div><h2 id="mk">Vuoi il tuo gioco qui?</h2><p>Manda il tuo disegno con la tua idea: diventa un videogioco tutto tuo.</p></div>
+    <a class="btn big" href="crea.html">✏️ Crea il tuo gioco</a>
+  </section>
+
+  <footer>Ogni gioco viene controllato prima di comparire in questa pagina.</footer>
+</div>
+
+<div id="player" hidden>
+  <iframe id="frame" title="Gioco" allow="autoplay; fullscreen"></iframe>
+  <button class="close" id="close" type="button" aria-label="Torna ai giochi">⌂</button>
+</div>
+
+<script>
+(()=>{
+  const grid=document.getElementById('grid'),player=document.getElementById('player'),frame=document.getElementById('frame');
+  const safe=/^[a-z0-9-]{1,60}$/;
+  function open(slug){frame.src='giochi-amici/'+slug+'.html';player.hidden=false;document.body.classList.add('playing')}
+  function close(){player.hidden=true;frame.src='about:blank';document.body.classList.remove('playing')}
+  document.getElementById('close').addEventListener('click',close);
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!player.hidden)close()});
+  function empty(){grid.innerHTML='<div class="empty"><h2>Ancora nessun gioco… per ora!</h2><p>Il primo potrebbe essere il tuo: manda un disegno e una idea.</p><a class="btn big" href="crea.html">✏️ Crea il tuo gioco</a></div>'}
+  fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{
+    list=(Array.isArray(list)?list:[]).filter(g=>g&&safe.test(g.slug||''));
+    if(!list.length)return empty();
+    list.forEach(g=>{const a=document.createElement('article');a.className='card';
+      a.innerHTML='<img class="shot" alt="" loading="lazy"><div class="body"><h2></h2><p class="by"></p><p class="desc"></p><button class="play" type="button">Gioca!</button></div>';
+      const img=a.querySelector('.shot');img.src='disegni-amici/'+g.slug+'.jpg';img.alt='Disegno di '+(g.nome||'un bambino');
+      a.querySelector('h2').textContent=g.titolo||g.slug;a.querySelector('.by').textContent='Disegnato da '+(g.nome||'un piccolo inventore');
+      a.querySelector('.desc').textContent=g.descrizione||'';a.querySelector('.play').addEventListener('click',()=>open(g.slug));grid.append(a)})
+  }).catch(empty);
+})();
+</script>
+</body>
+</html>

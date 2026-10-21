@@ -45,10 +45,10 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
 </head>
 <body>
 <div class="wrap">
-  <div class="toplinks"><a class="back" href="./">← Barbafiamme</a><a class="back" href="crea.html">+ Crea un gioco</a></div>
+  <div class="toplinks"><a class="back" href="./">← Barbafiamme</a><a class="back" href="amici.html">Piccoli Inventori</a><a class="back" href="crea.html">+ Crea un gioco</a></div>
   <span class="tag">Pagina segreta</span>
   <h1>I miei <span>giochi</span></h1>
-  <p class="lead">Qui vedi i giochi nati dai tuoi disegni, anche prima che compaiano sul sito. Solo tu hai questi link.</p>
+  <p class="lead">Qui vedi i giochi nati dai tuoi disegni, anche prima che compaiano tra i Piccoli Inventori. Solo tu hai questi link.</p>
   <div class="list" id="list"></div>
 </div>
 <div id="player" hidden><button class="close" id="close" type="button">← Chiudi il gioco</button><iframe id="frame" title="Il mio gioco" sandbox="allow-scripts allow-pointer-lock" allow="autoplay; fullscreen"></iframe></div>
@@ -57,7 +57,7 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
 <script>
 (()=>{
   const cfg=(window.Classifica&&Classifica.config)||{},list=document.getElementById('list');
-  const STATI={nuova:'📨 Ricevuta, in coda',ricevuta:'🛠️ In lavorazione',anteprima:'🎮 Pronto da provare!',pubblicato:'🏆 Pubblicato su Barbafiamme',rifiutata:'✋ Non possiamo farlo'};
+  const STATI={nuova:'📨 Ricevuta, in coda',ricevuta:'🛠️ In lavorazione',anteprima:'🎮 Pronto da provare!',pubblicato:'🏆 Pubblicato tra i Piccoli Inventori',rifiutata:'✋ Non possiamo farlo'};
   let mine=[];try{mine=JSON.parse(localStorage.getItem('bf_miei')||'[]')}catch(e){}
   const qs=new URLSearchParams(location.search).get('t');
   const okT=t=>/^[0-9a-f-]{36}$/i.test(t||'');

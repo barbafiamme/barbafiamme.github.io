@@ -69,22 +69,18 @@ textarea{min-height:140px;resize:vertical}
     <ol class="steps">
       <li>Fai una foto al disegno</li>
       <li>Racconta come deve essere il gioco</li>
-      <li>Il gioco nuovo compare su Barbafiamme dopo il controllo</li>
+      <li>Lo provi subito nella tua pagina segreta, poi compare tra i Piccoli Inventori</li>
     </ol>
 
     <fieldset>
       <legend>Cosa vuoi fare?</legend>
       <div class="choice">
         <label><input type="radio" name="tipo" value="nuovo" checked> Un gioco nuovo</label>
-        <label><input type="radio" name="tipo" value="modifica"> Cambiare un gioco</label>
+        <label id="modLabel"><input type="radio" name="tipo" value="modifica"> Cambiare un gioco dei Piccoli Inventori</label>
       </div>
       <div id="gameBox" hidden>
         <label class="lbl" for="gioco">Quale gioco?</label>
-        <select id="gioco">
-          <option value="pirati">Pirati all'Arrembaggio</option>
-          <option value="granpremio">Gran Premio dei Disegni</option>
-          <option value="squadriglia">Squadriglia contro il Buio</option>
-        </select>
+        <select id="gioco"></select>
       </div>
     </fieldset>
 
@@ -131,7 +127,7 @@ textarea{min-height:140px;resize:vertical}
 
   <section class="sheet done" id="done" hidden>
     <h2>Disegno ricevuto! 🎉</h2>
-    <p id="doneText">Grazie! Ogni ora controlliamo le richieste nuove. Appena il gioco è pronto lo puoi provare dalla tua <b>pagina segreta</b>, anche prima che compaia su Barbafiamme.</p>
+    <p id="doneText">Grazie! Ogni ora controlliamo le richieste nuove. Appena il gioco è pronto lo puoi provare dalla tua <b>pagina segreta</b>, anche prima che compaia tra i Piccoli Inventori.</p>
     <label class="lbl" for="secret">Il tuo link segreto</label>
     <div class="copyrow"><input type="text" id="secret" readonly><button class="btn" type="button" id="copy">Copia</button></div>
     <p class="hint">Conservalo e non darlo a nessuno: è solo tuo. Questo telefono lo ricorda anche in "I miei giochi".</p>
@@ -149,6 +145,9 @@ textarea{min-height:140px;resize:vertical}
   const form=$('form'),status=$('status'),send=$('send'),foto=$('foto'),preview=$('preview'),ph=$('ph'),drop=$('drop');
   let blob=null;
   try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
+  fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{list=(Array.isArray(list)?list:[]).filter(g=>/^[a-z0-9-]{1,60}$/.test(g.slug||''));
+    if(!list.length){$('modLabel').hidden=true;return}
+    list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');$('gioco').append(o)})}).catch(()=>{$('modLabel').hidden=true});
   form.addEventListener('change',e=>{if(e.target.name==='tipo')$('gameBox').hidden=form.tipo.value!=='modifica'});
   $('idea').addEventListener('input',()=>{$('count').textContent=$('idea').value.length+' / 1500'});
   function say(t,kind){status.hidden=false;status.textContent=t;status.className='status '+kind}
