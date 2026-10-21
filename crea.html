@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Crea il tuo gioco · Barbafiamme</title>
+<meta name="description" content="Manda un disegno e un'idea: Barbafiamme lo trasforma in un videogioco.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: one paper sheet pinned on the corkboard; the form reads top to bottom like a drawing contest entry */
+:root{
+  --paper:#fffdf6; --ink:#1f1d2b; --sun:#ffc93c; --sky:#4cc9e0; --red:#e63946; --green:#3fa34d; --muted:#5f5b74; --board:#f3e6c8; --dot:#e6d3a8;
+  --display:'Bungee',Impact,'Arial Black',sans-serif; --body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--board);background-image:radial-gradient(var(--dot) 1.4px,transparent 1.6px);background-size:22px 22px;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.4}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:20px}
+.toplinks{display:flex;gap:10px;flex-wrap:wrap}
+.back{align-self:flex-start;font-weight:800;color:var(--ink);text-decoration:none;border:3px solid var(--ink);border-radius:12px;padding:4px 12px;background:#fff;box-shadow:3px 3px 0 var(--ink)}
+.back:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.drop:focus-within{outline:3px dashed #2f6fe4;outline-offset:3px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,8vw,52px);line-height:1;margin:0;text-wrap:balance}
+h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-block;transform:rotate(-2deg)}
+.lead{margin:0;font-size:19px;font-weight:600;color:var(--muted);max-width:56ch}
+.sheet{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:7px 8px 0 var(--ink);padding:22px clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:20px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;border:2px solid var(--ink);border-radius:14px;padding:10px 12px;background:#fff;font-weight:600;font-size:15px;display:flex;gap:10px;align-items:flex-start}
+.steps li::before{content:counter(s);font-family:var(--display);font-size:20px;line-height:1;background:var(--sun);border:2px solid var(--ink);border-radius:50%;width:32px;height:32px;flex:none;display:flex;align-items:center;justify-content:center}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+legend,label.lbl{font-family:var(--display);font-size:18px;padding:0;margin-bottom:2px}
+.hint{margin:0;font-size:14px;color:var(--muted)}
+input[type=text],input[type=password],textarea,select{font:inherit;font-size:18px;width:100%;padding:10px 12px;border:3px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink)}
+textarea{min-height:140px;resize:vertical}
+.choice{display:flex;gap:10px;flex-wrap:wrap}
+.choice label{display:flex;align-items:center;gap:8px;border:3px solid var(--ink);border-radius:12px;padding:8px 14px;background:#fff;font-weight:800;cursor:pointer}
+.choice input{accent-color:var(--red);width:20px;height:20px}
+.choice label:has(input:checked){background:var(--sun)}
+.drop{position:relative;border:3px dashed var(--ink);border-radius:16px;background:#fff;min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;cursor:pointer}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop .ph{display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;pointer-events:none}
+.drop .ph b{font-family:var(--display);font-weight:400;font-size:20px}
+.drop img{max-width:100%;max-height:340px;border-radius:8px;display:block;pointer-events:none}
+.drop.has{border-style:solid}
+.send{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--red);color:#fff;border:3px solid var(--ink);border-radius:14px;padding:12px 24px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.send:disabled{opacity:.6;cursor:wait}
+.send:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.status{margin:0;font-weight:800;padding:10px 14px;border-radius:12px;border:3px solid var(--ink)}
+.status.ok{background:#dff3d8}
+.status.err{background:#ffe0e3}
+.status.wait{background:#fff4cf}
+.done{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.done h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,6vw,34px);margin:0;line-height:1.05}
+.done p{margin:0}
+.done .btn{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:8px 16px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);text-decoration:none}
+.copyrow{display:flex;gap:8px;width:100%}
+.copyrow input{flex:1;min-width:0;font-size:14px}
+.rules{margin:0;padding-left:20px;font-size:15px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="toplinks"><a class="back" href="./">← Torna ai giochi</a><a class="back" href="anteprima.html">I miei giochi</a></div>
+  <h1>Crea il tuo <span>gioco</span></h1>
+  <p class="lead">Hai fatto un disegno? Mandacelo con la tua idea e lo trasformiamo in un videogioco, come quelli di Agostino.</p>
+
+  <form class="sheet" id="form" novalidate>
+    <ol class="steps">
+      <li>Fai una foto al disegno</li>
+      <li>Racconta come deve essere il gioco</li>
+      <li>Il gioco nuovo compare su Barbafiamme dopo il controllo</li>
+    </ol>
+
+    <fieldset>
+      <legend>Cosa vuoi fare?</legend>
+      <div class="choice">
+        <label><input type="radio" name="tipo" value="nuovo" checked> Un gioco nuovo</label>
+        <label><input type="radio" name="tipo" value="modifica"> Cambiare un gioco</label>
+      </div>
+      <div id="gameBox" hidden>
+        <label class="lbl" for="gioco">Quale gioco?</label>
+        <select id="gioco">
+          <option value="pirati">Pirati all'Arrembaggio</option>
+          <option value="granpremio">Gran Premio dei Disegni</option>
+          <option value="squadriglia">Squadriglia contro il Buio</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Il disegno</legend>
+      <label class="drop" id="drop">
+        <input type="file" id="foto" accept="image/*">
+        <span class="ph" id="ph"><b>Tocca qui per la foto</b><span>oppure trascina l'immagine</span></span>
+        <img id="preview" alt="Anteprima del disegno" hidden>
+      </label>
+      <p class="hint">Solo disegni: niente foto di persone, nomi completi o indirizzi.</p>
+    </fieldset>
+
+    <fieldset>
+      <label class="lbl" for="titolo">Come si chiama il gioco?</label>
+      <input type="text" id="titolo" maxlength="60" placeholder="Es. La corsa dei draghi" autocomplete="off">
+    </fieldset>
+
+    <fieldset>
+      <label class="lbl" for="idea">Racconta la tua idea</label>
+      <textarea id="idea" maxlength="1500" placeholder="Es. Il drago verde vola tra le nuvole e deve raccogliere le stelle. Se tocca le nuvole nere perde una vita…"></textarea>
+      <p class="hint" id="count">0 / 1500</p>
+    </fieldset>
+
+    <fieldset>
+      <label class="lbl" for="autore">Nome del bambino o della bambina</label>
+      <input type="text" id="autore" maxlength="30" placeholder="Es. Luca" autocomplete="off" autocapitalize="words">
+      <p class="hint">Solo il nome, senza cognome: comparirà sul sito sotto il gioco ("Disegnato da Luca").</p>
+    </fieldset>
+
+    <fieldset>
+      <label class="lbl" for="codice">Codice segreto</label>
+      <input type="password" id="codice" maxlength="40" autocomplete="off" placeholder="Te lo dà chi ti ha mandato il sito">
+    </fieldset>
+
+    <ul class="rules">
+      <li>Niente personaggi di cartoni o film famosi: inventa i tuoi!</li>
+      <li>Ogni richiesta viene letta e controllata prima di diventare un gioco.</li>
+    </ul>
+
+    <p class="status" id="status" role="status" hidden></p>
+    <button class="send" id="send" type="submit">Invia il disegno! ✏️</button>
+  </form>
+
+  <section class="sheet done" id="done" hidden>
+    <h2>Disegno ricevuto! 🎉</h2>
+    <p id="doneText">Grazie! Ogni ora controlliamo le richieste nuove. Appena il gioco è pronto lo puoi provare dalla tua <b>pagina segreta</b>, anche prima che compaia su Barbafiamme.</p>
+    <label class="lbl" for="secret">Il tuo link segreto</label>
+    <div class="copyrow"><input type="text" id="secret" readonly><button class="btn" type="button" id="copy">Copia</button></div>
+    <p class="hint">Conservalo e non darlo a nessuno: è solo tuo. Questo telefono lo ricorda anche in "I miei giochi".</p>
+    <a class="btn" id="openSecret" href="anteprima.html">Apri la mia pagina segreta</a>
+    <button class="btn" type="button" id="another">Manda un altro disegno</button>
+    <a class="btn" href="./">Torna ai giochi</a>
+  </section>
+</div>
+
+<script src="classifica.js"></script>
+<script>
+(()=>{
+  const $=id=>document.getElementById(id);
+  const cfg=(window.Classifica&&Classifica.config)||{};
+  const form=$('form'),status=$('status'),send=$('send'),foto=$('foto'),preview=$('preview'),ph=$('ph'),drop=$('drop');
+  let blob=null;
+  try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
+  form.addEventListener('change',e=>{if(e.target.name==='tipo')$('gameBox').hidden=form.tipo.value!=='modifica'});
+  $('idea').addEventListener('input',()=>{$('count').textContent=$('idea').value.length+' / 1500'});
+  function say(t,kind){status.hidden=false;status.textContent=t;status.className='status '+kind}
+  // shrink the photo in the browser: long side 1600px, JPEG
+  function shrink(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();
+    img.onload=()=>{const m=1600,s=Math.min(1,m/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.round(img.naturalWidth*s),h=Math.round(img.naturalHeight*s);
+      const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);
+      c.toBlob(b=>b?res(b):rej(new Error('foto')),'image/jpeg',.85)};
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('foto'))};img.src=url})}
+  async function take(file){if(!file)return;if(!/^image\//.test(file.type)){say('Questo file non è una foto. Scegli un\'immagine.','err');return}
+    try{blob=await shrink(file);preview.src=URL.createObjectURL(blob);preview.hidden=false;ph.hidden=true;drop.classList.add('has');status.hidden=true}
+    catch(e){say('Non riesco ad aprire questa foto. Prova con un\'altra.','err')}}
+  foto.addEventListener('change',()=>take(foto.files[0]));
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault()}));
+  drop.addEventListener('drop',e=>{e.preventDefault();take(e.dataTransfer.files[0])});
+  const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
+  form.addEventListener('submit',async e=>{e.preventDefault();
+    const tipo=form.tipo.value,titolo=$('titolo').value.trim(),idea=$('idea').value.trim(),autore=$('autore').value.trim(),codice=$('codice').value.trim();
+    if(!blob)return say('Manca la foto del disegno.','err');
+    if(idea.length<10)return say('Racconta la tua idea con qualche parola in più.','err');
+    if(!autore)return say('Scrivi il nome del bambino o della bambina.','err');
+    if(!codice)return say('Scrivi il codice segreto.','err');
+    if(!cfg.url)return say('Il sito non è collegato all\'archivio. Riprova più tardi.','err');
+    send.disabled=true;say('Invio il disegno…','wait');
+    const path=codice+'/'+uid()+'.jpg',H={apikey:cfg.key,Authorization:'Bearer '+cfg.key};
+    try{
+      const up=await fetch(cfg.url+'/storage/v1/object/disegni/'+encodeURIComponent(codice)+'/'+path.split('/')[1],{method:'POST',headers:Object.assign({'Content-Type':'image/jpeg','x-upsert':'false'},H),body:blob});
+      if(!up.ok){send.disabled=false;return say(up.status===400||up.status===403||up.status===401?'Il codice segreto non è giusto. Controllalo e riprova.':'Il disegno non è stato salvato. Riprova tra poco.','err')}
+      const token=(crypto.randomUUID?crypto.randomUUID():null);if(!token){send.disabled=false;return say('Questo browser è troppo vecchio per inviare. Prova con un altro.','err')}
+      const row={token,tipo,gioco:tipo==='modifica'?$('gioco').value:null,titolo:titolo||null,descrizione:idea,nome_bambino:autore,disegno:path,codice};
+      const r=await fetch(cfg.url+'/rest/v1/richieste',{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},H),body:JSON.stringify(row)});
+      if(!r.ok){send.disabled=false;return say(r.status===401||r.status===403?'Il codice segreto non è giusto. Controllalo e riprova.':'La richiesta non è stata salvata. Riprova tra poco.','err')}
+      try{localStorage.setItem('bf_artista',autore);localStorage.setItem('bf_codice',codice);
+        const mine=JSON.parse(localStorage.getItem('bf_miei')||'[]');mine.unshift({t:token,titolo:titolo||'Il mio gioco',nome:autore,data:new Date().toISOString()});localStorage.setItem('bf_miei',JSON.stringify(mine.slice(0,30)))}catch(_){}
+      const link=new URL('anteprima.html?t='+token,location.href).href;$('secret').value=link;$('openSecret').href=link;
+      form.hidden=true;$('done').hidden=false;window.scrollTo({top:0,behavior:'smooth'})
+    }catch(err){send.disabled=false;say('Non riesco a collegarmi. Controlla la connessione e riprova.','err')}
+  });
+  $('copy').addEventListener('click',async()=>{const i=$('secret');try{await navigator.clipboard.writeText(i.value);$('copy').textContent='Copiato!'}catch(e){i.select()}});
+  $('another').addEventListener('click',()=>{form.reset();blob=null;preview.hidden=true;ph.hidden=false;drop.classList.remove('has');status.hidden=true;send.disabled=false;$('gameBox').hidden=true;
+    try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
+    $('done').hidden=true;form.hidden=false});
+})();
+</script>
+</body>
+</html>

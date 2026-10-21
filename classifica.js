@@ -59,5 +59,5 @@
         catch(err){btn.disabled=false;btn.textContent='Riprova';}});
       box.append(f)}
     renderList(box,g,null)}
-  window.Classifica={mount,top,submit,GAMES,online};
+  window.Classifica={mount,top,submit,GAMES,online,config:{url:CONFIG.url,key:CONFIG.key}};
 })();

@@ -83,6 +83,14 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 #zoom p{margin:0;color:var(--paper);font-size:18px;font-weight:700;text-align:center;max-width:52ch}
 #zoom .close{position:static}
 .sec-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1;margin:6px 0 -8px}
+.maker{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;background:var(--sun);border:4px solid var(--ink);border-radius:20px 16px 22px 18px;box-shadow:6px 7px 0 var(--ink);padding:16px clamp(16px,3vw,24px)}
+.maker-txt{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.maker h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,5vw,30px);line-height:1.05;margin:0}
+.maker p{margin:0;font-size:17px;font-weight:600}
+.maker-btns{display:flex;gap:10px;flex-wrap:wrap}
+.mk-btn{font-family:var(--display);font-size:18px;color:#fff;background:var(--red);border:3px solid var(--ink);border-radius:14px;padding:10px 18px;box-shadow:4px 4px 0 var(--ink);text-decoration:none}
+.mk-btn.ghost{background:#fff;color:var(--ink);font-family:var(--body);font-weight:800}
+.mk-btn:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 .hof{position:relative;background:#14111f;color:#ffe9a8;border:4px solid var(--ink);border-radius:22px;box-shadow:7px 8px 0 var(--ink);padding:22px clamp(14px,3vw,26px) 16px;display:flex;flex-direction:column;gap:18px;overflow:hidden}
 .hof::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 4px);pointer-events:none;border-radius:18px}
 .hof-top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between}
@@ -240,6 +248,14 @@ body.playing{overflow:hidden}
       </div>
     </article>
   </main>
+
+  <section class="maker" aria-labelledby="maker-title">
+    <div class="maker-txt">
+      <h2 id="maker-title">Hai fatto un disegno?</h2>
+      <p>Mandacelo con la tua idea: diventa un videogioco tutto tuo, che puoi provare subito nella tua pagina segreta.</p>
+    </div>
+    <div class="maker-btns"><a class="mk-btn" href="crea.html">✏️ Crea il tuo gioco</a><a class="mk-btn ghost" href="anteprima.html">I miei giochi</a></div>
+  </section>
 
   <section class="hof" aria-labelledby="hof-title">
     <div class="hof-top">

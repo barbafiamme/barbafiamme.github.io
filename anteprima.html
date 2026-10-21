@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>I miei giochi · Barbafiamme</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: the creator's private shelf — one paper card per request, the game opens full screen */
+:root{
+  --paper:#fffdf6; --ink:#1f1d2b; --sun:#ffc93c; --red:#e63946; --green:#3fa34d; --muted:#5f5b74; --board:#f3e6c8; --dot:#e6d3a8;
+  --display:'Bungee',Impact,'Arial Black',sans-serif; --body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--board);background-image:radial-gradient(var(--dot) 1.4px,transparent 1.6px);background-size:22px 22px;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.4}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:18px}
+.toplinks{display:flex;gap:10px;flex-wrap:wrap}
+.back,.btn{font:inherit;font-weight:800;color:var(--ink);text-decoration:none;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;display:inline-block}
+.btn.play{font-family:var(--display);font-weight:400;font-size:20px;background:var(--sun);padding:10px 20px}
+.back:focus-visible,.btn:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,8vw,48px);line-height:1;margin:0}
+h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-block;transform:rotate(-2deg)}
+.lead{margin:0;font-size:18px;font-weight:600;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:14px}
+.req{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 6px 0 var(--ink);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.req h2{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.05;margin:0}
+.req .by{margin:0;color:var(--muted);font-weight:700}
+.badge{align-self:flex-start;font-weight:800;font-size:15px;border:2px solid var(--ink);border-radius:999px;padding:2px 12px}
+.badge.nuova,.badge.ricevuta{background:#fff4cf}
+.badge.anteprima{background:#dff3d8}
+.badge.pubblicato{background:var(--sun)}
+.badge.rifiutata{background:#ffe0e3}
+.req .nota{margin:0;background:#fff;border:2px dashed var(--muted);border-radius:12px;padding:8px 12px}
+.empty{background:var(--paper);border:3px solid var(--ink);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.empty p{margin:0}
+#player{position:fixed;inset:0;z-index:10;background:#000;display:flex}
+#player iframe{flex:1;border:0;width:100%;height:100%;background:#fff}
+#player .close{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 8px);font:inherit;font-weight:800;font-size:14px;border:3px solid var(--ink);border-radius:12px;padding:4px 12px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;z-index:2}
+.tag{align-self:flex-start;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:2px 12px;border-radius:999px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="toplinks"><a class="back" href="./">← Barbafiamme</a><a class="back" href="crea.html">+ Crea un gioco</a></div>
+  <span class="tag">Pagina segreta</span>
+  <h1>I miei <span>giochi</span></h1>
+  <p class="lead">Qui vedi i giochi nati dai tuoi disegni, anche prima che compaiano sul sito. Solo tu hai questi link.</p>
+  <div class="list" id="list"></div>
+</div>
+<div id="player" hidden><button class="close" id="close" type="button">← Chiudi il gioco</button><iframe id="frame" title="Il mio gioco" sandbox="allow-scripts allow-pointer-lock" allow="autoplay; fullscreen"></iframe></div>
+
+<script src="classifica.js"></script>
+<script>
+(()=>{
+  const cfg=(window.Classifica&&Classifica.config)||{},list=document.getElementById('list');
+  const STATI={nuova:'📨 Ricevuta, in coda',ricevuta:'🛠️ In lavorazione',anteprima:'🎮 Pronto da provare!',pubblicato:'🏆 Pubblicato su Barbafiamme',rifiutata:'✋ Non possiamo farlo'};
+  let mine=[];try{mine=JSON.parse(localStorage.getItem('bf_miei')||'[]')}catch(e){}
+  const qs=new URLSearchParams(location.search).get('t');
+  const okT=t=>/^[0-9a-f-]{36}$/i.test(t||'');
+  if(okT(qs)&&!mine.some(m=>m.t===qs)){mine.unshift({t:qs,titolo:'Il mio gioco',data:new Date().toISOString()});try{localStorage.setItem('bf_miei',JSON.stringify(mine.slice(0,30)))}catch(e){}}
+  if(!mine.length){list.innerHTML='<div class="empty"><p><b>Non hai ancora mandato disegni da questo telefono.</b></p><p>Se hai un link segreto, aprilo e il gioco comparirà qui.</p><a class="btn play" href="crea.html">Manda un disegno</a></div>';return}
+  const player=document.getElementById('player'),frame=document.getElementById('frame');
+  function open(html){frame.srcdoc=html;player.hidden=false;document.body.style.overflow='hidden'}
+  document.getElementById('close').addEventListener('click',()=>{player.hidden=true;frame.srcdoc='';document.body.style.overflow=''});
+  const show=okT(qs)?mine.filter(m=>m.t===qs).concat(mine.filter(m=>m.t!==qs)):mine;
+  show.forEach(async m=>{const card=document.createElement('article');card.className='req';
+    card.innerHTML='<h2></h2><p class="by"></p><span class="badge">Controllo…</span>';card.querySelector('h2').textContent=m.titolo||'Il mio gioco';
+    card.querySelector('.by').textContent='Inviato il '+new Date(m.data).toLocaleDateString('it-IT');list.append(card);
+    try{const r=await fetch(cfg.url+'/rest/v1/rpc/vedi_richiesta',{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+cfg.key,'Content-Type':'application/json'},body:JSON.stringify({t:m.t})});
+      if(!r.ok)throw 0;const rows=await r.json(),d=rows[0];const b=card.querySelector('.badge');
+      if(!d){b.textContent='Richiesta non trovata';return}
+      if(d.titolo)card.querySelector('h2').textContent=d.titolo;
+      card.querySelector('.by').textContent='Disegnato da '+d.nome_bambino+' · '+new Date(d.created_at).toLocaleDateString('it-IT');
+      b.textContent=STATI[d.stato]||d.stato;b.className='badge '+d.stato;
+      if(d.nota){const n=document.createElement('p');n.className='nota';n.textContent=d.nota;card.append(n)}
+      if(d.gioco_html){const p=document.createElement('button');p.type='button';p.className='btn play';p.textContent='Gioca! ▶';p.addEventListener('click',()=>open(d.gioco_html));card.append(p)}
+      if(d.stato==='ricevuta'||d.stato==='nuova'){const n=document.createElement('p');n.className='by';n.textContent='Torna a guardare più tardi: controlliamo le richieste ogni ora.';card.append(n)}
+    }catch(e){card.querySelector('.badge').textContent='Non riesco a controllare adesso, riprova più tardi'}});
+})();
+</script>
+</body>
+</html>
