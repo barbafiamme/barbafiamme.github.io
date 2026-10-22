@@ -160,7 +160,7 @@ function finish(){
   $('endP').textContent=place===1?'Il tuo trenino è arrivato per primo alla stazione!':'Il tuo trenino è arrivato alla stazione. Ci riprovi? Tocca ancora più veloce!';
   $('endS').innerHTML='<span>'+place+'° posto</span><span>'+time.toFixed(2)+' secondi</span>';
   const b=$('board');b.innerHTML='';
-  if(place===1&&window.Classifica)Classifica.mount(b,'trenini',cs);
+  if(window.Classifica)Classifica.mount(b,'trenini',cs);
   $('end').hidden=false;$('again').focus()}
 $('startBtn').onclick=startRace;$('again').onclick=startRace;
 $('change').onclick=()=>{state='menu';$('end').hidden=true;$('start').hidden=false;tr=[];draw()};
