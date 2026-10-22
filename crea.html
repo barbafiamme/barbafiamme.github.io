@@ -53,6 +53,17 @@ textarea{min-height:140px;resize:vertical}
 .done{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
 .done h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,6vw,34px);margin:0;line-height:1.05}
 .done p{margin:0}
+.wait-box{align-self:stretch;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px}
+.wait-box .phase{font-weight:800;font-size:18px;min-height:1.4em}
+.track{position:relative;height:30px;border:3px solid var(--ink);border-radius:999px;background:repeating-linear-gradient(90deg,#f3e6c8 0 14px,#e6d3a8 14px 18px);overflow:hidden}
+.fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#ffc93c,#ff8a3c);border-right:3px solid var(--ink);transition:width 1s linear}
+.loco{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);font-size:22px;transition:left 1s linear;line-height:1}
+.wait-box .meta{display:flex;justify-content:space-between;gap:10px;font-weight:700;color:var(--muted);font-size:15px}
+.wait-box.ready{background:#dff3d8}
+.wait-box.ready .fill{background:#3fa34d}
+.wait-box.no{background:#ffe0e3}
+.done .btn.go{font-family:var(--display);font-weight:400;font-size:22px;background:var(--sun);padding:10px 22px}
+@media (prefers-reduced-motion:reduce){.fill,.loco{transition:none}}
 .done .btn{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:8px 16px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);text-decoration:none}
 .copyrow{display:flex;gap:8px;width:100%}
 .copyrow input{flex:1;min-width:0;font-size:14px}
@@ -145,7 +156,13 @@ textarea{min-height:140px;resize:vertical}
 
   <section class="sheet done" id="done" hidden>
     <h2>Disegno ricevuto! 🎉</h2>
-    <p id="doneText">Grazie! Ogni ora controlliamo le richieste nuove. Appena il gioco è pronto lo puoi provare dalla tua <b>pagina segreta</b>, anche prima che compaia tra i Piccoli Inventori.</p>
+    <p id="doneText">Grazie! Stiamo già costruendo il tuo videogioco: di solito ci vogliono circa 8 minuti. Puoi restare qui ad aspettare oppure tornare più tardi dalla tua <b>pagina segreta</b>.</p>
+    <div class="wait-box" id="waitBox" aria-live="polite">
+      <div class="phase" id="phase">📨 Il disegno è partito…</div>
+      <div class="track" role="progressbar" aria-label="Costruzione del gioco" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="track"><div class="fill" id="fill"></div><span class="loco" id="loco" aria-hidden="true">🚂</span></div>
+      <div class="meta"><span id="pct">0%</span><span id="eta">circa 8 minuti</span></div>
+      <a class="btn go" id="playNow" href="anteprima.html" hidden>Gioca adesso! ▶</a>
+    </div>
     <label class="lbl" for="secret">Il tuo link segreto</label>
     <div class="copyrow"><input type="text" id="secret" readonly><button class="btn" type="button" id="copy">Copia</button></div>
     <p class="hint">Conservalo e non darlo a nessuno: è solo tuo. Questo telefono lo ricorda anche in "I miei giochi".</p>
@@ -217,13 +234,33 @@ textarea{min-height:140px;resize:vertical}
       try{localStorage.setItem('bf_artista',autore);localStorage.setItem('bf_codice',codice);
         const mine=JSON.parse(localStorage.getItem('bf_miei')||'[]');mine.unshift({t:token,titolo:titolo||'Il mio gioco',nome:autore,data:new Date().toISOString()});localStorage.setItem('bf_miei',JSON.stringify(mine.slice(0,30)))}catch(_){}
       const link=new URL('anteprima.html?t='+token,location.href).href;$('secret').value=link;$('openSecret').href=link;
-      form.hidden=true;$('done').hidden=false;window.scrollTo({top:0,behavior:'smooth'})
+      form.hidden=true;$('done').hidden=false;window.scrollTo({top:0,behavior:'smooth'});startWait(token,link)
     }catch(err){send.disabled=false;say('Non riesco a collegarmi. Controlla la connessione e riprova.','err')}
   });
+  // attesa: barra di circa 8 minuti + controllo in background ogni 15 secondi
+  const TOT=8*60*1000,PHASES=[[0,'📨 Il disegno è partito…'],[6,'👀 Guardo bene il tuo disegno…'],[18,'🎨 Disegno i personaggi con i tuoi colori…'],[38,'🧱 Costruisco il mondo del gioco…'],[60,'🕹️ Aggiungo i comandi e le sorprese…'],[78,'🧪 Provo il gioco per vedere se è divertente…'],[92,'✨ Ultimi ritocchi, quasi pronto…']];
+  let waitT=null,pollT=null,pollNow=null;
+  function stopWait(){clearInterval(waitT);clearTimeout(pollT);waitT=pollT=pollNow=null}
+  function setBar(v){v=Math.max(0,Math.min(100,v));$('fill').style.width=v+'%';$('loco').style.left='calc(14px + (100% - 28px) * '+(v/100)+')';$('track').setAttribute('aria-valuenow',Math.round(v));$('pct').textContent=Math.floor(v)+'%'}
+  function startWait(token,link){stopWait();const box=$('waitBox'),t0=Date.now(),end=Date.now()+40*60*1000;let last='';box.className='wait-box';$('playNow').hidden=true;$('playNow').href=link;setBar(0);
+    const tick=()=>{const el=Date.now()-t0;let v=el<TOT?el/TOT*95:95+4*(1-Math.exp(-(el-TOT)/(6*60*1000)));setBar(v);
+      let ph=PHASES[0][1];PHASES.forEach(([at,t])=>{if(v>=at)ph=t});if(el>TOT+2*60*1000)ph='⏳ Ci vuole un po\' più del solito, ma ci stiamo lavorando!';
+      if(ph!==last){$('phase').textContent=ph;last=ph}
+      const left=Math.ceil((TOT-el)/60000);$('eta').textContent=left>1?'circa '+left+' minuti':left===1?'circa 1 minuto':'ancora un pochino'};
+    tick();waitT=setInterval(tick,1000);
+    const poll=async()=>{if(Date.now()>end){stopWait();$('phase').textContent='⏳ Ci vuole più tempo del solito. Ti avvisiamo nella pagina segreta: torna a guardare più tardi!';return}
+      try{const r=await fetch(cfg.url+'/rest/v1/rpc/vedi_richiesta',{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+cfg.key,'Content-Type':'application/json'},body:JSON.stringify({t:token})});
+        if(r.ok){const d=(await r.json())[0];
+          if(d&&(d.gioco_html||d.stato==='anteprima'||d.stato==='pubblicato')){stopWait();setBar(100);box.className='wait-box ready';$('phase').textContent='🎉 Il tuo gioco è pronto!';$('eta').textContent='';$('playNow').hidden=false;$('playNow').focus({preventScroll:true});
+            try{navigator.vibrate&&navigator.vibrate([120,60,120])}catch(_){}return}
+          if(d&&d.stato==='rifiutata'){stopWait();box.className='wait-box no';$('phase').textContent='✋ Questa volta non possiamo farlo.'+(d.nota?' '+d.nota:'');$('eta').textContent='';return}}}catch(_){}
+      pollT=setTimeout(poll,document.hidden?60000:15000)};
+    pollNow=poll;pollT=setTimeout(poll,10000)}
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pollNow){clearTimeout(pollT);pollNow()}});
   $('copy').addEventListener('click',async()=>{const i=$('secret');try{await navigator.clipboard.writeText(i.value);$('copy').textContent='Copiato!'}catch(e){i.select()}});
   $('another').addEventListener('click',()=>{form.reset();blob=null;preview.hidden=true;ph.hidden=false;drop.classList.remove('has');status.hidden=true;send.disabled=false;$('gameBox').hidden=true;
     try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
-    $('done').hidden=true;form.hidden=false});
+    stopWait();$('done').hidden=true;form.hidden=false});
 })();
 </script>
 </body>

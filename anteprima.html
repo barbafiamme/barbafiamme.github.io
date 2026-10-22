@@ -78,7 +78,7 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
       b.textContent=STATI[d.stato]||d.stato;b.className='badge '+d.stato;
       if(d.nota){const n=document.createElement('p');n.className='nota';n.textContent=d.nota;card.append(n)}
       if(d.gioco_html){const p=document.createElement('button');p.type='button';p.className='btn play';p.textContent='Gioca! ▶';p.addEventListener('click',()=>open(d.gioco_html));card.append(p)}
-      if(d.stato==='ricevuta'||d.stato==='nuova'){const n=document.createElement('p');n.className='by';n.textContent='Torna a guardare più tardi: controlliamo le richieste ogni ora.';card.append(n)}
+      if(d.stato==='ricevuta'||d.stato==='nuova'){const n=document.createElement('p');n.className='by';n.textContent='Di solito il gioco è pronto in circa 8 minuti: ricarica la pagina tra poco.';card.append(n)}
     }catch(e){card.querySelector('.badge').textContent='Non riesco a controllare adesso, riprova più tardi'}});
 })();
 </script>
