@@ -45,8 +45,11 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .play{margin-top:auto;align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:10px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
 .card.space .play{background:var(--sky)}
 .card.pirate .play{background:#ff8a5c}
+.card.train .play{background:#7fd66b}
 #player.pirate .close{left:max(206px,calc(50% - 26px));bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:52px;height:52px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
 #player.pirate .close::after{content:"⌂";font-size:26px;line-height:1}
+#player.train .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
+#player.train .close::after{content:"⌂";font-size:24px;line-height:1}
 .play:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .play:focus-visible,.close:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 .gallery{display:flex;flex-direction:column;gap:18px;padding-top:10px}
@@ -247,6 +250,26 @@ body.playing{overflow:hidden}
         <button class="play" type="button" data-game="giochi/pirati.html" data-kind="pirate">Gioca!</button>
       </div>
     </article>
+    <article class="card train">
+      <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Quattro trenini colorati sui binari">
+        <rect width="320" height="180" fill="#bfe6a8"/>
+        <g stroke="#8a4b22" stroke-width="3"><path d="M20 30V62M40 30V62M60 30V62M80 30V62M100 30V62M120 30V62M140 30V62M160 30V62M180 30V62M200 30V62M220 30V62M240 30V62M260 30V62M280 30V62M300 30V62M20 74V106M40 74V106M60 74V106M80 74V106M100 74V106M120 74V106M140 74V106M160 74V106M180 74V106M200 74V106M220 74V106M240 74V106M260 74V106M280 74V106M300 74V106M20 118V150M40 118V150M60 118V150M80 118V150M100 118V150M120 118V150M140 118V150M160 118V150M180 118V150M200 118V150M220 118V150M240 118V150M260 118V150M280 118V150M300 118V150"/></g>
+        <g stroke="#8c8c96" stroke-width="2.5"><path d="M0 36H320M0 56H320M0 80H320M0 100H320M0 124H320M0 144H320"/></g>
+        <g stroke="#1f1d2b" stroke-width="2.5" stroke-linejoin="round">
+          <rect x="150" y="31" width="38" height="24" rx="5" fill="#1f4fd8"/><rect x="192" y="31" width="42" height="24" rx="5" fill="#1f4fd8"/><circle cx="228" cy="43" r="4" fill="#ffe066"/>
+          <rect x="120" y="75" width="38" height="24" rx="5" fill="#e3342f"/><rect x="162" y="75" width="42" height="24" rx="5" fill="#e3342f"/><circle cx="198" cy="87" r="4" fill="#ffe066"/>
+          <rect x="60" y="119" width="38" height="24" rx="5" fill="#1fa84a"/><rect x="102" y="119" width="42" height="24" rx="5" fill="#1fa84a"/><circle cx="138" cy="131" r="4" fill="#ffe066"/>
+          <rect x="190" y="119" width="38" height="24" rx="5" fill="#6a2fb8"/><rect x="232" y="119" width="42" height="24" rx="5" fill="#6a2fb8"/><circle cx="268" cy="131" r="4" fill="#ffe066"/>
+        </g>
+        <g fill="#58d3ff"><rect x="156" y="39" width="8" height="8"/><rect x="170" y="39" width="8" height="8"/><rect x="200" y="39" width="8" height="8"/><rect x="214" y="39" width="8" height="8"/><rect x="126" y="83" width="8" height="8"/><rect x="140" y="83" width="8" height="8"/><rect x="170" y="83" width="8" height="8"/><rect x="184" y="83" width="8" height="8"/><rect x="66" y="127" width="8" height="8"/><rect x="80" y="127" width="8" height="8"/><rect x="110" y="127" width="8" height="8"/><rect x="124" y="127" width="8" height="8"/><rect x="196" y="127" width="8" height="8"/><rect x="210" y="127" width="8" height="8"/><rect x="240" y="127" width="8" height="8"/><rect x="254" y="127" width="8" height="8"/></g>
+      </svg>
+      <div class="body">
+        <h2>Trenini, chi arriva prima?</h2>
+        <p>Scegli il tuo trenino tra quattro e tocca, tocca, tocca! Chi arriva per primo alla stazione vince.</p>
+        <div class="chips"><span class="chip">4 trenini</span><span class="chip">Corsa a tempo</span><span class="chip">Facile</span></div>
+        <button class="play" type="button" data-game="giochi/trenini.html" data-kind="train">Gioca!</button>
+      </div>
+    </article>
   </main>
 
   <section class="maker" aria-labelledby="maker-title">
@@ -272,6 +295,7 @@ body.playing{overflow:hidden}
     <div class="boards">
       <div class="lb" data-g="pirati" style="--c:#ff8a5c"><h3>Pirati</h3><small>primi 20 · più monete</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
       <div class="lb" data-g="granpremio" style="--c:#ffc93c"><h3>Gran Premio</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="trenini" style="--c:#7fd66b"><h3>Trenini</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
       <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>primi 20 · più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
     </div>
     <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
@@ -298,6 +322,8 @@ body.playing{overflow:hidden}
         <figcaption><b>Gli aerei e il Buio</b><span>→ Squadriglia contro il Buio</span></figcaption></figure></div>
       <div class="slide"><figure class="pin"><button type="button" data-full="disegni/pirati.jpg" data-cap="La nave pirata a righe con il capitano, la moglie vestita di blu, i pappagalli, il fuoco e il mare. Da qui è nato Pirati all'Arrembaggio."><img src="disegni/pirati.jpg" alt="Disegno di una nave pirata marrone a righe con vele bianche, teschio, pirati, pappagalli, fuoco rosso e mare blu" loading="lazy"></button>
         <figcaption><b>La nave dei pirati</b><span>→ Pirati all'Arrembaggio</span></figcaption></figure></div>
+      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/trenini.jpg" data-cap="Quattro trenini colorati sui binari, con i vagoni blu, rossi, verdi e viola. Da qui sono nati i Trenini, chi arriva prima."><img src="disegni/trenini.jpg" alt="Disegno di trenini colorati su due binari con vagoni blu, rossi, verdi e viola" loading="lazy"></button>
+        <figcaption><b>I trenini colorati</b><span>→ Trenini, chi arriva prima</span></figcaption></figure></div>
       <div class="slide"><figure class="pin"><button type="button" data-full="disegni/rossa-95.jpg" data-cap="Auto rossa e gialla con il numero 95."><img src="disegni/rossa-95.jpg" alt="Disegno di un'auto rossa con una fascia gialla e il numero 95" loading="lazy"></button>
         <figcaption><b>Rossa col 95</b><span>disegno</span></figcaption></figure></div>
       <div class="slide"><figure class="pin"><button type="button" data-full="disegni/azzurra-43.jpg" data-cap="Auto azzurra con un grande alettone e il numero 43."><img src="disegni/azzurra-43.jpg" alt="Disegno di un'auto azzurra con alettone e il numero 43" loading="lazy"></button>
