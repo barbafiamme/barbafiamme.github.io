@@ -9,7 +9,8 @@
   const GAMES={
     granpremio:{title:'Gran Premio dei Disegni',unit:'tempo',asc:true,fmt:v=>(v/100).toFixed(2)+' s'},
     squadriglia:{title:'Squadriglia contro il Buio',unit:'punti',asc:false,fmt:v=>v+' punti'},
-    pirati:{title:"Pirati all'Arrembaggio",unit:'monete',asc:false,fmt:v=>v+' monete'}
+    pirati:{title:"Pirati all'Arrembaggio",unit:'monete',asc:false,fmt:v=>v+' monete'},
+    trenini:{title:'Trenini, chi arriva prima',unit:'tempo',asc:true,fmt:v=>(v/100).toFixed(2)+' s'}
   };
   // giochi dei Piccoli Inventori: si registrano da soli con il loro slug
   function register(g,o){o=o||{};if(!/^[a-z0-9-]{1,60}$/.test(g))return;const u=o.unit||'punti';

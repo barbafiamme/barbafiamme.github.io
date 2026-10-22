@@ -1,0 +1,173 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+<title>Trenini, chi arriva prima</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--scrim:rgba(31,29,43,.55);--display:'Bungee',Impact,'Arial Black',sans-serif;--body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;color-scheme:light}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#bfe6a8;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;touch-action:pan-y;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:12px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(26px,7vw,40px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.pick:focus-visible,#go:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.picks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pick{font-family:var(--body);font-weight:800;font-size:18px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:8px 6px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:3px 3px 0 var(--ink);min-height:72px}
+.pick canvas{width:100%;max-width:170px;height:40px}
+.pick[aria-pressed=true]{background:var(--sun);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);z-index:2;pointer-events:none}
+#pos{left:12px}#time{right:12px}
+#go{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:min(86vw,360px);height:86px;font-family:var(--display);font-size:30px;background:#ff5a4f;color:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);cursor:pointer;z-index:3;touch-action:manipulation}
+#go:active,#go.down{transform:translate(-50%,4px);box-shadow:0 2px 0 var(--ink)}
+#count{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:clamp(80px,22vw,200px);color:#fff;-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;pointer-events:none;z-index:4}
+.stats{display:flex;flex-wrap:wrap;gap:8px}.stats span{border:2px solid var(--ink);border-radius:999px;padding:2px 12px;background:#fff;font-weight:800;font-size:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px}.btn.ghost{background:#fff}
+</style></head><body>
+<canvas id="game"></canvas>
+<div class="pill" id="pos" hidden></div><div class="pill" id="time" hidden></div>
+<button id="go" type="button" hidden>PUSH! 🚂</button>
+<div id="count" hidden></div>
+
+<div class="overlay" id="start"><div class="panel">
+  <h1>Trenini, <span>chi arriva prima?</span></h1>
+  <p>Scegli il tuo trenino! Quattro trenini corrono sui binari: vince chi arriva per primo alla stazione.</p>
+  <div class="picks" id="picks"></div>
+  <p><b>Come si gioca:</b> tocca il pulsante rosso (o premi la barra spaziatrice) tante volte, più veloce che puoi: il tuo trenino corre!</p>
+  <button class="btn" id="startBtn" type="button">Via!</button>
+</div></div>
+
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="endT"></h2><p id="endP"></p><div class="stats" id="endS"></div>
+  <div id="board"></div>
+  <div class="row"><button class="btn" id="again" type="button">Ancora!</button><button class="btn ghost" id="change" type="button">Cambia trenino</button></div>
+</div></div>
+
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('trenini',{title:'Trenini, chi arriva prima',unit:'tempo',asc:true});
+const TR=[
+ {n:'Blu Rapido',body:'#1f4fd8',trim:'#6b3a1e',win:'#58d3ff'},
+ {n:'Rosso Fiamma',body:'#e3342f',trim:'#8a8a92',win:'#58d3ff'},
+ {n:'Verde Prato',body:'#1fa84a',trim:'#f39a1e',win:'#58d3ff'},
+ {n:'Viola Sole',body:'#6a2fb8',trim:'#ffd93a',win:'#58d3ff'}
+];
+const cv=document.getElementById('game'),cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,DPR=1,mine=0,state='menu',lanes=[],tr=[],t0=0,tnow=0,cd=0,order=[],lastTap=0,done=false;
+const KP=[[.08,.95],[.55,.93],[.90,.80],[.80,.58],[.35,.50],[.12,.34],[.30,.14],[.70,.08],[.95,.10]]; // percorso in frazioni dello schermo
+function cr(p0,p1,p2,p3,t){const t2=t*t,t3=t2*t;return[0,1].map(i=>.5*((2*p1[i])+(-p0[i]+p2[i])*t+(2*p0[i]-5*p1[i]+4*p2[i]-p3[i])*t2+(-p0[i]+3*p1[i]-3*p2[i]+p3[i])*t3))}
+const LW=15; // distanza tra i binari
+function build(){
+  const pts=[],m=Math.min(W,H)*.06,top=120,bot=H-130;
+  const P=KP.map(k=>[m+k[0]*(W-2*m),top+k[1]*(bot-top)]);
+  const E=[P[0],...P,P[P.length-1]];
+  for(let i=1;i<E.length-2;i++)for(let s=0;s<30;s++)pts.push(cr(E[i-1],E[i],E[i+1],E[i+2],s/30));
+  pts.push(P[P.length-1]);
+  const sc=Math.min(1,Math.min(W,H)/520)*.7+.45;
+  const gap=LW*sc;lanes=[];
+  for(let l=0;l<4;l++){const off=(l-1.5)*gap,L=[0],q=[];
+    for(let i=0;i<pts.length;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
+      q.push([pts[i][0]-dy*off,pts[i][1]+dx*off,Math.atan2(dy,dx)]);}
+    for(let i=1;i<q.length;i++)L.push(L[i-1]+Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]));
+    lanes.push({q,L,len:L[L.length-1]})}
+  lanes.sc=sc;
+}
+function at(l,d){const ln=lanes[l],L=ln.L;d=Math.max(0,Math.min(ln.len,d));let lo=0,hi=L.length-1;while(hi-lo>1){const mid=(lo+hi)>>1;if(L[mid]<=d)lo=mid;else hi=mid}
+  const f=(d-L[lo])/((L[hi]-L[lo])||1),a=ln.q[lo],b=ln.q[hi];let da=b[2]-a[2];if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;return[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+da*f]}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);build();draw()}
+addEventListener('resize',resize);
+// disegno di un vagone con il pennarello
+function rr(c,x,y,w,h,r){c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)}
+function wagon(c,T,x,y,a,s,engine){
+  c.save();c.translate(x,y);c.rotate(a);c.scale(s,s);c.lineWidth=2.5;c.strokeStyle='#1f1d2b';c.lineJoin='round';
+  const w=engine?46:42,h=22;
+  rr(c,-w/2,-h/2,w,h,5);c.fillStyle=T.body;c.fill();c.stroke();
+  c.fillStyle=T.trim;c.fillRect(-w/2+4,-h/2+3,w-8,3);c.fillRect(-w/2+4,h/2-6,w-8,3);
+  c.fillStyle=T.win;for(let i=0;i<(engine?2:3);i++){c.fillRect(-w/2+7+i*12,-4,8,8);c.strokeRect(-w/2+7+i*12,-4,8,8)}
+  if(engine){c.fillStyle='#ffe066';c.beginPath();c.arc(w/2-4,0,4,0,7);c.fill();c.stroke();c.fillStyle='#fff';c.fillRect(-w/2+30,-h/2-5,7,6);c.strokeRect(-w/2+30,-h/2-5,7,6)}
+  c.restore()}
+function trainAt(c,l,d,T,s){ // locomotiva + 2 vagoni
+  const sp=48*s;for(let k=2;k>=0;k--){const p=at(l,d-k*sp);wagon(c,T,p[0],p[1],p[2],s,k===0)}}
+function drawTrack(){
+  const s=lanes.sc;
+  cx.fillStyle='#bfe6a8';cx.fillRect(0,0,W,H);
+  cx.fillStyle='#a6d88c';for(let i=0;i<26;i++){const x=(i*173)%W,y=(i*97)%H;cx.beginPath();cx.ellipse(x,y,16,7,0,0,7);cx.fill()}
+  // alberelli
+  for(let i=0;i<14;i++){const x=(i*239+60)%W,y=(i*131+40)%H;cx.fillStyle='#8a5a2b';cx.fillRect(x-3,y,6,12);cx.fillStyle='#2f9e44';cx.beginPath();cx.arc(x,y-2,13,0,7);cx.fill();cx.strokeStyle='#1f1d2b';cx.lineWidth=2;cx.stroke()}
+  for(let l=0;l<4;l++){const q=lanes[l].q;
+    // traversine
+    cx.strokeStyle='#8a4b22';cx.lineWidth=3*s;
+    for(let d=0;d<lanes[l].len;d+=14*s){const p=at(l,d),nx=-Math.sin(p[2]),ny=Math.cos(p[2]);cx.beginPath();cx.moveTo(p[0]+nx*9*s,p[1]+ny*9*s);cx.lineTo(p[0]-nx*9*s,p[1]-ny*9*s);cx.stroke()}
+    cx.strokeStyle='#8c8c96';cx.lineWidth=2.5;
+    for(const sd of[-6,6]){cx.beginPath();q.forEach((p,i)=>{const x=p[0]-Math.sin(p[2])*sd*s,y=p[1]+Math.cos(p[2])*sd*s;i?cx.lineTo(x,y):cx.moveTo(x,y)});cx.stroke()}}
+  // stazione all'arrivo
+  const e=lanes[0].q[lanes[0].q.length-1],e3=lanes[3].q[lanes[3].q.length-1],mx=(e[0]+e3[0])/2,my=(e[1]+e3[1])/2,a=e[2];
+  cx.save();cx.translate(mx,my);cx.rotate(a);cx.fillStyle='#fffdf6';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  cx.fillStyle='#fff';for(let i=0;i<8;i++){cx.fillStyle=i%2?'#111':'#fff';cx.fillRect(0,-60*s+i*15*s,12*s,15*s)} // traguardo a scacchi
+  cx.restore();
+  cx.save();cx.translate(Math.max(60,Math.min(W-60,mx)),my-50*s);cx.font='bold '+Math.round(16*s+4)+'px Bungee,Impact,sans-serif';cx.textAlign='center';cx.fillStyle='#e63946';cx.strokeStyle='#1f1d2b';cx.lineWidth=4;cx.strokeText('STAZIONE',0,-4*s);cx.fillText('STAZIONE',0,-4*s);cx.restore();
+  // partenza
+  const b=lanes[0].q[0];cx.fillStyle='rgba(255,255,255,.85)';cx.beginPath();cx.arc(b[0],b[1]+34*s,0,0,7);cx.fill();
+}
+function draw(){
+  drawTrack();
+  const s=lanes.sc*.95;
+  // disegna da dietro a davanti
+  const idx=[0,1,2,3].sort((a,b)=>lanes[a].q[0][1]-lanes[b].q[0][1]);
+  for(let l=0;l<4;l++){const T=tr[l]?TR[tr[l].t]:TR[l],d=tr[l]?tr[l].d:0;trainAt(cx,l,d+(tr[l]?0:100*s),T,s);
+    if(l===mine&&state!=='menu'){const p=at(l,d);cx.fillStyle='#fff';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;const y=p[1]-34*s;cx.beginPath();cx.moveTo(p[0],y+10);cx.lineTo(p[0]-9,y-6);cx.lineTo(p[0]+9,y-6);cx.closePath();cx.fill();cx.stroke()}}
+}
+// scelta del trenino
+const picks=$('picks');
+TR.forEach((T,i)=>{const b=document.createElement('button');b.type='button';b.className='pick';b.setAttribute('aria-pressed',i===0);
+  const c=document.createElement('canvas');c.width=340;c.height=80;b.append(c,document.createTextNode(T.n));
+  const g=c.getContext('2d');[0,1].forEach(k=>wagon(g,T,70+k*100,40,0,1.9,k===1));
+  b.onclick=()=>{mine=i;[...picks.children].forEach((x,j)=>x.setAttribute('aria-pressed',j===i))};picks.append(b)});
+// partita
+function startRace(){
+  // i 4 colori: il tuo sul binario che hai scelto, gli altri sugli altri
+  tr=[0,1,2,3].map(l=>({t:l,d:100*lanes.sc*.95,v:0,skill:l===mine?1:.9+Math.random()*.16,wob:0,wobT:0,fin:null}));
+  order=[];done=false;state='count';cd=3.99;$('start').hidden=true;$('end').hidden=true;
+  $('pos').textContent='Pronti…';$('time').textContent='0.0 s';$('go').hidden=false;$('pos').hidden=false;$('time').hidden=false;$('count').hidden=false;lastT=performance.now();requestAnimationFrame(loop)}
+let lastT=0;
+function tap(){if(state==='run'){const p=tr[mine];p.v+=.0095;if(p.v>.09)p.v=.09}else if(state==='count'){}}
+function loop(now){
+  if(state==='menu'||state==='over')return;
+  const dt=Math.min(.05,(now-lastT)/1000);lastT=now;
+  if(state==='count'){cd-=dt;const n=Math.ceil(cd);$('count').textContent=n>0?n:'VIA!';if(cd<=0){state='run';t0=now;setTimeout(()=>{$('count').hidden=true},500)}}
+  else if(state==='run'){
+    tnow=(now-t0)/1000;$('time').textContent=tnow.toFixed(1)+' s';
+    const lead=Math.max(...tr.map(p=>p.d));
+    tr.forEach((p,l)=>{if(p.fin!==null)return;const L=lanes[l].len;
+      if(l===mine){p.v=Math.max(.012,p.v-p.v*1.15*dt);p.d+=p.v*L*dt}
+      else{p.wobT-=dt;if(p.wobT<=0){p.wobT=.8+Math.random();p.wob=(Math.random()-.5)*.012}
+        const behind=(lead-p.d)/L;const rb=1+Math.max(-.12,Math.min(.18,behind*.9));
+        p.v=(.036*p.skill+p.wob)*rb;p.d+=p.v*L*dt}
+      if(p.d>=L){p.d=L;p.fin=(now-t0)/1000;order.push(l);if(order.length===1&&l===mine)p.first=true}});
+    const rank=[...tr.keys()].sort((a,b)=>(tr[b].fin===null?tr[b].d/lanes[b].len:2-tr[b].fin/1000)-(tr[a].fin===null?tr[a].d/lanes[a].len:2-tr[a].fin/1000));
+    $('pos').textContent=(rank.indexOf(mine)+1)+'° posto';
+    if(tr[mine].fin!==null&&!done){done=true;setTimeout(finish,900)}}
+  draw();requestAnimationFrame(loop)}
+function finish(){
+  state='over';draw();
+  $('go').hidden=true;$('pos').hidden=true;$('time').hidden=true;
+  const place=order.indexOf(mine)+1,time=tr[mine].fin,cs=Math.round(time*100);
+  $('endT').textContent=place===1?'Hai vinto! 🏆':place===2?'Secondo, che bravo! 🥈':'Sei arrivato! 🚂';
+  $('endP').textContent=place===1?'Il tuo trenino è arrivato per primo alla stazione!':'Il tuo trenino è arrivato alla stazione. Ci riprovi? Tocca ancora più veloce!';
+  $('endS').innerHTML='<span>'+place+'° posto</span><span>'+time.toFixed(2)+' secondi</span>';
+  const b=$('board');b.innerHTML='';
+  if(place===1&&window.Classifica)Classifica.mount(b,'trenini',cs);
+  $('end').hidden=false;$('again').focus()}
+$('startBtn').onclick=startRace;$('again').onclick=startRace;
+$('change').onclick=()=>{state='menu';$('end').hidden=true;$('start').hidden=false;tr=[];draw()};
+const go=$('go');
+go.addEventListener('pointerdown',e=>{e.preventDefault();go.classList.add('down');tap()});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>go.addEventListener(ev,()=>go.classList.remove('down')));
+addEventListener('keydown',e=>{if((e.code==='Space'||e.key==='Enter'||e.key==='ArrowRight')&&state==='run'){e.preventDefault();if(!e.repeat)tap()}});
+cv.addEventListener('pointerdown',()=>tap());
+resize();
+</script></body></html>
