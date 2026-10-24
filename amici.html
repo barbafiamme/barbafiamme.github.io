@@ -83,6 +83,7 @@ h1 .b{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-blo
 #zoom button{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:var(--paper);cursor:pointer}
 @media (prefers-reduced-motion:reduce){.pin{transform:none!important}}
 #hof{scroll-margin-top:12px}
+.hof .btn{align-self:flex-start}
 footer{font-size:15px;color:var(--muted);font-weight:600}
 </style>
 </head>
@@ -98,10 +99,10 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
 
   <main class="grid" id="grid" aria-live="polite"></main>
 
-  <section class="hof" id="hof" aria-labelledby="hof-title" hidden>
-    <h2 class="hof-title" id="hof-title">RECORD DEI PICCOLI INVENTORI</h2>
-    <p class="hof-sub">Gioca e scrivi le tue iniziali a fine partita per entrare in classifica!</p>
-    <div class="boards" id="boards"></div>
+  <section class="hof" id="hof" aria-labelledby="hof-title">
+    <h2 class="hof-title" id="hof-title">SALA DEI RECORD</h2>
+    <p class="hof-sub">Le classifiche di tutti i giochi, quelli di Agostino e quelli dei Piccoli Inventori, sono insieme nella Sala dei Record.</p>
+    <a class="btn big" href="index.html#record">🏆 Vai alla Sala dei Record</a>
   </section>
 
   <section class="artists" id="artists" aria-labelledby="art-title" hidden>
@@ -124,7 +125,6 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
   <button class="close" id="close" type="button" aria-label="Torna ai giochi">⌂</button>
 </div>
 
-<script src="classifica.js"></script>
 <script>
 (()=>{
   const grid=document.getElementById('grid'),player=document.getElementById('player'),frame=document.getElementById('frame');
@@ -142,22 +142,8 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
       const img=a.querySelector('.shot');img.src='disegni-amici/'+g.slug+'.jpg';img.alt='Disegno di '+(g.nome||'un bambino');
       a.querySelector('h2').textContent=g.titolo||g.slug;a.querySelector('.by').textContent='Disegnato da '+(g.nome||'un piccolo inventore');
       a.querySelector('.desc').textContent=g.descrizione||'';a.querySelector('.play').addEventListener('click',()=>open(g.slug));grid.append(a)});
-    records(list);artists(list);
-    if(location.hash==='#hof')requestAnimationFrame(()=>document.getElementById('hof').scrollIntoView());
+    artists(list);
   }).catch(empty);
-  // record: una classifica per ogni gioco approvato
-  const COLORS=['#9be15d','#ffc93c','#5fd7ff','#ff8a5c','#c79bff','#ff6fa8'];
-  function records(list){const C=window.Classifica;if(!C)return;const boards=document.getElementById('boards');document.getElementById('hof').hidden=false;
-    list.forEach((g,k)=>{const cl=g.classifica||{};C.register(g.slug,{title:g.titolo,unit:cl.unit||'punti',asc:!!cl.asc});
-      const lb=document.createElement('div');lb.className='lb';lb.style.setProperty('--c',COLORS[k%COLORS.length]);
-      lb.innerHTML='<h3></h3><small></small><ol><li class="empty">CARICAMENTO...</li></ol>';lb.querySelector('h3').textContent=g.titolo||g.slug;
-      lb.querySelector('small').textContent='di '+(g.nome||'?')+' · '+(cl.asc?'il più veloce':'più '+(cl.unit||'punti'));boards.append(lb);
-      const ol=lb.querySelector('ol');
-      C.top(g.slug,20).then(rows=>{ol.innerHTML='';if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
-        rows.forEach((r,i)=>{const li=document.createElement('li');if(i>=5)li.className='extra';li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
-          li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g.slug].fmt(r.score);ol.append(li)});
-        if(rows.length>5){const b=document.createElement('button');b.type='button';b.className='more';const lab=()=>{const o=lb.classList.contains('open');b.textContent=o?'MOSTRA MENO ▲':'MOSTRA TUTTI I '+rows.length+' ▼';b.setAttribute('aria-expanded',o)};lab();b.addEventListener('click',()=>{lb.classList.toggle('open');lab()});lb.append(b)}})
-      .catch(()=>{ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA</li>'})})}
   // disegni raggruppati per bambino
   const zoom=document.getElementById('zoom'),zi=document.getElementById('zoomImg'),zc=document.getElementById('zoomCap');
   document.getElementById('zoomClose').addEventListener('click',()=>{zoom.hidden=true});zoom.addEventListener('click',e=>{if(e.target===zoom)zoom.hidden=true});
