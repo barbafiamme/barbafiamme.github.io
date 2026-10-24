@@ -153,7 +153,7 @@ function loop(now){
     sw.forEach((q,l)=>{if(q.fin!==null)return;
       if(l===mine){q.v=Math.max(.03,q.v-q.v*1.15*dt)}
       else{q.wobT-=dt;if(q.wobT<=0){q.wobT=.8+Math.random();q.wob=(Math.random()-.5)*.06}
-        const behind=(lead-q.p)/NL,rb=1+Math.max(-.12,Math.min(.18,behind*.9));q.v=(base*q.skill+q.wob)*rb}
+        const behind=(lead-q.p)/NL,rb=1+Math.max(-.12,Math.min(0,behind*.9));q.v=Math.min((base*q.skill+q.wob)*rb,Math.max(sw[mine].v,.15))}
       q.p+=q.v*(l===mine&&boost>0?1.7:1)*dt;q.ph+=dt*(4+q.v*22);
       if(q.p>=NL){q.p=NL;q.fin=(now-t0)/1000;order.push(l)}});
     const rank=[...sw.keys()].sort((a,b)=>(sw[b].fin===null?sw[b].p/NL:2-sw[b].fin/1000)-(sw[a].fin===null?sw[a].p/NL:2-sw[a].fin/1000));
