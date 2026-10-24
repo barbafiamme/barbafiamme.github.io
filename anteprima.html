@@ -62,7 +62,9 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
   const qs=new URLSearchParams(location.search).get('t');
   const okT=t=>/^[0-9a-f-]{36}$/i.test(t||'');
   if(okT(qs)&&!mine.some(m=>m.t===qs)){mine.unshift({t:qs,titolo:'Il mio gioco',data:new Date().toISOString()});try{localStorage.setItem('bf_miei',JSON.stringify(mine.slice(0,30)))}catch(e){}}
-  if(!mine.length){list.innerHTML='<div class="empty"><p><b>Non hai ancora mandato disegni da questo telefono.</b></p><p>Se hai un link segreto, aprilo e il gioco comparirà qui.</p><a class="btn play" href="crea.html">Manda un disegno</a></div>';return}
+  function forget(t){mine=mine.filter(x=>x.t!==t);try{localStorage.setItem('bf_miei',JSON.stringify(mine))}catch(e){}}
+  function empty(){list.innerHTML='<div class="empty"><p><b>Nessun gioco in attesa su questo telefono.</b></p><p>Qui compaiono i giochi ancora da pubblicare: quelli pubblicati li trovi sul sito. Se hai un link segreto, aprilo e il gioco comparirà qui.</p><a class="btn play" href="crea.html">Manda un disegno</a></div>'}
+  if(!mine.length){empty();return}
   const player=document.getElementById('player'),frame=document.getElementById('frame');
   function open(html){frame.srcdoc=html;player.hidden=false;document.body.style.overflow='hidden'}
   document.getElementById('close').addEventListener('click',()=>{player.hidden=true;frame.srcdoc='';document.body.style.overflow=''});
@@ -75,6 +77,12 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
       if(!d){b.textContent='Richiesta non trovata';return}
       if(d.titolo)card.querySelector('h2').textContent=d.titolo;
       card.querySelector('.by').textContent='Disegnato da '+d.nome_bambino+' · '+new Date(d.created_at).toLocaleDateString('it-IT');
+      if(d.stato==='pubblicato'){forget(m.t);
+        if(m.t!==qs){card.remove();if(!list.querySelector('.req'))empty();return}
+        // aperto dal link segreto: un ultimo saluto, poi non compare più
+        b.textContent='🏆 Pubblicato!';b.className='badge pubblicato';
+        const n=document.createElement('p');n.className='nota';n.textContent='Il tuo gioco ora è sul sito di Barbafiamme e tutti possono giocarci! Da qui sparisce, lo trovi tra i giochi.';card.append(n);
+        const go=document.createElement('p');go.innerHTML='<a class="btn play" href="index.html">🏠 Giochi di Barbafiamme</a> <a class="btn play" href="amici.html">🎮 Piccoli Inventori</a>';card.append(go);return}
       b.textContent=STATI[d.stato]||d.stato;b.className='badge '+d.stato;
       if(d.nota){const n=document.createElement('p');n.className='nota';n.textContent=d.nota;card.append(n)}
       if(d.gioco_html){const p=document.createElement('button');p.type='button';p.className='btn play';p.textContent='Gioca! ▶';p.addEventListener('click',()=>open(d.gioco_html));card.append(p)}
