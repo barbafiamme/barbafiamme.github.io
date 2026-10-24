@@ -22,8 +22,9 @@ h2{font-size:clamp(26px,6vw,36px)}
 .pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);z-index:2;pointer-events:none}
 #pos{left:12px}#time{right:12px}
 #info{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 62px);transform:translateX(-50%);background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:2px 14px;font-weight:800;font-size:16px;z-index:2;pointer-events:none;white-space:nowrap}
-#go{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:min(86vw,360px);height:86px;font-family:var(--display);font-size:30px;background:#ff5a4f;color:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);cursor:pointer;z-index:3;touch-action:manipulation}
-#go:active,#go.down{transform:translate(-50%,4px);box-shadow:0 2px 0 var(--ink)}
+#go,#turbo{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:min(44vw,250px);height:86px;font-family:var(--display);font-size:26px;background:#ff5a4f;color:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);cursor:pointer;z-index:3;touch-action:manipulation}
+#go{left:calc(50% - 6px);transform:translateX(-100%)}#turbo{left:calc(50% + 6px);background:#ffc93c;color:var(--ink);font-size:24px;line-height:1.05}
+#go:active,#go.down{transform:translate(-100%,4px);box-shadow:0 2px 0 var(--ink)}#turbo:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}#turbo:disabled{opacity:.45}#turbo small{display:block;font-family:var(--body);font-weight:800;font-size:15px}
 #count{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:clamp(80px,22vw,200px);color:#fff;-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;pointer-events:none;z-index:4}
 .stats{display:flex;flex-wrap:wrap;gap:8px}.stats span{border:2px solid var(--ink);border-radius:999px;padding:2px 12px;background:#fff;font-weight:800;font-size:16px}
 .row{display:flex;flex-wrap:wrap;gap:12px}.btn.ghost{background:#fff}
@@ -31,13 +32,14 @@ h2{font-size:clamp(26px,6vw,36px)}
 <canvas id="game"></canvas>
 <div class="pill" id="pos" hidden></div><div class="pill" id="time" hidden></div><div id="info" hidden></div>
 <button id="go" type="button" hidden>SCHIZZA! 💦</button>
+<button id="turbo" type="button" hidden>VELOCE! ⚡<small></small></button>
 <div id="count" hidden></div>
 
 <div class="overlay" id="start"><div class="panel">
   <h1>Piscina <span>veloce!</span></h1>
   <p>Scegli il tuo nuotatore! Quattro nuotatori fanno 10 vasche avanti e indietro: chi arriva primo vince.</p>
   <div class="picks" id="picks"></div>
-  <p><b>Come si gioca:</b> tocca il pulsante rosso (o premi la barra spaziatrice) tante volte: più schizzi, più vai veloce! Il primo round è <b>con la tavoletta</b>, il secondo <b>senza</b>.</p>
+  <p><b>Come si gioca:</b> tocca il pulsante rosso (o premi la barra spaziatrice) tante volte: più schizzi, più vai veloce! Il pulsante giallo <b>VELOCE ⚡</b> (o il tasto V) ti fa schizzare ancora più veloce per un attimo: lo puoi usare 3 volte per round! Il primo round è <b>con la tavoletta</b>, il secondo <b>senza</b>.</p>
   <button class="btn" id="startBtn" type="button">Via!</button>
 </div></div>
 
@@ -59,7 +61,7 @@ const SW=[
 const NL=10; // vasche per round
 const cv=document.getElementById('game'),cx=cv.getContext('2d');
 const $=id=>document.getElementById(id);
-let W=0,H=0,DPR=1,mine=0,state='menu',sw=[],t0=0,cd=0,order=[],done=false,round=1,r1time=0,P={x0:0,x1:0,y0:0,lh:0,sc:1},splash=[],lastT=0,clk=0;
+let W=0,H=0,DPR=1,mine=0,state='menu',sw=[],t0=0,cd=0,order=[],done=false,round=1,r1time=0,P={x0:0,x1:0,y0:0,lh:0,sc:1},splash=[],lastT=0,clk=0,turbos=0,boost=0;
 function layout(){const top=108,bot=H-122,m=Math.max(14,W*.03);P.x0=m;P.x1=W-m;P.y0=top;P.lh=Math.max(34,Math.min(120,(bot-top)/4));
   // se lo schermo e' basso le corsie si stringono ma restano 4
   P.sc=Math.min(P.lh/46,(P.x1-P.x0)/330)*1.0;if(P.sc<.55)P.sc=.55}
@@ -130,10 +132,13 @@ SW.forEach((S,i)=>{const b=document.createElement('button');b.type='button';b.cl
 function begin(){round=1;r1time=0;startRound()}
 function startRound(){
   sw=[0,1,2,3].map(l=>({t:l,p:0,v:0,skill:l===mine?1:.92+Math.random()*.14,wob:0,wobT:0,fin:null,ph:Math.random()*6}));
-  order=[];done=false;splash=[];state='count';cd=3.99;$('start').hidden=true;$('end').hidden=true;
+  order=[];done=false;splash=[];turbos=3;boost=0;updTurbo();state='count';cd=3.99;$('start').hidden=true;$('end').hidden=true;
   $('pos').textContent='Pronti…';$('time').textContent='0.0 s';
   $('info').textContent=round===1?'Round 1: con la tavoletta 🟨':'Round 2: senza tavoletta 🏊';
-  ['go','pos','time','info','count'].forEach(id=>$(id).hidden=false);lastT=performance.now();requestAnimationFrame(loop)}
+  ['go','turbo','pos','time','info','count'].forEach(id=>$(id).hidden=false);lastT=performance.now();requestAnimationFrame(loop)}
+function updTurbo(){const b=$('turbo');b.querySelector('small').textContent=turbos+' rimasti';b.disabled=turbos<=0}
+function turbo(){if(state!=='run'||turbos<=0||boost>0)return;turbos--;boost=2;updTurbo();
+  const o=pxy(mine,sw[mine].p);for(let i=0;i<14;i++)splash.push({x:o.x-o.dir*(10+Math.random()*30)*P.sc,y:o.y+(Math.random()-.5)*26*P.sc,r:3+Math.random()*4,a:1,vx:-o.dir*(40+Math.random()*60),vy:(Math.random()-.5)*80})}
 function tap(){if(state!=='run')return;const p=sw[mine];p.v=Math.min(round===1?.42:.5,p.v+(round===1?.045:.055));
   const o=pxy(mine,p.p);for(let i=0;i<5;i++)splash.push({x:o.x-o.dir*(18+Math.random()*12)*P.sc,y:o.y+(Math.random()-.5)*18*P.sc,r:2+Math.random()*3.5,a:.9,vx:-o.dir*(20+Math.random()*30),vy:(Math.random()-.5)*50})}
 function loop(now){
@@ -143,12 +148,13 @@ function loop(now){
   if(state==='count'){cd-=dt;const n=Math.ceil(cd);$('count').textContent=n>0?n:'VIA!';if(cd<=0){state='run';t0=now;setTimeout(()=>{$('count').hidden=true},500)}}
   else if(state==='run'){
     const tn=(now-t0)/1000;$('time').textContent=tn.toFixed(1)+' s';
+    if(boost>0)boost=Math.max(0,boost-dt);
     const lead=Math.max(...sw.map(q=>q.p)),base=round===1?.27:.31;
     sw.forEach((q,l)=>{if(q.fin!==null)return;
       if(l===mine){q.v=Math.max(.03,q.v-q.v*1.15*dt)}
       else{q.wobT-=dt;if(q.wobT<=0){q.wobT=.8+Math.random();q.wob=(Math.random()-.5)*.06}
         const behind=(lead-q.p)/NL,rb=1+Math.max(-.12,Math.min(.18,behind*.9));q.v=(base*q.skill+q.wob)*rb}
-      q.p+=q.v*dt;q.ph+=dt*(4+q.v*22);
+      q.p+=q.v*(l===mine&&boost>0?1.7:1)*dt;q.ph+=dt*(4+q.v*22);
       if(q.p>=NL){q.p=NL;q.fin=(now-t0)/1000;order.push(l)}});
     const rank=[...sw.keys()].sort((a,b)=>(sw[b].fin===null?sw[b].p/NL:2-sw[b].fin/1000)-(sw[a].fin===null?sw[a].p/NL:2-sw[a].fin/1000));
     $('pos').textContent=(rank.indexOf(mine)+1)+'° posto';
@@ -157,7 +163,7 @@ function loop(now){
   draw();requestAnimationFrame(loop)}
 function finish(){
   state='over';draw();
-  ['go','pos','time','info'].forEach(id=>$(id).hidden=true);
+  ['go','turbo','pos','time','info'].forEach(id=>$(id).hidden=true);
   const place=order.indexOf(mine)+1,time=sw[mine].fin,b=$('board');b.innerHTML='';
   $('endS').innerHTML='<span>'+place+'° posto</span><span>'+time.toFixed(2)+' secondi</span>';
   if(round===1){r1time=time;
@@ -173,10 +179,12 @@ function finish(){
   $('end').hidden=false;$('again').focus()}
 $('startBtn').onclick=begin;
 $('change').onclick=()=>{state='menu';$('end').hidden=true;$('start').hidden=false;sw=[];draw()};
+$('turbo').addEventListener('pointerdown',e=>{e.preventDefault();turbo()});
 const go=$('go');
 go.addEventListener('pointerdown',e=>{e.preventDefault();go.classList.add('down');tap()});
 ['pointerup','pointerleave','pointercancel'].forEach(ev=>go.addEventListener(ev,()=>go.classList.remove('down')));
-addEventListener('keydown',e=>{if((e.code==='Space'||e.key==='Enter'||e.key==='ArrowRight')&&state==='run'){e.preventDefault();if(!e.repeat)tap()}});
+addEventListener('keydown',e=>{if(e.code==='KeyV'&&state==='run'){e.preventDefault();if(!e.repeat)turbo();return}
+  if((e.code==='Space'||e.key==='Enter'||e.key==='ArrowRight')&&state==='run'){e.preventDefault();if(!e.repeat)tap()}});
 cv.addEventListener('pointerdown',()=>tap());
 resize();
 </script></body></html>
