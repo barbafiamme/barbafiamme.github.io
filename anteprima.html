@@ -41,6 +41,7 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
 #player iframe{flex:1;border:0;width:100%;height:100%;background:#fff}
 #player .close{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 8px);font:inherit;font-weight:800;font-size:14px;border:3px solid var(--ink);border-radius:12px;padding:4px 12px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;z-index:2}
 .tag{align-self:flex-start;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:2px 12px;border-radius:999px}
+.btn.change{background:#fff}
 </style>
 </head>
 <body>
@@ -86,6 +87,8 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
       b.textContent=STATI[d.stato]||d.stato;b.className='badge '+d.stato;
       if(d.nota){const n=document.createElement('p');n.className='nota';n.textContent=d.nota;card.append(n)}
       if(d.gioco_html){const p=document.createElement('button');p.type='button';p.className='btn play';p.textContent='Gioca! ▶';p.addEventListener('click',()=>open(d.gioco_html));card.append(p)}
+      if(d.stato==='anteprima'&&/^[a-z0-9-]{1,60}$/.test(d.slug||'')){const c=document.createElement('a');c.className='btn play change';
+        c.href='crea.html?gioco='+encodeURIComponent(d.slug)+'&titolo='+encodeURIComponent((d.titolo||'Il mio gioco').slice(0,50));c.textContent='✏️ Cambialo';card.append(c)}
       if(d.stato==='ricevuta'||d.stato==='nuova'){const n=document.createElement('p');n.className='by';n.textContent='Di solito il gioco è pronto in circa 8 minuti: ricarica la pagina tra poco.';card.append(n)}
     }catch(e){card.querySelector('.badge').textContent='Non riesco a controllare adesso, riprova più tardi'}});
 })();
