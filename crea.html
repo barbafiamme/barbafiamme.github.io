@@ -185,7 +185,15 @@ textarea{min-height:140px;resize:vertical}
   try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
   fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{list=(Array.isArray(list)?list:[]).filter(g=>/^[a-z0-9-]{1,60}$/.test(g.slug||''));
     if(!list.length)return;const grp=document.createElement('optgroup');grp.label='Giochi dei Piccoli Inventori';
-    list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');grp.append(o)});$('gioco').prepend(grp);$('gioco').selectedIndex=0}).catch(()=>{});
+    list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');grp.append(o)});$('gioco').prepend(grp);$('gioco').selectedIndex=0;preselect()}).catch(()=>{});
+  // arrivo da "Cambialo" nella pagina segreta: modifica già scelta, con il gioco ancora in prova
+  const want=(()=>{const q=new URLSearchParams(location.search),g=q.get('gioco');return /^[a-z0-9-]{1,60}$/.test(g||'')?{g,t:(q.get('titolo')||g).slice(0,50)}:null})();
+  function preselect(){if(!want)return;const sel=$('gioco');
+    if(![...sel.options].some(o=>o.value===want.g)){let grp=sel.querySelector('optgroup[data-prova]');
+      if(!grp){grp=document.createElement('optgroup');grp.label='Giochi ancora in prova';grp.dataset.prova='1';sel.prepend(grp)}
+      const o=document.createElement('option');o.value=want.g;o.textContent=want.t;grp.append(o)}
+    sel.value=want.g;form.tipo.value='modifica';$('gameBox').hidden=false;$('drawOpt').hidden=false;$('titleBox').hidden=true}
+  preselect();
   form.addEventListener('change',e=>{if(e.target.name==='tipo'){const m=form.tipo.value==='modifica';$('gameBox').hidden=!m;$('drawOpt').hidden=!m;$('titleBox').hidden=m}});
   // dettatura: il bambino racconta l'idea a voce
   (()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
