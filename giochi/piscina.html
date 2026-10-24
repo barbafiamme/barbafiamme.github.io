@@ -131,7 +131,7 @@ SW.forEach((S,i)=>{const b=document.createElement('button');b.type='button';b.cl
 // partita
 function begin(){round=1;r1time=0;startRound()}
 function startRound(){
-  sw=[0,1,2,3].map(l=>({t:l,p:0,v:0,skill:l===mine?1:.92+Math.random()*.14,wob:0,wobT:0,fin:null,ph:Math.random()*6}));
+  sw=[0,1,2,3].map(l=>({t:l,p:0,v:0,skill:l===mine?1:.88+Math.random()*.12,wob:0,wobT:0,fin:null,ph:Math.random()*6}));
   order=[];done=false;splash=[];turbos=3;boost=0;updTurbo();state='count';cd=3.99;$('start').hidden=true;$('end').hidden=true;
   $('pos').textContent='Pronti…';$('time').textContent='0.0 s';
   $('info').textContent=round===1?'Round 1: con la tavoletta 🟨':'Round 2: senza tavoletta 🏊';
@@ -139,7 +139,7 @@ function startRound(){
 function updTurbo(){const b=$('turbo');b.querySelector('small').textContent=turbos+' rimasti';b.disabled=turbos<=0}
 function turbo(){if(state!=='run'||turbos<=0||boost>0)return;turbos--;boost=2;updTurbo();
   const o=pxy(mine,sw[mine].p);for(let i=0;i<14;i++)splash.push({x:o.x-o.dir*(10+Math.random()*30)*P.sc,y:o.y+(Math.random()-.5)*26*P.sc,r:3+Math.random()*4,a:1,vx:-o.dir*(40+Math.random()*60),vy:(Math.random()-.5)*80})}
-function tap(){if(state!=='run')return;const p=sw[mine];p.v=Math.min(round===1?.42:.5,p.v+(round===1?.045:.055));
+function tap(){if(state!=='run')return;const p=sw[mine];p.v=Math.min(round===1?.46:.54,p.v+(round===1?.052:.063));
   const o=pxy(mine,p.p);for(let i=0;i<5;i++)splash.push({x:o.x-o.dir*(18+Math.random()*12)*P.sc,y:o.y+(Math.random()-.5)*18*P.sc,r:2+Math.random()*3.5,a:.9,vx:-o.dir*(20+Math.random()*30),vy:(Math.random()-.5)*50})}
 function loop(now){
   if(state==='menu'||state==='over')return;
@@ -149,9 +149,9 @@ function loop(now){
   else if(state==='run'){
     const tn=(now-t0)/1000;$('time').textContent=tn.toFixed(1)+' s';
     if(boost>0)boost=Math.max(0,boost-dt);
-    const lead=Math.max(...sw.map(q=>q.p)),base=round===1?.27:.31;
+    const lead=Math.max(...sw.map(q=>q.p)),base=round===1?.25:.285;
     sw.forEach((q,l)=>{if(q.fin!==null)return;
-      if(l===mine){q.v=Math.max(.03,q.v-q.v*1.15*dt)}
+      if(l===mine){q.v=Math.max(.03,q.v-q.v*.95*dt)}
       else{q.wobT-=dt;if(q.wobT<=0){q.wobT=.8+Math.random();q.wob=(Math.random()-.5)*.06}
         const behind=(lead-q.p)/NL,rb=1+Math.max(-.12,Math.min(0,behind*.9));q.v=Math.min((base*q.skill+q.wob)*rb,Math.max(sw[mine].v,.15))}
       q.p+=q.v*(l===mine&&boost>0?1.7:1)*dt;q.ph+=dt*(4+q.v*22);
