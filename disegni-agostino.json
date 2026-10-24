@@ -1,0 +1,65 @@
+[
+ {
+  "src": "disegni/azzurra-20.jpg",
+  "titolo": "Numero 20",
+  "gioco": "Turbo Azzurro",
+  "descrizione": "Auto azzurra e blu, numero 20. In gioco è diventata Turbo Azzurro.",
+  "alt": "Disegno di un'auto azzurra e blu con il numero 20 dentro uno schermo"
+ },
+ {
+  "src": "disegni/grigia-9.jpg",
+  "titolo": "Grigia col 9",
+  "gioco": "Grigio Smeraldo",
+  "descrizione": "Auto grigia con righe verdi e lo stemma col 9. In gioco è diventata Grigio Smeraldo.",
+  "alt": "Disegno di un'auto grigia con righe verdi e uno stemma col numero 9"
+ },
+ {
+  "src": "disegni/verde.jpg",
+  "titolo": "Verde e gialla",
+  "gioco": "Lime Sprint",
+  "descrizione": "Auto verde con ruote gialle e due stemmi con gli occhi. In gioco è diventata Lime Sprint.",
+  "alt": "Disegno di un'auto verde con ruote gialle e due stemmi gialli"
+ },
+ {
+  "src": "disegni/viola-arancio.jpg",
+  "titolo": "Viola e arancione",
+  "gioco": "Viola Arancio",
+  "descrizione": "Auto viola con il parafango e la fascia arancione. In gioco è diventata Viola Arancio.",
+  "alt": "Disegno di un'auto viola con dettagli arancioni"
+ },
+ {
+  "src": "disegni/aerei.jpg",
+  "titolo": "Gli aerei e il Buio",
+  "gioco": "Squadriglia contro il Buio",
+  "descrizione": "La squadriglia di aerei colorati che scappa dal buio che avanza. Da qui è nato Squadriglia contro il Buio.",
+  "alt": "Disegno pieno di colori con aerei verdi, azzurri e rossi e una grande macchia nera"
+ },
+ {
+  "src": "disegni/pirati.jpg",
+  "titolo": "La nave dei pirati",
+  "gioco": "Pirati all'Arrembaggio",
+  "descrizione": "La nave pirata a righe con il capitano, la moglie vestita di blu, i pappagalli, il fuoco e il mare. Da qui è nato Pirati all'Arrembaggio.",
+  "alt": "Disegno di una nave pirata marrone a righe con vele bianche, teschio, pirati, pappagalli, fuoco rosso e mare blu"
+ },
+ {
+  "src": "disegni/trenini.jpg",
+  "titolo": "I trenini colorati",
+  "gioco": "Trenini, chi arriva prima",
+  "descrizione": "Quattro trenini colorati sui binari, con i vagoni blu, rossi, verdi e viola. Da qui sono nati i Trenini, chi arriva prima.",
+  "alt": "Disegno di trenini colorati su due binari con vagoni blu, rossi, verdi e viola"
+ },
+ {
+  "src": "disegni/rossa-95.jpg",
+  "titolo": "Rossa col 95",
+  "gioco": "",
+  "descrizione": "Auto rossa e gialla con il numero 95.",
+  "alt": "Disegno di un'auto rossa con una fascia gialla e il numero 95"
+ },
+ {
+  "src": "disegni/azzurra-43.jpg",
+  "titolo": "Azzurra col 43",
+  "gioco": "",
+  "descrizione": "Auto azzurra con un grande alettone e il numero 43.",
+  "alt": "Disegno di un'auto azzurra con alettone e il numero 43"
+ }
+]

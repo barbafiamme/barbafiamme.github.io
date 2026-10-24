@@ -52,39 +52,6 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 #player.train .close::after{content:"⌂";font-size:24px;line-height:1}
 .play:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .play:focus-visible,.close:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
-.gallery{display:flex;flex-direction:column;gap:18px;padding-top:10px}
-.gal-head{display:flex;flex-direction:column;gap:6px}
-.gal-head h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,40px);line-height:1.05;margin:0}
-.gal-head p{margin:0;font-size:18px;font-weight:600;color:var(--muted);max-width:56ch}
-.carousel{position:relative;max-width:820px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-.pins{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:16px 0 18px;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
-.pins::-webkit-scrollbar{display:none}
-.slide{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;padding:0 10px;box-sizing:border-box;min-width:0}
-.pin{margin:0;background:#fff;padding:12px 12px 14px;box-shadow:0 2px 0 rgba(31,29,43,.12),0 10px 18px -8px rgba(31,29,43,.35);position:relative;display:flex;flex-direction:column;gap:8px;min-width:0}
-.pin::before{content:"";position:absolute;top:-9px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--red);border:2px solid var(--ink);box-shadow:2px 2px 0 rgba(31,29,43,.4)}
-.slide:nth-child(3n+1) .pin{transform:rotate(-.8deg)}
-.slide:nth-child(3n+2) .pin{transform:rotate(.7deg)}
-.slide:nth-child(3n+2) .pin::before{background:var(--sky)}
-.slide:nth-child(3n) .pin::before{background:var(--sun)}
-.pin button{padding:0;border:0;background:none;cursor:zoom-in;display:block}
-.pin button:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
-.pin img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:#f4f2ec}
-.pin figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:19px}
-.nav{position:absolute;top:calc(50% - 40px);width:56px;height:56px;border-radius:50%;border:3px solid var(--ink);background:var(--sun);color:var(--ink);font-family:var(--display);font-size:24px;box-shadow:3px 3px 0 var(--ink);cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;padding:0}
-.nav.prev{left:-6px}.nav.next{right:-6px}
-.nav:disabled{opacity:.35;cursor:default}
-.nav:active:not(:disabled){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
-.nav:focus-visible,.dots button:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
-.dots{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
-.dots button{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:#fff;padding:0;cursor:pointer}
-.dots button[aria-current="true"]{background:var(--red);transform:scale(1.25)}
-.count{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:6px}
-@media (max-width:560px){.nav{width:46px;height:46px;font-size:20px;top:calc(50% - 34px)}.nav.prev{left:-4px}.nav.next{right:-4px}}
-.pin figcaption span{font-weight:700;color:var(--muted);font-size:15px}
-#zoom{position:fixed;inset:0;z-index:20;background:rgba(31,29,43,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);box-sizing:border-box}
-#zoom img{display:block;width:auto;height:auto;max-width:100%;max-height:72vh;border:4px solid var(--paper);box-shadow:6px 6px 0 #000}
-#zoom p{margin:0;color:var(--paper);font-size:18px;font-weight:700;text-align:center;max-width:52ch}
-#zoom .close{position:static}
 .sec-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1;margin:6px 0 -8px}
 .maker{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;background:var(--sun);border:4px solid var(--ink);border-radius:20px 16px 22px 18px;box-shadow:6px 7px 0 var(--ink);padding:16px clamp(16px,3vw,24px)}
 .maker-txt{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:4px}
@@ -94,39 +61,12 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .mk-btn{font-family:var(--display);font-size:18px;color:#fff;background:var(--red);border:3px solid var(--ink);border-radius:14px;padding:10px 18px;box-shadow:4px 4px 0 var(--ink);text-decoration:none}
 .mk-btn.ghost{background:#fff;color:var(--ink);font-family:var(--body);font-weight:800}
 .mk-btn:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
-.hof{position:relative;background:#14111f;color:#ffe9a8;border:4px solid var(--ink);border-radius:22px;box-shadow:7px 8px 0 var(--ink);padding:22px clamp(14px,3vw,26px) 16px;display:flex;flex-direction:column;gap:18px;overflow:hidden}
-.hof::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 4px);pointer-events:none;border-radius:18px}
-.hof-top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between}
-.hof-head{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 280px}
-.hof-title{margin:0;font-family:'Press Start 2P',ui-monospace,monospace;font-weight:400;font-size:clamp(18px,4.4vw,30px);line-height:1.2;color:#ff4f6d;text-shadow:0 0 10px rgba(255,79,109,.75),3px 3px 0 #000}
-.hof-sub{margin:0;font-size:17px;font-weight:700;color:#cfc6ff;max-width:46ch}
-.counter{display:flex;flex-direction:column;align-items:center;gap:8px;background:#07060d;border:3px solid #3a3360;border-radius:14px;padding:10px 14px;flex:0 1 auto}
-.hi{font-family:'Press Start 2P',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;color:#ff4f6d;text-shadow:0 0 6px rgba(255,79,109,.8)}
-.digits{display:flex;gap:5px}
-.digits span{width:clamp(26px,7vw,40px);height:clamp(38px,10vw,54px);display:flex;align-items:center;justify-content:center;background:#0b0a12;border:2px solid #2c2748;border-radius:6px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:clamp(16px,4.6vw,24px);color:#ffb400;text-shadow:0 0 8px rgba(255,180,0,.9),0 0 18px rgba(255,120,0,.6)}
+.wrap{position:relative}
+.counter{position:absolute;top:14px;right:16px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:5px;background:#14111f;border:3px solid var(--ink);border-radius:12px;padding:7px 9px 8px;box-shadow:4px 4px 0 var(--ink)}
+.hi{font-family:'Press Start 2P',ui-monospace,monospace;font-size:8px;letter-spacing:.14em;color:#ff4f6d;text-shadow:0 0 6px rgba(255,79,109,.8)}
+.digits{display:flex;gap:3px}
+.digits span{width:clamp(15px,3.6vw,22px);height:clamp(22px,5.2vw,30px);display:flex;align-items:center;justify-content:center;background:#0b0a12;border:2px solid #2c2748;border-radius:4px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:clamp(10px,2.4vw,14px);color:#ffb400;text-shadow:0 0 8px rgba(255,180,0,.9),0 0 18px rgba(255,120,0,.6)}
 .digits.off span{color:#5a4a20;text-shadow:none}
-.msg{font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;line-height:1.6;text-align:center;color:#7fe3ff;text-shadow:0 0 6px rgba(127,227,255,.7);max-width:280px}
-.blink{animation:blink 1s steps(2,start) infinite}
-@keyframes blink{to{visibility:hidden}}
-.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;align-items:start}
-.lb{border:3px solid var(--c);border-radius:14px;padding:12px 12px 14px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px;min-width:0}
-.lb h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1;color:var(--c)}
-.lb small{font-size:13px;font-weight:700;color:#a99fd0;text-transform:uppercase;letter-spacing:.08em}
-.lb ol{list-style:none;margin:6px 0 0;padding:0 4px 0 0;display:flex;flex-direction:column;gap:6px}
-.lb:not(.open) li.extra{display:none}
-.lb .more{align-self:stretch;margin-top:4px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:10px;line-height:1.5;padding:9px 8px;border:2px solid var(--c);border-radius:10px;background:transparent;color:var(--c);cursor:pointer}
-.lb .more:hover{background:rgba(255,255,255,.08)}
-.lb .more:focus-visible{outline:3px dashed #fff;outline-offset:2px}
-.lb li{display:grid;grid-template-columns:2em 1fr auto;align-items:center;gap:8px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:12px;padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.06)}
-.lb li:first-child{background:rgba(255,201,60,.18);font-size:13px}
-.lb li .m{font-size:18px;font-family:system-ui,sans-serif;text-align:center}
-.lb li b{font-weight:400;letter-spacing:.12em;color:#fff}
-.lb li .v{color:#ffb400;text-shadow:0 0 6px rgba(255,180,0,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
-.lb li.empty{display:block;text-align:center;font-size:10px;line-height:1.7;color:#7fe3ff;background:none}
-#record,#hof{scroll-margin-top:12px}
-.coin{position:relative;z-index:1;font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;color:#a99fd0;letter-spacing:.08em;text-align:center}
-@media (prefers-reduced-motion:reduce){.blink{animation:none}}
-@media (max-width:560px){.counter{width:100%;box-sizing:border-box}}
 footer{font-size:15px;color:var(--muted);font-weight:600}
 /* player */
 #player{position:fixed;inset:0;background:#000;z-index:10;display:flex;flex-direction:column}
@@ -141,6 +81,10 @@ body.playing{overflow:hidden}
 <body>
 <div class="wrap">
   <header>
+    <div class="counter" title="Visite al sito">
+      <div class="hi">VISITE</div>
+      <div class="digits off" id="visits" role="status" aria-live="polite" aria-label="Numero di visite"><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div>
+    </div>
     <div class="brand">
     <svg class="logo" viewBox="0 0 160 170" role="img" aria-label="Logo di Barbafiamme: un pilota con la barba di fiamme">
       <circle cx="80" cy="74" r="66" fill="#ffc93c" stroke="#1f1d2b" stroke-width="5"/>
@@ -282,67 +226,7 @@ body.playing{overflow:hidden}
     <div class="maker-btns"><a class="mk-btn" href="crea.html">✏️ Crea il tuo gioco</a><a class="mk-btn ghost" href="amici.html">🎮 Piccoli Inventori</a><a class="mk-btn ghost" href="anteprima.html">I miei giochi</a></div>
   </section>
 
-  <section class="hof" id="record" aria-labelledby="hof-title">
-    <div class="hof-top">
-      <div class="hof-head">
-        <h2 class="hof-title" id="hof-title">SALA DEI RECORD</h2>
-        <p class="hof-sub">Fai una partita e scrivi le tue iniziali: entri nella classifica di tutto il mondo!</p>
-      </div>
-      <div class="counter">
-        <div class="hi">VISITE</div>
-        <div class="digits off" id="visits" role="status" aria-live="polite" aria-label="Numero di visite"><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span></div>
-        <div class="msg" id="visitMsg"><span class="blink">CARICAMENTO...</span></div>
-      </div>
-    </div>
-    <div class="boards">
-      <div class="lb" data-g="pirati" style="--c:#ff8a5c"><h3>Pirati</h3><small>primi 20 · più monete</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
-      <div class="lb" data-g="granpremio" style="--c:#ffc93c"><h3>Gran Premio</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
-      <div class="lb" data-g="trenini" style="--c:#7fd66b"><h3>Trenini</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
-      <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>primi 20 · più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
-    </div>
-    <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
-  </section>
-
-
-  <section class="gallery" aria-labelledby="gal-title">
-    <div class="gal-head">
-      <h2 id="gal-title">I disegni di Agostino</h2>
-      <p>Da qui è partito tutto: le auto della corsa, gli aerei della squadriglia e le navi dei pirati sono nati da questi fogli. Scorri con le frecce o con il dito, e tocca un disegno per vederlo grande.</p>
-    </div>
-    <div class="carousel" aria-roledescription="carosello" aria-label="Disegni di Agostino">
-      <button class="nav prev" id="prev" type="button" aria-label="Disegno precedente">◀</button>
-      <div class="pins" id="pins" tabindex="0">
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/azzurra-20.jpg" data-cap="Auto azzurra e blu, numero 20. In gioco è diventata Turbo Azzurro."><img src="disegni/azzurra-20.jpg" alt="Disegno di un'auto azzurra e blu con il numero 20 dentro uno schermo" loading="lazy"></button>
-        <figcaption><b>Numero 20</b><span>→ Turbo Azzurro</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/grigia-9.jpg" data-cap="Auto grigia con righe verdi e lo stemma col 9. In gioco è diventata Grigio Smeraldo."><img src="disegni/grigia-9.jpg" alt="Disegno di un'auto grigia con righe verdi e uno stemma col numero 9" loading="lazy"></button>
-        <figcaption><b>Grigia col 9</b><span>→ Grigio Smeraldo</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/verde.jpg" data-cap="Auto verde con ruote gialle e due stemmi con gli occhi. In gioco è diventata Lime Sprint."><img src="disegni/verde.jpg" alt="Disegno di un'auto verde con ruote gialle e due stemmi gialli" loading="lazy"></button>
-        <figcaption><b>Verde e gialla</b><span>→ Lime Sprint</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/viola-arancio.jpg" data-cap="Auto viola con il parafango e la fascia arancione. In gioco è diventata Viola Arancio."><img src="disegni/viola-arancio.jpg" alt="Disegno di un'auto viola con dettagli arancioni" loading="lazy"></button>
-        <figcaption><b>Viola e arancione</b><span>→ Viola Arancio</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/aerei.jpg" data-cap="La squadriglia di aerei colorati che scappa dal buio che avanza. Da qui è nato Squadriglia contro il Buio."><img src="disegni/aerei.jpg" alt="Disegno pieno di colori con aerei verdi, azzurri e rossi e una grande macchia nera" loading="lazy" style="object-position:50% 85%"></button>
-        <figcaption><b>Gli aerei e il Buio</b><span>→ Squadriglia contro il Buio</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/pirati.jpg" data-cap="La nave pirata a righe con il capitano, la moglie vestita di blu, i pappagalli, il fuoco e il mare. Da qui è nato Pirati all'Arrembaggio."><img src="disegni/pirati.jpg" alt="Disegno di una nave pirata marrone a righe con vele bianche, teschio, pirati, pappagalli, fuoco rosso e mare blu" loading="lazy"></button>
-        <figcaption><b>La nave dei pirati</b><span>→ Pirati all'Arrembaggio</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/trenini.jpg" data-cap="Quattro trenini colorati sui binari, con i vagoni blu, rossi, verdi e viola. Da qui sono nati i Trenini, chi arriva prima."><img src="disegni/trenini.jpg" alt="Disegno di trenini colorati su due binari con vagoni blu, rossi, verdi e viola" loading="lazy"></button>
-        <figcaption><b>I trenini colorati</b><span>→ Trenini, chi arriva prima</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/rossa-95.jpg" data-cap="Auto rossa e gialla con il numero 95."><img src="disegni/rossa-95.jpg" alt="Disegno di un'auto rossa con una fascia gialla e il numero 95" loading="lazy"></button>
-        <figcaption><b>Rossa col 95</b><span>disegno</span></figcaption></figure></div>
-      <div class="slide"><figure class="pin"><button type="button" data-full="disegni/azzurra-43.jpg" data-cap="Auto azzurra con un grande alettone e il numero 43."><img src="disegni/azzurra-43.jpg" alt="Disegno di un'auto azzurra con alettone e il numero 43" loading="lazy"></button>
-        <figcaption><b>Azzurra col 43</b><span>disegno</span></figcaption></figure></div>
-    </div>
-      <button class="nav next" id="next" type="button" aria-label="Disegno successivo">▶</button>
-      <div class="dots" id="dots"></div>
-    </div>
-  </section>
-
   <footer>Disegni e idee di Agostino, giochi costruiti insieme a papà.</footer>
-</div>
-
-<div id="zoom" hidden role="dialog" aria-modal="true" aria-label="Disegno ingrandito">
-  <img id="zoomImg" alt="">
-  <p id="zoomCap"></p>
-  <button class="close" id="zoomClose" type="button">Chiudi</button>
 </div>
 
 <div id="player" hidden>
@@ -357,30 +241,12 @@ body.playing{overflow:hidden}
   function close(){player.hidden=true;frame.src='about:blank';document.body.classList.remove('playing')}
   document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>open(b.dataset.game,b.dataset.kind)));
   document.getElementById('close').addEventListener('click',close);
-  const zoom=document.getElementById('zoom'),zi=document.getElementById('zoomImg'),zc=document.getElementById('zoomCap');let lastBtn=null;
-  function zClose(){zoom.hidden=true;document.body.classList.remove('playing');if(lastBtn)lastBtn.focus()}
-  document.querySelectorAll('[data-full]').forEach(b=>b.addEventListener('click',()=>{lastBtn=b;zi.src=b.dataset.full;zi.alt=b.querySelector('img').alt;zc.textContent=b.dataset.cap;zoom.hidden=false;document.body.classList.add('playing');document.getElementById('zoomClose').focus()}));
-  document.getElementById('zoomClose').addEventListener('click',zClose);
-  const track=document.getElementById('pins'),slides=[...track.querySelectorAll('.slide')],dots=document.getElementById('dots'),prev=document.getElementById('prev'),next=document.getElementById('next');
-  const count=document.createElement('span');count.className='count';
-  slides.forEach((sl,i)=>{sl.setAttribute('role','group');sl.setAttribute('aria-roledescription','disegno');sl.setAttribute('aria-label',(i+1)+' di '+slides.length);
-    const d=document.createElement('button');d.type='button';d.setAttribute('aria-label','Vai al disegno '+(i+1));d.addEventListener('click',()=>go(i));dots.append(d)});
-  dots.append(count);
-  let cur=0;
-  function go(i){i=Math.max(0,Math.min(slides.length-1,i));track.scrollTo({left:slides[i].offsetLeft-track.offsetLeft,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
-  function sync(){const i=Math.round(track.scrollLeft/track.clientWidth);cur=Math.max(0,Math.min(slides.length-1,i));
-    [...dots.querySelectorAll('button')].forEach((d,k)=>d.setAttribute('aria-current',k===cur));prev.disabled=cur===0;next.disabled=cur===slides.length-1;count.textContent=(cur+1)+' / '+slides.length}
-  let raf=0;track.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(sync)});
-  prev.addEventListener('click',()=>go(cur-1));next.addEventListener('click',()=>go(cur+1));
-  track.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();go(cur+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1)}});
-  addEventListener('resize',()=>go(cur));sync();
-  zoom.addEventListener('click',e=>{if(e.target===zoom)zClose()});
-  addEventListener('keydown',e=>{if(e.key==='Escape'){if(!zoom.hidden)zClose();else if(!player.hidden)close()}});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!player.hidden)close()});
 })();
 </script>
 <script>
 (()=>{
-  const box=document.getElementById('visits'),msg=document.getElementById('visitMsg');
+  const box=document.getElementById('visits');
   const API='https://abacus.jasoncameron.dev/',NS='barbafiamme.github.io',KEY='visite';
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   function show(n){const s=String(Math.min(n,999999)).padStart(6,'0');box.classList.remove('off');[...box.children].forEach((d,i)=>d.textContent=s[i]);box.setAttribute('aria-label','Visite: '+n)}
@@ -391,32 +257,11 @@ body.playing{overflow:hidden}
   fetch(url,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{
     if(typeof j.value!=='number')throw 0;
     try{sessionStorage.setItem('bf_counted','1')}catch(e){}
-    roll(j.value);msg.innerHTML=counted?'BENTORNATO, GIOCATORE!':'SEI IL GIOCATORE N. '+j.value+'!<br><span class="blink">PREMI GIOCA PER INIZIARE</span>';
-  }).catch(()=>{msg.textContent='CONTATORE IN PAUSA. RIPROVA PIÙ TARDI';});
+    roll(j.value);
+  }).catch(()=>{box.setAttribute('aria-label','Contatore in pausa')});
 })();
 </script>
 
-<script src="classifica.js"></script>
-<script>
-(()=>{const C=window.Classifica;if(!C)return;
-  async function fill(lb){const g=lb.dataset.g,ol=lb.querySelector('ol');
-    try{const rows=await C.top(g,20);ol.innerHTML='';
-      if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
-      rows.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
-        if(i>=5)li.className='extra';li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g].fmt(r.score);ol.append(li)});
-      if(rows.length>5){const b=document.createElement('button');b.type='button';b.className='more';const lab=()=>{const o=lb.classList.contains('open');b.textContent=o?'MOSTRA MENO ▲':'MOSTRA TUTTI I '+rows.length+' ▼';b.setAttribute('aria-expanded',o)};lab();
-        b.addEventListener('click',()=>{lb.classList.toggle('open');lab()});lb.append(b)}}
-    catch(e){ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA<br>RIPROVA PIÙ TARDI</li>'}}
-  document.querySelectorAll('.lb').forEach(fill);
-  // tutti i giochi nella stessa Sala dei Record: anche quelli dei Piccoli Inventori
-  const COLORS=['#9be15d','#c79bff','#ff6fa8','#ffc93c','#5fd7ff','#ff8a5c'],boards=document.querySelector('.boards');
-  fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{(Array.isArray(list)?list:[]).filter(g=>g&&/^[a-z0-9-]{1,60}$/.test(g.slug||'')).forEach((g,k)=>{
-    const cl=g.classifica||{},unit=cl.unit||'punti';C.register(g.slug,{title:g.titolo,unit,asc:!!cl.asc});
-    const lb=document.createElement('div');lb.className='lb';lb.dataset.g=g.slug;lb.style.setProperty('--c',COLORS[k%COLORS.length]);
-    lb.innerHTML='<h3></h3><small></small><ol><li class="empty">CARICAMENTO...</li></ol>';lb.querySelector('h3').textContent=g.titolo||g.slug;
-    lb.querySelector('small').textContent='primi 20 · di '+(g.nome||'?')+' · '+(cl.asc||unit==='tempo'?'tempo più veloce':'più '+unit);
-    boards.append(lb);fill(lb)})}).catch(()=>{})})();
-</script>
 <script src="menu.js"></script>
 </body>
 </html>
