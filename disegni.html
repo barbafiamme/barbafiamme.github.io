@@ -79,13 +79,10 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
   const safe=/^[a-z0-9-]{1,60}$/,COLORS=['#ffc93c','#7cc934','#5fd7ff','#ff8a5c','#c79bff','#ff6fa8'];
   const key=n=>n.trim().toLocaleLowerCase('it');
 
-  // disegni di Agostino: presi dalla galleria della pagina principale, così restano sempre aggiornati
-  const agostino=fetch('index.html',{cache:'no-cache'}).then(r=>r.text()).then(html=>{
-    const doc=new DOMParser().parseFromString(html,'text/html');
-    return [...doc.querySelectorAll('#pins figure.pin')].map(f=>{const b=f.querySelector('button[data-full]'),im=f.querySelector('img');
-      const game=(f.querySelector('figcaption span')||{}).textContent||'';
-      return b&&{nome:'Agostino',src:b.getAttribute('data-full'),titolo:(f.querySelector('figcaption b')||{}).textContent||'Disegno',
-        sotto:game.trim()==='disegno'?'':game.trim(),cap:b.getAttribute('data-cap')||'',alt:im?im.alt:''}}).filter(Boolean)}).catch(()=>[]);
+  // disegni di Agostino: elenco in disegni-agostino.json (src, titolo, gioco, descrizione, alt)
+  const agostino=fetch('disegni-agostino.json',{cache:'no-cache'}).then(r=>r.json()).then(a=>(Array.isArray(a)?a:[])
+    .filter(d=>d&&/^disegni\/[a-z0-9-]+\.(jpg|jpeg|png|webp)$/.test(d.src||'')).map(d=>({nome:'Agostino',src:d.src,titolo:d.titolo||'Disegno',
+      sotto:d.gioco?'→ '+d.gioco:'',cap:d.descrizione||'',alt:d.alt||''}))).catch(()=>[]);
 
   // disegni dei Piccoli Inventori
   const amici=fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(a=>(Array.isArray(a)?a:[]).filter(g=>g&&safe.test(g.slug||'')).map(g=>({
