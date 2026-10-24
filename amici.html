@@ -82,12 +82,14 @@ h1 .b{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-blo
 #zoom p{margin:0;color:var(--paper);font-weight:800;font-size:18px;text-align:center}
 #zoom button{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:var(--paper);cursor:pointer}
 @media (prefers-reduced-motion:reduce){.pin{transform:none!important}}
+#hof{scroll-margin-top:12px}
 footer{font-size:15px;color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="toplinks"><a class="back" href="./">← Barbafiamme</a><a class="back" href="anteprima.html">I miei giochi</a></div>
+  <nav class="bf-menu" data-page="amici"></nav>
+  <div class="toplinks"><a class="back" href="anteprima.html">I miei giochi</a></div>
   <header>
     <span class="tag">I giochi degli amici di Barbafiamme</span>
     <h1><span class="a">Piccoli</span> <span class="b">Inventori</span></h1>
@@ -141,6 +143,7 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
       a.querySelector('h2').textContent=g.titolo||g.slug;a.querySelector('.by').textContent='Disegnato da '+(g.nome||'un piccolo inventore');
       a.querySelector('.desc').textContent=g.descrizione||'';a.querySelector('.play').addEventListener('click',()=>open(g.slug));grid.append(a)});
     records(list);artists(list);
+    if(location.hash==='#hof')requestAnimationFrame(()=>document.getElementById('hof').scrollIntoView());
   }).catch(empty);
   // record: una classifica per ogni gioco approvato
   const COLORS=['#9be15d','#ffc93c','#5fd7ff','#ff8a5c','#c79bff','#ff6fa8'];
@@ -170,5 +173,6 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
       box.append(sec)})}
 })();
 </script>
+<script src="menu.js"></script>
 </body>
 </html>

@@ -123,6 +123,9 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .lb li b{font-weight:400;letter-spacing:.12em;color:#fff}
 .lb li .v{color:#ffb400;text-shadow:0 0 6px rgba(255,180,0,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
 .lb li.empty{display:block;text-align:center;font-size:10px;line-height:1.7;color:#7fe3ff;background:none}
+.hof-more{position:relative;z-index:1;align-self:center;font-family:'Press Start 2P',ui-monospace,monospace;font-size:11px;line-height:1.6;color:#9be15d;text-decoration:none;border:2px solid #9be15d;border-radius:10px;padding:9px 12px;text-align:center}
+.hof-more:hover{background:rgba(155,225,93,.12)}
+#record,#hof{scroll-margin-top:12px}
 .coin{position:relative;z-index:1;font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;color:#a99fd0;letter-spacing:.08em;text-align:center}
 @media (prefers-reduced-motion:reduce){.blink{animation:none}}
 @media (max-width:560px){.counter{width:100%;box-sizing:border-box}}
@@ -163,6 +166,7 @@ body.playing{overflow:hidden}
         <h1><span class="a">Barba</span><span class="b">fiamme</span></h1>
       </div>
     </div>
+    <nav class="bf-menu" data-page="home"></nav>
     <p class="lead">I videogiochi nati dai disegni di Agostino. Scegline uno e premi Gioca: funzionano sul telefono e sul computer.</p>
   </header>
 
@@ -280,7 +284,7 @@ body.playing{overflow:hidden}
     <div class="maker-btns"><a class="mk-btn" href="crea.html">✏️ Crea il tuo gioco</a><a class="mk-btn ghost" href="amici.html">🎮 Piccoli Inventori</a><a class="mk-btn ghost" href="anteprima.html">I miei giochi</a></div>
   </section>
 
-  <section class="hof" aria-labelledby="hof-title">
+  <section class="hof" id="record" aria-labelledby="hof-title">
     <div class="hof-top">
       <div class="hof-head">
         <h2 class="hof-title" id="hof-title">SALA DEI RECORD</h2>
@@ -298,6 +302,7 @@ body.playing{overflow:hidden}
       <div class="lb" data-g="trenini" style="--c:#7fd66b"><h3>Trenini</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
       <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>primi 20 · più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
     </div>
+    <a class="hof-more" href="amici.html#hof">RECORD DEI PICCOLI INVENTORI ▶</a>
     <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
   </section>
 
@@ -406,5 +411,6 @@ body.playing{overflow:hidden}
         b.addEventListener('click',()=>{lb.classList.toggle('open');lab()});lb.append(b)}}
     catch(e){ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA<br>RIPROVA PIÙ TARDI</li>'}})})();
 </script>
+<script src="menu.js"></script>
 </body>
 </html>
