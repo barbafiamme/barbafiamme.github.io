@@ -61,5 +61,12 @@
   "gioco": "",
   "descrizione": "Auto azzurra con un grande alettone e il numero 43.",
   "alt": "Disegno di un'auto azzurra con alettone e il numero 43"
+ },
+ {
+  "src": "disegni/piscina.jpg",
+  "titolo": "La piscina",
+  "gioco": "Piscina veloce",
+  "descrizione": "Una piscina blu con tre nuotatori in costume verde, arancione e rosso. Da qui è nata la Piscina veloce.",
+  "alt": "Disegno di una piscina blu con tre nuotatori che nuotano, con il costume verde, arancione e rosso"
  }
 ]
