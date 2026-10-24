@@ -1,0 +1,182 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+<title>Piscina veloce</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--scrim:rgba(31,29,43,.55);--display:'Bungee',Impact,'Arial Black',sans-serif;--body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;color-scheme:light}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#2f7fe0;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;touch-action:pan-y;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:12px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(26px,7vw,40px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.pick:focus-visible,#go:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.picks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pick{font-family:var(--body);font-weight:800;font-size:18px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:8px 6px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:3px 3px 0 var(--ink);min-height:72px}
+.pick canvas{width:100%;max-width:150px;height:46px}
+.pick[aria-pressed=true]{background:var(--sun);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);z-index:2;pointer-events:none}
+#pos{left:12px}#time{right:12px}
+#info{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 62px);transform:translateX(-50%);background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:2px 14px;font-weight:800;font-size:16px;z-index:2;pointer-events:none;white-space:nowrap}
+#go{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:min(86vw,360px);height:86px;font-family:var(--display);font-size:30px;background:#ff5a4f;color:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);cursor:pointer;z-index:3;touch-action:manipulation}
+#go:active,#go.down{transform:translate(-50%,4px);box-shadow:0 2px 0 var(--ink)}
+#count{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:clamp(80px,22vw,200px);color:#fff;-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;pointer-events:none;z-index:4}
+.stats{display:flex;flex-wrap:wrap;gap:8px}.stats span{border:2px solid var(--ink);border-radius:999px;padding:2px 12px;background:#fff;font-weight:800;font-size:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px}.btn.ghost{background:#fff}
+</style></head><body>
+<canvas id="game"></canvas>
+<div class="pill" id="pos" hidden></div><div class="pill" id="time" hidden></div><div id="info" hidden></div>
+<button id="go" type="button" hidden>SCHIZZA! 💦</button>
+<div id="count" hidden></div>
+
+<div class="overlay" id="start"><div class="panel">
+  <h1>Piscina <span>veloce!</span></h1>
+  <p>Scegli il tuo nuotatore! Quattro nuotatori fanno 10 vasche avanti e indietro: chi arriva primo vince.</p>
+  <div class="picks" id="picks"></div>
+  <p><b>Come si gioca:</b> tocca il pulsante rosso (o premi la barra spaziatrice) tante volte: più schizzi, più vai veloce! Il primo round è <b>con la tavoletta</b>, il secondo <b>senza</b>.</p>
+  <button class="btn" id="startBtn" type="button">Via!</button>
+</div></div>
+
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="endT"></h2><p id="endP"></p><div class="stats" id="endS"></div>
+  <div id="board"></div>
+  <div class="row"><button class="btn" id="again" type="button">Ancora!</button><button class="btn ghost" id="change" type="button">Cambia nuotatore</button></div>
+</div></div>
+
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('piscina',{title:'Piscina veloce',unit:'tempo',asc:true});
+const SW=[
+ {n:'Verdino',hair:'#ffd23a',trunk:'#1fa84a'},
+ {n:'Arancio',hair:'#1f1d2b',trunk:'#f2891f'},
+ {n:'Rossella',hair:'#2a4fd0',trunk:'#d8262f'},
+ {n:'Gialla',hair:'#8a4b22',trunk:'#ffd23a',cap:true}
+];
+const NL=10; // vasche per round
+const cv=document.getElementById('game'),cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,DPR=1,mine=0,state='menu',sw=[],t0=0,cd=0,order=[],done=false,round=1,r1time=0,P={x0:0,x1:0,y0:0,lh:0,sc:1},splash=[],lastT=0,clk=0;
+function layout(){const top=108,bot=H-122,m=Math.max(14,W*.03);P.x0=m;P.x1=W-m;P.y0=top;P.lh=Math.max(34,Math.min(120,(bot-top)/4));
+  // se lo schermo e' basso le corsie si stringono ma restano 4
+  P.sc=Math.min(P.lh/46,(P.x1-P.x0)/330)*1.0;if(P.sc<.55)P.sc=.55}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);layout();draw()}
+addEventListener('resize',resize);
+function pxy(l,p){const len=Math.min(NL,p),k=Math.floor(Math.min(len,NL-1e-6)),f=len-k,fw=k%2===0;
+  const pad=22*P.sc,xa=P.x0+pad,xb=P.x1-pad;return{x:fw?xa+(xb-xa)*f:xb-(xb-xa)*f,y:P.y0+(l+.5)*P.lh,dir:fw?1:-1}}
+function drawPool(){
+  cx.fillStyle='#d9efe6';cx.fillRect(0,0,W,H);
+  // bordo della piscina
+  cx.fillStyle='#f4efe2';cx.fillRect(P.x0-12,P.y0-12,P.x1-P.x0+24,P.lh*4+24);
+  cx.fillStyle='#38a9ee';cx.fillRect(P.x0,P.y0,P.x1-P.x0,P.lh*4);
+  cx.strokeStyle='#1f1d2b';cx.lineWidth=3;cx.strokeRect(P.x0,P.y0,P.x1-P.x0,P.lh*4);
+  // onde
+  cx.strokeStyle='rgba(255,255,255,.35)';cx.lineWidth=2;
+  for(let l=0;l<4;l++)for(let i=0;i<9;i++){const x=P.x0+((i*97+l*41+clk*18)%(P.x1-P.x0)),y=P.y0+l*P.lh+P.lh*(.2+((i*37)%5)/8);
+    cx.beginPath();cx.moveTo(x,y);cx.quadraticCurveTo(x+8,y-5,x+16,y);cx.quadraticCurveTo(x+24,y+5,x+32,y);cx.stroke()}
+  // corde delle corsie
+  for(let l=1;l<4;l++){const y=P.y0+l*P.lh;for(let x=P.x0;x<P.x1;x+=16){cx.fillStyle=(x/16|0)%2?'#ff5a4f':'#fff';cx.beginPath();cx.arc(x+8,y,4,0,7);cx.fill()}}
+  // muri di virata
+  cx.fillStyle='rgba(255,255,255,.55)';cx.fillRect(P.x0,P.y0,6,P.lh*4);cx.fillRect(P.x1-6,P.y0,6,P.lh*4);
+  // lettere
+  cx.fillStyle='#fff';cx.strokeStyle='#1f1d2b';cx.lineWidth=4;cx.textAlign='center';cx.font='18px Bungee,Impact,sans-serif';
+  cx.strokeText('PISCINA',W/2,P.y0-24);cx.fillText('PISCINA',W/2,P.y0-24);
+}
+function swimmer(c,S,x,y,dir,ph,s,v,board){
+  c.save();c.translate(x,y);c.scale(dir*s,s);c.lineCap='round';c.lineJoin='round';
+  const k=Math.sin(ph),k2=Math.sin(ph+Math.PI);
+  const skin='#f4a27a';
+  // schizzi dietro i piedi
+  if(v>.05){c.fillStyle='rgba(255,255,255,.8)';for(let i=0;i<3;i++){c.beginPath();c.arc(-30-i*7,(i-1)*5+k*3,3.5-i*.6,0,7);c.fill()}}
+  // gambe
+  c.strokeStyle='#1f1d2b';c.lineWidth=8;[k,k2].forEach(q=>{c.beginPath();c.moveTo(-8,0);c.lineTo(-28,q*7);c.stroke()});
+  c.strokeStyle=skin;c.lineWidth=5;[k,k2].forEach(q=>{c.beginPath();c.moveTo(-8,0);c.lineTo(-28,q*7);c.stroke()});
+  // braccia
+  if(board){c.strokeStyle='#1f1d2b';c.lineWidth=8;c.beginPath();c.moveTo(10,-5);c.lineTo(26,-4);c.moveTo(10,5);c.lineTo(26,4);c.stroke();
+    c.strokeStyle=skin;c.lineWidth=5;c.beginPath();c.moveTo(10,-5);c.lineTo(26,-4);c.moveTo(10,5);c.lineTo(26,4);c.stroke();
+}
+  else{[[-1,k],[1,k2]].forEach(([sd,q])=>{const ex=14+q*13,ey=sd*(9+Math.max(0,q)*4);
+    c.strokeStyle='#1f1d2b';c.lineWidth=8;c.beginPath();c.moveTo(8,sd*4);c.lineTo(ex,ey);c.stroke();
+    c.strokeStyle=skin;c.lineWidth=5;c.beginPath();c.moveTo(8,sd*4);c.lineTo(ex,ey);c.stroke()})}
+  // corpo
+  c.strokeStyle='#1f1d2b';c.lineWidth=12;c.beginPath();c.moveTo(-10,0);c.lineTo(14,0);c.stroke();
+  c.strokeStyle=skin;c.lineWidth=8;c.beginPath();c.moveTo(-10,0);c.lineTo(14,0);c.stroke();
+  c.fillStyle=S.trunk;c.strokeStyle='#1f1d2b';c.lineWidth=2.5;c.beginPath();c.roundRect?c.roundRect(-14,-6.5,15,13,3):c.rect(-14,-6.5,15,13);c.fill();c.stroke();
+  // testa
+  c.fillStyle=skin;c.beginPath();c.arc(20,0,8,0,7);c.fill();c.stroke();
+  c.fillStyle=S.hair;c.beginPath();c.arc(18.5,0,8.2,Math.PI*.5,Math.PI*1.5);c.closePath();c.fill();c.stroke();
+  if(S.cap){c.fillStyle='#ffd23a';c.beginPath();c.arc(18.5,0,8.4,Math.PI*.5,Math.PI*1.5);c.fill();c.stroke()}
+  c.fillStyle='#1f1d2b';c.beginPath();c.arc(25,-3,1.3,0,7);c.arc(25,3,1.3,0,7);c.fill();
+  if(board){c.fillStyle='#ffd23a';c.strokeStyle='#1f1d2b';c.lineWidth=2.5;c.beginPath();c.roundRect?c.roundRect(30,-10,15,20,5):c.rect(30,-10,15,20);c.fill();c.stroke()}
+  c.restore()}
+function draw(){
+  drawPool();
+  const order2=[0,1,2,3];
+  for(const l of order2){const q=sw[l],S=q?SW[q.t]:SW[l],p=q?q.p:0,v=q?q.v:0,ph=q?q.ph:0;const o=pxy(l,p);
+    swimmer(cx,S,o.x,o.y,o.dir,ph,P.sc,v,round===1);
+    if(l===mine&&state!=='menu'){const y=o.y-24*P.sc;cx.fillStyle='#fff';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;cx.beginPath();cx.moveTo(o.x,y+9);cx.lineTo(o.x-9,y-7);cx.lineTo(o.x+9,y-7);cx.closePath();cx.fill();cx.stroke()}}
+  for(const s of splash){cx.fillStyle='rgba(255,255,255,'+Math.max(0,s.a)+')';cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()}
+}
+// scelta del nuotatore
+const picks=$('picks');
+SW.forEach((S,i)=>{const b=document.createElement('button');b.type='button';b.className='pick';b.setAttribute('aria-pressed',i===0);
+  const c=document.createElement('canvas');c.width=300;c.height=92;b.append(c,document.createTextNode(S.n));
+  swimmer(c.getContext('2d'),S,150,46,1,.6,1.5,0,false);
+  b.onclick=()=>{mine=i;[...picks.children].forEach((x,j)=>x.setAttribute('aria-pressed',j===i))};picks.append(b)});
+// partita
+function begin(){round=1;r1time=0;startRound()}
+function startRound(){
+  sw=[0,1,2,3].map(l=>({t:l,p:0,v:0,skill:l===mine?1:.92+Math.random()*.14,wob:0,wobT:0,fin:null,ph:Math.random()*6}));
+  order=[];done=false;splash=[];state='count';cd=3.99;$('start').hidden=true;$('end').hidden=true;
+  $('pos').textContent='Pronti…';$('time').textContent='0.0 s';
+  $('info').textContent=round===1?'Round 1: con la tavoletta 🟨':'Round 2: senza tavoletta 🏊';
+  ['go','pos','time','info','count'].forEach(id=>$(id).hidden=false);lastT=performance.now();requestAnimationFrame(loop)}
+function tap(){if(state!=='run')return;const p=sw[mine];p.v=Math.min(round===1?.42:.5,p.v+(round===1?.045:.055));
+  const o=pxy(mine,p.p);for(let i=0;i<5;i++)splash.push({x:o.x-o.dir*(18+Math.random()*12)*P.sc,y:o.y+(Math.random()-.5)*18*P.sc,r:2+Math.random()*3.5,a:.9,vx:-o.dir*(20+Math.random()*30),vy:(Math.random()-.5)*50})}
+function loop(now){
+  if(state==='menu'||state==='over')return;
+  const dt=Math.min(.05,(now-lastT)/1000);lastT=now;clk+=dt;
+  splash.forEach(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;s.a-=dt*1.8;s.r+=dt*4});splash=splash.filter(s=>s.a>0);
+  if(state==='count'){cd-=dt;const n=Math.ceil(cd);$('count').textContent=n>0?n:'VIA!';if(cd<=0){state='run';t0=now;setTimeout(()=>{$('count').hidden=true},500)}}
+  else if(state==='run'){
+    const tn=(now-t0)/1000;$('time').textContent=tn.toFixed(1)+' s';
+    const lead=Math.max(...sw.map(q=>q.p)),base=round===1?.27:.31;
+    sw.forEach((q,l)=>{if(q.fin!==null)return;
+      if(l===mine){q.v=Math.max(.03,q.v-q.v*1.15*dt)}
+      else{q.wobT-=dt;if(q.wobT<=0){q.wobT=.8+Math.random();q.wob=(Math.random()-.5)*.06}
+        const behind=(lead-q.p)/NL,rb=1+Math.max(-.12,Math.min(.18,behind*.9));q.v=(base*q.skill+q.wob)*rb}
+      q.p+=q.v*dt;q.ph+=dt*(4+q.v*22);
+      if(q.p>=NL){q.p=NL;q.fin=(now-t0)/1000;order.push(l)}});
+    const rank=[...sw.keys()].sort((a,b)=>(sw[b].fin===null?sw[b].p/NL:2-sw[b].fin/1000)-(sw[a].fin===null?sw[a].p/NL:2-sw[a].fin/1000));
+    $('pos').textContent=(rank.indexOf(mine)+1)+'° posto';
+    const vs=Math.min(NL,Math.floor(sw[mine].p)+1);$('info').textContent=(round===1?'Round 1 · tavoletta':'Round 2 · senza tavoletta')+' · vasca '+vs+'/'+NL;
+    if(sw[mine].fin!==null&&!done){done=true;setTimeout(finish,900)}}
+  draw();requestAnimationFrame(loop)}
+function finish(){
+  state='over';draw();
+  ['go','pos','time','info'].forEach(id=>$(id).hidden=true);
+  const place=order.indexOf(mine)+1,time=sw[mine].fin,b=$('board');b.innerHTML='';
+  $('endS').innerHTML='<span>'+place+'° posto</span><span>'+time.toFixed(2)+' secondi</span>';
+  if(round===1){r1time=time;
+    $('endT').textContent=place===1?'Primo round vinto! 🏆':'Primo round finito! 🏊';
+    $('endP').textContent='Bravissimo! Ora il secondo round: senza tavoletta si va più veloce, ma devi schizzare di più!';
+    $('again').textContent='Round 2!';$('again').onclick=()=>{round=2;startRound()};$('change').hidden=true;
+  }else{const tot=r1time+time,cs=Math.max(1,Math.round(tot*100));
+    $('endT').textContent=place===1?'Hai vinto! 🏆':place===2?'Secondo, che bravo! 🥈':'Sei arrivato! 🏊';
+    $('endP').textContent=place===1?'Sei il più veloce della piscina!':'Hai nuotato tutte le vasche. Ci riprovi? Schizza ancora più veloce!';
+    $('endS').innerHTML+='<span>Totale: '+tot.toFixed(2)+' s</span>';
+    if(window.Classifica)Classifica.mount(b,'piscina',cs);
+    $('again').textContent='Ancora!';$('again').onclick=begin;$('change').hidden=false}
+  $('end').hidden=false;$('again').focus()}
+$('startBtn').onclick=begin;
+$('change').onclick=()=>{state='menu';$('end').hidden=true;$('start').hidden=false;sw=[];draw()};
+const go=$('go');
+go.addEventListener('pointerdown',e=>{e.preventDefault();go.classList.add('down');tap()});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>go.addEventListener(ev,()=>go.classList.remove('down')));
+addEventListener('keydown',e=>{if((e.code==='Space'||e.key==='Enter'||e.key==='ArrowRight')&&state==='run'){e.preventDefault();if(!e.repeat)tap()}});
+cv.addEventListener('pointerdown',()=>tap());
+resize();
+</script></body></html>
