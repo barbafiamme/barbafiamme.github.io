@@ -122,7 +122,7 @@ textarea{min-height:140px;resize:vertical}
       <p class="hint">Solo disegni: niente foto di persone, nomi completi o indirizzi.</p>
     </fieldset>
 
-    <fieldset>
+    <fieldset id="titleBox">
       <label class="lbl" for="titolo">Come si chiama il gioco?</label>
       <input type="text" id="titolo" maxlength="60" placeholder="Es. La corsa dei draghi" autocomplete="off">
     </fieldset>
@@ -186,7 +186,7 @@ textarea{min-height:140px;resize:vertical}
   fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{list=(Array.isArray(list)?list:[]).filter(g=>/^[a-z0-9-]{1,60}$/.test(g.slug||''));
     if(!list.length)return;const grp=document.createElement('optgroup');grp.label='Giochi dei Piccoli Inventori';
     list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');grp.append(o)});$('gioco').prepend(grp);$('gioco').selectedIndex=0}).catch(()=>{});
-  form.addEventListener('change',e=>{if(e.target.name==='tipo'){const m=form.tipo.value==='modifica';$('gameBox').hidden=!m;$('drawOpt').hidden=!m}});
+  form.addEventListener('change',e=>{if(e.target.name==='tipo'){const m=form.tipo.value==='modifica';$('gameBox').hidden=!m;$('drawOpt').hidden=!m;$('titleBox').hidden=m}});
   // dettatura: il bambino racconta l'idea a voce
   (()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
     const box=$('voiceBox'),mic=$('mic'),lab=$('micLabel'),hint=$('vhint'),ta=$('idea');box.hidden=false;
@@ -217,7 +217,7 @@ textarea{min-height:140px;resize:vertical}
   drop.addEventListener('drop',e=>{e.preventDefault();take(e.dataTransfer.files[0])});
   const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
   form.addEventListener('submit',async e=>{e.preventDefault();
-    const tipo=form.tipo.value,titolo=$('titolo').value.trim(),idea=$('idea').value.trim(),autore=$('autore').value.trim(),codice=$('codice').value.trim();
+    const tipo=form.tipo.value,sel=$('gioco'),titolo=tipo==='modifica'?('Modifica: '+((sel.options[sel.selectedIndex]||{}).text||sel.value)).slice(0,60):$('titolo').value.trim(),idea=$('idea').value.trim(),autore=$('autore').value.trim(),codice=$('codice').value.trim();
     if(!blob&&tipo!=='modifica')return say('Manca la foto del disegno.','err');
     if(idea.length<10)return say('Racconta la tua idea con qualche parola in più.','err');
     if(!autore)return say('Scrivi il nome del bambino o della bambina.','err');
@@ -261,7 +261,7 @@ textarea{min-height:140px;resize:vertical}
     pollNow=poll;pollT=setTimeout(poll,10000)}
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pollNow){clearTimeout(pollT);pollNow()}});
   $('copy').addEventListener('click',async()=>{const i=$('secret');try{await navigator.clipboard.writeText(i.value);$('copy').textContent='Copiato!'}catch(e){i.select()}});
-  $('another').addEventListener('click',()=>{form.reset();blob=null;preview.hidden=true;ph.hidden=false;drop.classList.remove('has');status.hidden=true;send.disabled=false;$('gameBox').hidden=true;$('drawOpt').hidden=true;
+  $('another').addEventListener('click',()=>{form.reset();blob=null;preview.hidden=true;ph.hidden=false;drop.classList.remove('has');status.hidden=true;send.disabled=false;$('gameBox').hidden=true;$('drawOpt').hidden=true;$('titleBox').hidden=false;
     try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
     stopWait();$('done').hidden=true;form.hidden=false});
 })();
