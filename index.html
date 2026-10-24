@@ -123,8 +123,6 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .lb li b{font-weight:400;letter-spacing:.12em;color:#fff}
 .lb li .v{color:#ffb400;text-shadow:0 0 6px rgba(255,180,0,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
 .lb li.empty{display:block;text-align:center;font-size:10px;line-height:1.7;color:#7fe3ff;background:none}
-.hof-more{position:relative;z-index:1;align-self:center;font-family:'Press Start 2P',ui-monospace,monospace;font-size:11px;line-height:1.6;color:#9be15d;text-decoration:none;border:2px solid #9be15d;border-radius:10px;padding:9px 12px;text-align:center}
-.hof-more:hover{background:rgba(155,225,93,.12)}
 #record,#hof{scroll-margin-top:12px}
 .coin{position:relative;z-index:1;font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;color:#a99fd0;letter-spacing:.08em;text-align:center}
 @media (prefers-reduced-motion:reduce){.blink{animation:none}}
@@ -302,7 +300,6 @@ body.playing{overflow:hidden}
       <div class="lb" data-g="trenini" style="--c:#7fd66b"><h3>Trenini</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
       <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>primi 20 · più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
     </div>
-    <a class="hof-more" href="amici.html#hof">RECORD DEI PICCOLI INVENTORI ▶</a>
     <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
   </section>
 
@@ -402,14 +399,23 @@ body.playing{overflow:hidden}
 <script src="classifica.js"></script>
 <script>
 (()=>{const C=window.Classifica;if(!C)return;
-  document.querySelectorAll('.lb').forEach(async lb=>{const g=lb.dataset.g,ol=lb.querySelector('ol');
+  async function fill(lb){const g=lb.dataset.g,ol=lb.querySelector('ol');
     try{const rows=await C.top(g,20);ol.innerHTML='';
       if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
       rows.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
         if(i>=5)li.className='extra';li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g].fmt(r.score);ol.append(li)});
       if(rows.length>5){const b=document.createElement('button');b.type='button';b.className='more';const lab=()=>{const o=lb.classList.contains('open');b.textContent=o?'MOSTRA MENO ▲':'MOSTRA TUTTI I '+rows.length+' ▼';b.setAttribute('aria-expanded',o)};lab();
         b.addEventListener('click',()=>{lb.classList.toggle('open');lab()});lb.append(b)}}
-    catch(e){ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA<br>RIPROVA PIÙ TARDI</li>'}})})();
+    catch(e){ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA<br>RIPROVA PIÙ TARDI</li>'}}
+  document.querySelectorAll('.lb').forEach(fill);
+  // tutti i giochi nella stessa Sala dei Record: anche quelli dei Piccoli Inventori
+  const COLORS=['#9be15d','#c79bff','#ff6fa8','#ffc93c','#5fd7ff','#ff8a5c'],boards=document.querySelector('.boards');
+  fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{(Array.isArray(list)?list:[]).filter(g=>g&&/^[a-z0-9-]{1,60}$/.test(g.slug||'')).forEach((g,k)=>{
+    const cl=g.classifica||{},unit=cl.unit||'punti';C.register(g.slug,{title:g.titolo,unit,asc:!!cl.asc});
+    const lb=document.createElement('div');lb.className='lb';lb.dataset.g=g.slug;lb.style.setProperty('--c',COLORS[k%COLORS.length]);
+    lb.innerHTML='<h3></h3><small></small><ol><li class="empty">CARICAMENTO...</li></ol>';lb.querySelector('h3').textContent=g.titolo||g.slug;
+    lb.querySelector('small').textContent='primi 20 · di '+(g.nome||'?')+' · '+(cl.asc||unit==='tempo'?'tempo più veloce':'più '+unit);
+    boards.append(lb);fill(lb)})}).catch(()=>{})})();
 </script>
 <script src="menu.js"></script>
 </body>
