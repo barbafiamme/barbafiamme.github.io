@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Disegni · Barbafiamme</title>
+<meta name="description" content="Tutti i disegni da cui sono nati i videogiochi di Barbafiamme, divisi per bambino.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: one corkboard section per child, each drawing pinned like a photo */
+:root{
+  --paper:#fffdf6; --ink:#1f1d2b; --sun:#ffc93c; --red:#e63946; --muted:#5f5b74; --board:#f6e2d3; --dot:#e8c8b0;
+  --display:'Bungee',Impact,'Arial Black',sans-serif; --body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--board);background-image:radial-gradient(var(--dot) 1.4px,transparent 1.6px);background-size:22px 22px;color:var(--ink);font-family:var(--body);font-size:17px;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-direction:column;gap:8px}
+.tag{align-self:flex-start;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:3px 12px;border-radius:999px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,11vw,76px);line-height:.95;margin:0;color:var(--red);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
+.lead{margin:0;font-size:19px;font-weight:600;color:var(--muted);max-width:56ch}
+.jump{display:flex;flex-wrap:wrap;gap:8px}
+.jump a{font-weight:800;font-size:15px;color:var(--ink);text-decoration:none;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:2px 12px}
+.jump a:hover{background:#fff4cf}
+.artist{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 6px 0 var(--ink);padding:14px 16px 18px;display:flex;flex-direction:column;gap:14px;scroll-margin-top:12px}
+.artist h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(22px,5vw,28px);line-height:1.1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.artist h2 small{font-family:var(--body);font-weight:800;font-size:14px;color:var(--muted)}
+.ini{width:44px;height:44px;border-radius:50%;background:var(--c,#7cc934);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.pins{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:16px}
+.pin{margin:0;background:#fff;padding:8px 8px 10px;box-shadow:0 8px 14px -8px rgba(31,29,43,.45);display:flex;flex-direction:column;gap:4px;min-width:0}
+.pin:nth-child(odd){transform:rotate(-1.2deg)}.pin:nth-child(even){transform:rotate(1deg)}
+.pin button{padding:0;border:0;background:none;cursor:zoom-in;display:block}
+.pin button:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.pin img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#f4f2ec}
+.pin figcaption{display:flex;flex-direction:column;line-height:1.25}
+.pin figcaption b{font-size:15px}
+.pin figcaption span{font-size:14px;font-weight:700;color:var(--muted)}
+.msg{background:var(--paper);border:3px dashed var(--ink);border-radius:18px;padding:18px;font-weight:700}
+#zoom{position:fixed;inset:0;z-index:20;background:rgba(31,29,43,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
+#zoom img{max-width:100%;max-height:75vh;border:4px solid var(--paper);background:#fff}
+#zoom p{margin:0;color:var(--paper);font-weight:800;font-size:18px;text-align:center;max-width:60ch}
+#zoom button{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:var(--paper);cursor:pointer}
+@media (prefers-reduced-motion:reduce){.pin{transform:none!important}}
+footer{font-size:15px;color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="bf-menu" data-page="disegni"></nav>
+  <header>
+    <span class="tag">La galleria di Barbafiamme</span>
+    <h1>Disegni</h1>
+    <p class="lead">Tutti i disegni da cui sono nati i nostri videogiochi, divisi per bambino. Tocca un disegno per vederlo grande.</p>
+    <div class="jump" id="jump"></div>
+  </header>
+
+  <main id="list" aria-live="polite" style="display:flex;flex-direction:column;gap:22px"><p class="msg">Sto appendendo i disegni…</p></main>
+
+  <footer>Hai fatto un disegno anche tu? <a href="crea.html">Mandacelo e diventa un videogioco!</a></footer>
+</div>
+
+<div id="zoom" hidden role="dialog" aria-modal="true" aria-label="Disegno ingrandito">
+  <img id="zoomImg" alt="">
+  <p id="zoomCap"></p>
+  <button id="zoomClose" type="button">Chiudi</button>
+</div>
+
+<script>
+(()=>{
+  const list=document.getElementById('list'),jump=document.getElementById('jump');
+  const zoom=document.getElementById('zoom'),zi=document.getElementById('zoomImg'),zc=document.getElementById('zoomCap');
+  const shut=()=>{zoom.hidden=true;zi.src=''};
+  document.getElementById('zoomClose').addEventListener('click',shut);
+  zoom.addEventListener('click',e=>{if(e.target===zoom)shut()});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!zoom.hidden)shut()});
+  const safe=/^[a-z0-9-]{1,60}$/,COLORS=['#ffc93c','#7cc934','#5fd7ff','#ff8a5c','#c79bff','#ff6fa8'];
+  const key=n=>n.trim().toLocaleLowerCase('it');
+
+  // disegni di Agostino: elenco in disegni-agostino.json (src, titolo, gioco, descrizione, alt)
+  const agostino=fetch('disegni-agostino.json',{cache:'no-cache'}).then(r=>r.json()).then(a=>(Array.isArray(a)?a:[])
+    .filter(d=>d&&/^disegni\/[a-z0-9-]+\.(jpg|jpeg|png|webp)$/.test(d.src||'')).map(d=>({nome:'Agostino',src:d.src,titolo:d.titolo||'Disegno',
+      sotto:d.gioco?'→ '+d.gioco:'',cap:d.descrizione||'',alt:d.alt||''}))).catch(()=>[]);
+
+  // disegni dei Piccoli Inventori
+  const amici=fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(a=>(Array.isArray(a)?a:[]).filter(g=>g&&safe.test(g.slug||'')).map(g=>({
+    nome:(g.nome||'Piccolo inventore').trim(),src:'disegni-amici/'+g.slug+'.jpg',titolo:g.titolo||g.slug,sotto:'→ gioco dei Piccoli Inventori',
+    cap:(g.titolo||g.slug)+(g.descrizione?': '+g.descrizione:''),alt:'Disegno di '+(g.nome||'un bambino')+' per '+(g.titolo||g.slug)}))).catch(()=>[]);
+
+  Promise.all([agostino,amici]).then(([a,b])=>{
+    const all=a.concat(b);list.textContent='';
+    if(!all.length){list.innerHTML='<p class="msg">I disegni non si sono caricati. Riprova tra poco.</p>';return}
+    const by=new Map();all.forEach(d=>{const k=key(d.nome);if(!by.has(k))by.set(k,{nome:d.nome,items:[]});by.get(k).items.push(d)});
+    // Agostino per primo, poi gli altri in ordine alfabetico
+    const groups=[...by.values()].sort((x,y)=>(key(y.nome)==='agostino')-(key(x.nome)==='agostino')||x.nome.localeCompare(y.nome,'it'));
+    groups.forEach((g,i)=>{const id='bimbo-'+key(g.nome).normalize('NFD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+      const sec=document.createElement('section');sec.className='artist';sec.id=id;sec.style.setProperty('--c',COLORS[i%COLORS.length]);
+      sec.innerHTML='<h2><span class="ini" aria-hidden="true"></span><span class="n"></span><small></small></h2><div class="pins"></div>';
+      sec.querySelector('.ini').textContent=g.nome.charAt(0).toUpperCase();sec.querySelector('.n').textContent=g.nome;
+      sec.querySelector('small').textContent=g.items.length===1?'1 disegno':g.items.length+' disegni';
+      const pins=sec.querySelector('.pins');
+      g.items.forEach(d=>{const f=document.createElement('figure');f.className='pin';
+        f.innerHTML='<button type="button"><img loading="lazy" alt=""></button><figcaption><b></b><span></span></figcaption>';
+        const img=f.querySelector('img');img.src=d.src;img.alt=d.alt||('Disegno di '+g.nome);
+        f.querySelector('b').textContent=d.titolo;const s=f.querySelector('figcaption span');if(d.sotto)s.textContent=d.sotto;else s.remove();
+        f.querySelector('button').setAttribute('aria-label','Ingrandisci: '+d.titolo);
+        f.querySelector('button').addEventListener('click',()=>{zi.src=d.src;zi.alt=img.alt;zc.textContent=(d.cap||d.titolo)+' · disegnato da '+g.nome;zoom.hidden=false;document.getElementById('zoomClose').focus()});
+        pins.append(f)});
+      list.append(sec);
+      const j=document.createElement('a');j.href='#'+id;j.textContent=g.nome+' ('+g.items.length+')';jump.append(j)});
+    if(location.hash){const t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}
+  });
+})();
+</script>
+<script src="menu.js?v=2"></script>
+</body>
+</html>

@@ -1,3 +1,4 @@
 [
-  {"slug":"strega-catturazucche","titolo":"Strega catturazucche","nome":"Agata","descrizione":"La strega prende più zucche che può in un minuto, ma attenta al fantasma che se le mangia!","classifica":{"unit":"zucche","asc":false}}
+  {"slug":"strega-catturazucche","titolo":"Strega catturazucche","nome":"Agata","descrizione":"La strega prende più zucche che può in un minuto, ma attenta al fantasma che se le mangia!","classifica":{"unit":"zucche","asc":false}},
+  {"slug":"dinosauri-contro-macchine","titolo":"Dinosauri contro macchine","nome":"Edo","descrizione":"Il dinosauro nero spazza via le macchine con la coda o le morde e le lancia lontano!","classifica":{"unit":"macchine","asc":false}}
 ]

@@ -1,0 +1,148 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dinosauri contro macchine</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--scrim:rgba(31,29,43,.55);--muted:#6b6880;--red:#e63946;--display:'Bungee',Impact,'Arial Black',sans-serif;--body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;color-scheme:light}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#bfe3f2;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;display:block;width:100%;height:100%}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(28px,7vw,42px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.4}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.ctl:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+#hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill small{font-family:var(--body);font-weight:700;font-size:12px;display:block;line-height:1;color:var(--muted)}
+#hearts{color:var(--red);letter-spacing:2px}
+#banner{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 90px);text-align:center;font-family:var(--display);font-size:clamp(20px,5.5vw,38px);color:var(--sun);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;pointer-events:none;z-index:2}
+#controls{position:fixed;left:0;right:0;bottom:0;padding:0 14px calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:2}
+.ctl{pointer-events:auto;width:128px;height:104px;border-radius:26px;border:3px solid var(--ink);background:rgba(255,253,246,.9);font-family:var(--display);font-size:20px;line-height:1.1;color:var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer;padding:0}
+.ctl.tail{background:rgba(255,201,60,.95)}
+.ctl.on{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);filter:brightness(.9)}
+.ctl span{display:block;font-size:34px}
+#board{min-height:0}
+</style></head><body>
+<canvas id="game"></canvas>
+<div id="hud" hidden>
+  <div class="pill"><small>MACCHINE VIA</small><span id="score">0</span></div>
+  <div class="pill"><small>VITE</small><span id="hearts">♥♥♥</span></div>
+</div>
+<div id="banner"></div>
+<div id="controls" hidden>
+  <button class="ctl tail" id="bTail" aria-label="Colpo di coda"><span>↶</span>CODA</button>
+  <button class="ctl" id="bBite" aria-label="Abbassati e lancia"><span>↓</span>MORDI</button>
+</div>
+<div class="overlay" id="start"><div class="panel">
+  <h1>Dinosauri <span>contro</span> macchine</h1>
+  <p>Il grande dinosauro nero ha un lavoro: spazzare via tutte le macchine!</p>
+  <ul>
+    <li><b>CODA</b> (tasto Spazio o ←): spazza via le macchine vicine.</li>
+    <li><b>MORDI</b> (tasto ↓): ti abbassi, prendi una macchina con la bocca e la lanci lontano!</li>
+    <li>I camion sono grossi: ci vogliono due colpi di coda, oppure un morso.</li>
+    <li>Se una macchina ti tocca perdi un cuore. Hai 3 cuori.</li>
+  </ul>
+  <button class="btn" id="go">Via!</button>
+</div></div>
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="endT">Che dinosauro!</h2>
+  <p id="endP"></p>
+  <div id="board"></div>
+  <button class="btn" id="again">Ancora!</button>
+</div></div>
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('dinosauri-contro-macchine',{title:'Dinosauri contro macchine',unit:'macchine'});
+const cv=document.getElementById('game'),cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,u=1,GY=0,DX=0;
+function resize(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+  u=Math.max(.45,Math.min(W/760,H/470));GY=H*.7;DX=Math.max(90*u,W*.15)}
+addEventListener('resize',resize);resize();
+const COL=['#e63946','#2f6fe4','#2aa84a','#ff8a1f','#9b59d0','#00a6b8','#ff5fa2'];
+let S=null,running=false,last=0;
+function reset(){S={t:0,score:0,hearts:3,cars:[],fx:[],spawn:1.2,tail:0,tailCd:0,bite:0,biteCd:0,held:null,inv:0,msg:'',msgT:0,clouds:[0,1,2].map(i=>({x:i*W/2.5,y:30+i*40,s:.7+Math.random()*.6}))}}
+function say(t){S.msg=t;S.msgT=1.1;$('banner').textContent=t}
+function spawnCar(){const truck=Math.random()<Math.min(.35,.08+S.t/200);
+  const sp=(120+Math.min(S.t*3.2,170))*(.85+Math.random()*.4);
+  S.cars.push({x:W/u+80,w:truck?120:80,h:truck?70:44,truck,hp:truck?2:1,vx:-sp,vy:0,y:0,rot:0,fly:false,col:COL[Math.random()*COL.length|0],hit:false})}
+function launch(c,vx){c.fly=true;c.vx=vx;c.vy=-380-Math.random()*160;c.spin=(Math.random()<.5?-1:1)*(4+Math.random()*5);if(!c.counted){c.counted=true;S.score++;$('score').textContent=S.score;puff(c.x,c.y)}}
+function puff(x,y){for(let i=0;i<8;i++)S.fx.push({x,y:y-20,vx:(Math.random()-.5)*260,vy:-Math.random()*240,l:.5,c:i%2?'#fffdf6':'#ffc93c'})}
+function doTail(){if(!running||S.tailCd>0)return;S.tail=.28;S.tailCd=.42;
+  for(const c of S.cars){if(c.fly||c.held)continue;const d=c.x-DX/u;if(d<230){if(c.hp>1){c.hp--;c.x+=90;c.vx=Math.abs(c.vx)*.4;c.shake=.3;puff(c.x,0)}else launch(c,520+Math.random()*200)}}}
+function doBite(){if(!running||S.biteCd>0||S.held)return;S.bite=.5;S.biteCd=.8;S.biteDone=false}
+function update(dt){const s=S;s.t+=dt;s.tailCd-=dt;s.biteCd-=dt;s.inv-=dt;if(s.tail>0)s.tail-=dt;if(s.bite>0)s.bite-=dt;s.msgT-=dt;if(s.msgT<=0)$('banner').textContent='';
+  s.spawn-=dt;if(s.spawn<=0){spawnCar();s.spawn=Math.max(.55,1.7-s.t*.012)*(.7+Math.random()*.6)}
+  // morso: a metà abbassata prende la macchina più vicina
+  if(s.bite>0&&!s.biteDone&&s.bite<.35){s.biteDone=true;let b=null;for(const c of s.cars)if(!c.fly&&!c.held&&c.x-DX/u<170&&(!b||c.x<b.x))b=c;if(b){b.held=true;s.held=b}}
+  if(s.held&&s.bite<.18){const c=s.held;s.held=null;c.held=false;launch(c,900);say(['Lanciata!','Via!','Che forza!','Bocca-bomba!'][Math.random()*4|0])}
+  if(s.held){s.held.x=DX/u+85;s.held.y=-18}
+  for(let i=s.cars.length-1;i>=0;i--){const c=s.cars[i];if(c.shake>0)c.shake-=dt;
+    if(c.fly){c.x+=c.vx*dt;c.vy+=900*dt;c.y+=c.vy*dt;c.rot+=c.spin*dt;
+      for(const o of s.cars)if(o!==c&&!o.fly&&!o.held&&Math.abs(o.x-c.x)<(o.w+c.w)/2*.9&&c.y>-120){launch(o,c.vx*.8);say('Doppia!')}
+      if(c.x>W/u+200||c.y>400)s.cars.splice(i,1)}
+    else if(!c.held){c.x+=c.vx*dt;if(c.vx>-90&&c.truck)c.vx-=60*dt;
+      if(c.x-c.w/2<DX/u+34&&s.inv<=0){s.hearts--;s.inv=1.2;launch(c,-300);c.counted=true;c.vy=-300;$('hearts').textContent='♥'.repeat(Math.max(0,s.hearts))+'♡'.repeat(3-Math.max(0,s.hearts));say('Ahi!');if(s.hearts<=0){finish();return}}
+      else if(c.x<-120)s.cars.splice(i,1)}}
+  for(let i=s.fx.length-1;i>=0;i--){const f=s.fx[i];f.l-=dt;f.x+=f.vx*dt/u;f.y+=f.vy*dt;f.vy+=600*dt;if(f.l<=0)s.fx.splice(i,1)}
+  for(const c of s.clouds){c.x-=12*dt*u;if(c.x<-120)c.x=W+60}}
+function finish(){running=false;$('hud').hidden=true;$('controls').hidden=true;$('banner').textContent='';
+  const n=S.score;$('endT').textContent=n>=25?'Dinosauro campione!':n>=10?'Che dinosauro forte!':'Bravo dinosauro!';
+  $('endP').textContent=n===0?'Le macchine erano velocissime! Riprova, la coda è pronta.':'Hai spazzato via '+n+(n===1?' macchina':' macchine')+'! Riprova: puoi farne ancora di più.';
+  $('end').hidden=false;
+  if(window.Classifica)Classifica.mount($('board'),'dinosauri-contro-macchine',Math.max(1,n))}
+function dino(){const k=S.bite>0?Math.sin(Math.min(1,(.5-S.bite)/.15)*Math.PI/2)*(S.bite<.15?S.bite/.15:1):0;
+  const tw=S.tail>0?Math.sin((1-S.tail/.28)*Math.PI):0;const bob=running?Math.sin(S.t*8)*2:0;
+  const blink=S.inv>0&&Math.floor(S.t*14)%2;if(blink)cx.globalAlpha=.45;
+  cx.save();cx.translate(DX,GY+bob*u);cx.scale(u,u);cx.lineJoin='round';cx.lineCap='round';cx.fillStyle='#1a1726';cx.strokeStyle='#0d0b14';cx.lineWidth=5;
+  // coda (si muove con il colpo)
+  cx.save();cx.translate(-30,-70+k*30);cx.rotate(-tw*1.2);cx.beginPath();cx.moveTo(0,-22);cx.quadraticCurveTo(-90,-10,-190,60);cx.lineTo(-200,52);cx.quadraticCurveTo(-110,-50,0,12);cx.closePath();cx.fill();cx.stroke();
+  cx.fillStyle='#1a1726';for(let i=0;i<4;i++){const x=-30-i*38,y=-12+i*17;cx.beginPath();cx.moveTo(x,y-8);cx.lineTo(x-8,y-26);cx.lineTo(x-20,y-6);cx.fill()}cx.restore();
+  // gambe
+  cx.beginPath();cx.roundRect(-22,-50,26,50,8);cx.fill();cx.stroke();cx.beginPath();cx.roundRect(16,-50,26,50,8);cx.fill();cx.stroke();
+  cx.fillStyle='#fffdf6';for(const x of [-18,-8,22,32]){cx.beginPath();cx.arc(x,1,4,0,7);cx.fill()}
+  cx.fillStyle='#1a1726';
+  // corpo e collo (si abbassa col morso)
+  cx.save();cx.translate(0,-70+k*34);cx.beginPath();cx.ellipse(8,0,58,46,-.35,0,7);cx.fill();cx.stroke();
+  cx.save();cx.rotate(k*.5);cx.beginPath();cx.moveTo(10,-30);cx.quadraticCurveTo(50,-70,62,-96);cx.lineTo(96,-88);cx.quadraticCurveTo(76,-46,52,10);cx.closePath();cx.fill();cx.stroke();
+  // spunzoni sulla schiena
+  for(let i=0;i<5;i++){const x=14+i*11,y=-36-i*13;cx.beginPath();cx.moveTo(x-6,y);cx.lineTo(x-16,y-14);cx.lineTo(x+4,y-6);cx.fill()}
+  // testa con bocca aperta
+  cx.save();cx.translate(66,-100);cx.beginPath();cx.moveTo(-10,-8);cx.lineTo(10,-34);cx.lineTo(24,-12);cx.lineTo(66,-18);cx.lineTo(70,-4);cx.lineTo(24,2);cx.closePath();cx.fill();cx.stroke();
+  cx.beginPath();cx.moveTo(-6,8);cx.lineTo(24,2);cx.lineTo(62,6+k*18);cx.lineTo(58,22+k*18);cx.lineTo(0,26);cx.closePath();cx.fill();cx.stroke();
+  cx.fillStyle='#fffdf6';for(let i=0;i<4;i++){cx.beginPath();cx.moveTo(30+i*9,-14+i*-.5);cx.lineTo(34+i*9,-4);cx.lineTo(38+i*9,-14);cx.fill();cx.beginPath();cx.moveTo(30+i*9,6+k*14);cx.lineTo(34+i*9,-4+k*10);cx.lineTo(38+i*9,6+k*14);cx.fill()}
+  cx.fillStyle='#ffd51c';cx.beginPath();cx.arc(14,-12,9,0,7);cx.fill();cx.stroke();cx.fillStyle='#0d0b14';cx.beginPath();cx.arc(16,-12,3.5,0,7);cx.fill();cx.restore();cx.restore();
+  // braccio con artigli
+  cx.beginPath();cx.moveTo(26,-14);cx.lineTo(54,-40);cx.lineTo(62,-30);cx.lineTo(36,0);cx.closePath();cx.fill();cx.stroke();cx.strokeStyle='#fffdf6';cx.lineWidth=3;for(let i=0;i<3;i++){cx.beginPath();cx.moveTo(56+i*4,-40);cx.lineTo(66+i*5,-50+i*3);cx.stroke()}
+  cx.restore();cx.restore();cx.globalAlpha=1}
+function car(c){cx.save();cx.translate(c.x*u+(c.shake>0?Math.sin(S.t*60)*3:0),GY+c.y*u);cx.scale(u,u);cx.rotate(c.rot||0);cx.lineJoin='round';cx.lineWidth=4;cx.strokeStyle='#1f1d2b';cx.fillStyle=c.col;
+  const w=c.w,h=c.h;
+  if(c.truck){cx.beginPath();cx.roundRect(-w/2,-h-14,w*.68,h,6);cx.fill();cx.stroke();cx.fillStyle='#2b2a3a';cx.beginPath();cx.roundRect(-w/2+w*.7,-h*.7-14,w*.28,h*.7,6);cx.fill();cx.stroke();cx.fillStyle='#cfe8f5';cx.fillRect(-w/2+w*.74,-h*.6-14,w*.15,h*.32);
+    cx.fillStyle='#fffdf6';cx.font='bold 18px sans-serif';cx.textAlign='center';cx.fillText(c.hp>1?'2':'1',-w/2+w*.34,-h*.3-14)}
+  else{cx.beginPath();cx.roundRect(-w/2,-h*.6-12,w,h*.6,10);cx.fill();cx.stroke();cx.beginPath();cx.moveTo(-w*.28,-h*.6-12);cx.lineTo(-w*.18,-h-12);cx.lineTo(w*.18,-h-12);cx.lineTo(w*.3,-h*.6-12);cx.closePath();cx.fill();cx.stroke();
+    cx.fillStyle='#cfe8f5';cx.beginPath();cx.moveTo(-w*.2,-h*.6-14);cx.lineTo(-w*.13,-h-6);cx.lineTo(w*.13,-h-6);cx.lineTo(w*.22,-h*.6-14);cx.fill();cx.fillStyle='#ffe27a';cx.fillRect(-w/2-3,-h*.5-12,7,9)}
+  cx.fillStyle='#2b2a3a';for(const x of [-w*.3,w*.3]){cx.beginPath();cx.arc(x,-12,12,0,7);cx.fill();cx.stroke();cx.fillStyle='#ccc';cx.beginPath();cx.arc(x,-12,4,0,7);cx.fill();cx.fillStyle='#2b2a3a'}
+  cx.restore()}
+function draw(){const g=cx.createLinearGradient(0,0,0,GY);g.addColorStop(0,'#9fd6ee');g.addColorStop(1,'#e9f6ee');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  cx.fillStyle='#fff';for(const c of S.clouds){cx.beginPath();cx.ellipse(c.x,c.y*u+20,46*c.s*u,16*c.s*u,0,0,7);cx.ellipse(c.x+24*c.s*u,c.y*u+10,30*c.s*u,16*c.s*u,0,0,7);cx.fill()}
+  cx.fillStyle='#7fcf5a';cx.fillRect(0,GY-6,W,H-GY+6);cx.fillStyle='#4b4a58';cx.fillRect(0,GY-2,W,60*u);cx.fillStyle='#ffe27a';for(let x=-((S.t*140*u)%(80*u));x<W;x+=80*u)cx.fillRect(x,GY+26*u,40*u,5*u);
+  cx.strokeStyle='#1f1d2b';cx.lineWidth=3;cx.beginPath();cx.moveTo(0,GY-2);cx.lineTo(W,GY-2);cx.stroke();
+  for(const c of S.cars)car(c);dino();
+  for(const f of S.fx){cx.fillStyle=f.c;cx.globalAlpha=Math.max(0,f.l*2);cx.beginPath();cx.arc(f.x*u,GY+f.y*u,6*u,0,7);cx.fill()}cx.globalAlpha=1}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(running)update(dt);if(S)draw();requestAnimationFrame(loop)}
+function start(){reset();$('score').textContent='0';$('hearts').textContent='♥♥♥';$('start').hidden=true;$('end').hidden=true;$('hud').hidden=false;$('controls').hidden=false;running=true;say('Spazza via le macchine!')}
+$('go').onclick=start;$('again').onclick=start;
+function hold(el,fn){el.addEventListener('pointerdown',e=>{e.preventDefault();el.classList.add('on');fn()});['pointerup','pointerleave','pointercancel'].forEach(t=>el.addEventListener(t,()=>el.classList.remove('on')))}
+hold($('bTail'),doTail);hold($('bBite'),doBite);
+addEventListener('keydown',e=>{if(e.repeat)return;const k=e.key;
+  if(k===' '||k==='ArrowLeft'||k==='a'||k==='A'){e.preventDefault();if(running)doTail();else if(!$('start').hidden)start()}
+  else if(k==='ArrowDown'||k==='s'||k==='S'||k==='ArrowRight'){e.preventDefault();doBite()}
+  else if(k==='Enter'&&!running){if(!$('start').hidden||!$('end').hidden)start()}});
+reset();requestAnimationFrame(loop);
+window.__bf={get S(){return S},doTail,doBite,start};
+</script></body></html>

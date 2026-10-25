@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="La Sala dei Record di Barbafiamme: le classifiche mondiali di tutti i giochi.">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>Sala dei Record · Barbafiamme</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&family=Press+Start+2P&display=swap">
+<style>
+/* Sala dei Record: le classifiche di tutti i giochi, in stile sala giochi anni '90 */
+:root{
+  --paper:#fffdf6; --ink:#1f1d2b; --sun:#ffc93c; --sky:#4cc9e0; --red:#e63946; --muted:#5f5b74; --board:#f3e6c8; --dot:#e6d3a8;
+  --display:'Bungee',Impact,'Arial Black',sans-serif; --body:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--board);background-image:radial-gradient(var(--dot) 1.4px,transparent 1.6px);background-size:22px 22px;color:var(--ink);font-family:var(--body)}
+.wrap{max-width:980px;margin:0 auto;padding:28px 16px 48px;display:flex;flex-direction:column;gap:26px}
+header{display:flex;flex-direction:column;gap:8px}
+.tag{align-self:flex-start;font-weight:800;font-size:14px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:3px 12px;border-radius:999px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,11vw,84px);line-height:.95;margin:0;letter-spacing:.01em}
+h1 .a{color:var(--red);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
+h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e63946 95%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:2px var(--ink)}
+.brand{display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap}
+.brand-text{display:flex;flex-direction:column;gap:8px;min-width:0}
+.logo{width:clamp(110px,26vw,150px);height:auto;flex:none;filter:drop-shadow(5px 6px 0 var(--ink))}
+.logo .fl{transform-box:fill-box;transform-origin:50% 0;animation:flick 1.6s ease-in-out infinite alternate}
+.logo .fl2{animation-duration:1.1s;animation-delay:-.4s}
+.logo .fl3{animation-duration:.8s;animation-delay:-.2s}
+@keyframes flick{from{transform:scale(1,1)}to{transform:scale(1.05,1.09) skewX(-2deg)}}
+@media (prefers-reduced-motion:reduce){.logo .fl{animation:none}}
+.lead{margin:0;font-size:20px;font-weight:600;color:var(--muted);max-width:52ch}
+.logo{width:clamp(76px,18vw,104px)}
+h1{font-size:clamp(34px,9vw,64px)}
+.btn{align-self:flex-start;font-family:var(--display);font-size:18px;color:var(--ink);background:var(--sun);border:3px solid var(--ink);border-radius:14px;padding:10px 18px;box-shadow:4px 4px 0 var(--ink);text-decoration:none}
+.btn:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.hof .hof-head{flex:none}
+.hof{position:relative;background:#14111f;color:#ffe9a8;border:4px solid var(--ink);border-radius:22px;box-shadow:7px 8px 0 var(--ink);padding:22px clamp(14px,3vw,26px) 16px;display:flex;flex-direction:column;gap:18px;overflow:hidden}
+.hof::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 4px);pointer-events:none;border-radius:18px}
+.hof-top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between}
+.hof-head{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 280px}
+.hof-title{margin:0;font-family:'Press Start 2P',ui-monospace,monospace;font-weight:400;font-size:clamp(18px,4.4vw,30px);line-height:1.2;color:#ff4f6d;text-shadow:0 0 10px rgba(255,79,109,.75),3px 3px 0 #000}
+.hof-sub{margin:0;font-size:17px;font-weight:700;color:#cfc6ff;max-width:46ch}
+.counter{display:flex;flex-direction:column;align-items:center;gap:8px;background:#07060d;border:3px solid #3a3360;border-radius:14px;padding:10px 14px;flex:0 1 auto}
+.hi{font-family:'Press Start 2P',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;color:#ff4f6d;text-shadow:0 0 6px rgba(255,79,109,.8)}
+.digits{display:flex;gap:5px}
+.digits span{width:clamp(26px,7vw,40px);height:clamp(38px,10vw,54px);display:flex;align-items:center;justify-content:center;background:#0b0a12;border:2px solid #2c2748;border-radius:6px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:clamp(16px,4.6vw,24px);color:#ffb400;text-shadow:0 0 8px rgba(255,180,0,.9),0 0 18px rgba(255,120,0,.6)}
+.digits.off span{color:#5a4a20;text-shadow:none}
+.msg{font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;line-height:1.6;text-align:center;color:#7fe3ff;text-shadow:0 0 6px rgba(127,227,255,.7);max-width:280px}
+.blink{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;align-items:start}
+.lb{border:3px solid var(--c);border-radius:14px;padding:12px 12px 14px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px;min-width:0}
+.lb h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1;color:var(--c)}
+.lb small{font-size:13px;font-weight:700;color:#a99fd0;text-transform:uppercase;letter-spacing:.08em}
+.lb ol{list-style:none;margin:6px 0 0;padding:0 4px 0 0;display:flex;flex-direction:column;gap:6px}
+.lb:not(.open) li.extra{display:none}
+.lb .more{align-self:stretch;margin-top:4px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:10px;line-height:1.5;padding:9px 8px;border:2px solid var(--c);border-radius:10px;background:transparent;color:var(--c);cursor:pointer}
+.lb .more:hover{background:rgba(255,255,255,.08)}
+.lb .more:focus-visible{outline:3px dashed #fff;outline-offset:2px}
+.lb li{display:grid;grid-template-columns:2em 1fr auto;align-items:center;gap:8px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:12px;padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.06)}
+.lb li:first-child{background:rgba(255,201,60,.18);font-size:13px}
+.lb li .m{font-size:18px;font-family:system-ui,sans-serif;text-align:center}
+.lb li b{font-weight:400;letter-spacing:.12em;color:#fff}
+.lb li .v{color:#ffb400;text-shadow:0 0 6px rgba(255,180,0,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lb li.empty{display:block;text-align:center;font-size:10px;line-height:1.7;color:#7fe3ff;background:none}
+#record,#hof{scroll-margin-top:12px}
+.coin{position:relative;z-index:1;font-family:'Press Start 2P',ui-monospace,monospace;font-size:9px;color:#a99fd0;letter-spacing:.08em;text-align:center}
+@media (prefers-reduced-motion:reduce){.blink{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+    <svg class="logo" viewBox="0 0 160 170" role="img" aria-label="Logo di Barbafiamme: un pilota con la barba di fiamme">
+      <circle cx="80" cy="74" r="66" fill="#ffc93c" stroke="#1f1d2b" stroke-width="5"/>
+      <g stroke="#1f1d2b" stroke-width="4" stroke-linejoin="round">
+        <path class="fl" d="M38 88C30 108 40 128 52 136 48 124 56 118 58 130 62 148 76 162 80 166 84 158 98 148 100 132 104 120 110 126 108 138 122 126 130 106 122 88Z" fill="#e63946"/>
+      </g>
+      <path class="fl fl2" d="M50 92C46 108 54 120 62 126 62 118 68 116 70 126 72 138 78 148 80 152 84 144 90 136 92 126 94 116 100 120 100 128 110 118 114 104 110 92Z" fill="#ff8a1f"/>
+      <path class="fl fl3" d="M64 96C62 108 68 116 72 120 74 114 78 114 80 124 82 116 86 112 90 118 94 108 96 100 94 96Z" fill="#ffd23f"/>
+      <path d="M40 60C40 34 120 34 120 60L120 84C120 92 40 92 40 84Z" fill="#ffd9b0" stroke="#1f1d2b" stroke-width="4"/>
+      <path d="M34 58C34 22 126 22 126 58L126 62 34 62Z" fill="#4cc9e0" stroke="#1f1d2b" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M58 30C64 26 72 25 78 25" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <rect x="32" y="58" width="96" height="8" rx="4" fill="#e63946" stroke="#1f1d2b" stroke-width="3"/>
+      <circle cx="62" cy="70" r="10" fill="#fff" stroke="#1f1d2b" stroke-width="4"/>
+      <circle cx="98" cy="70" r="10" fill="#fff" stroke="#1f1d2b" stroke-width="4"/>
+      <circle cx="64" cy="71" r="4" fill="#1f1d2b"/><circle cx="100" cy="71" r="4" fill="#1f1d2b"/>
+      <path d="M68 86Q80 94 92 86" fill="none" stroke="#1f1d2b" stroke-width="4" stroke-linecap="round"/>
+      <text x="80" y="50" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="18" fill="#1f1d2b">B</text>
+    </svg>
+      <div class="brand-text">
+        <span class="tag">Le classifiche di Barbafiamme</span>
+        <h1><span class="a">Sala dei</span> <span class="b">Record</span></h1>
+      </div>
+    </div>
+    <nav class="bf-menu" data-page="record"></nav>
+  </header>
+
+  <section class="hof" id="record" aria-labelledby="hof-title">
+    <div class="hof-head">
+      <h2 class="hof-title" id="hof-title">HIGH SCORES</h2>
+      <p class="hof-sub">Fai una partita e scrivi le tue iniziali: entri nella classifica di tutto il mondo! Qui ci sono tutti i giochi, quelli di Agostino e quelli dei Piccoli Inventori.</p>
+    </div>
+    <div class="boards">
+      <div class="lb" data-g="pirati" style="--c:#ff8a5c"><h3>Pirati</h3><small>primi 20 · più monete</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="granpremio" style="--c:#ffc93c"><h3>Gran Premio</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="trenini" style="--c:#7fd66b"><h3>Trenini</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="piscina" style="--c:#4fc3f7"><h3>Piscina</h3><small>primi 20 · tempo più veloce</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+      <div class="lb" data-g="squadriglia" style="--c:#5fd7ff"><h3>Squadriglia</h3><small>primi 20 · più punti</small><ol><li class="empty">CARICAMENTO...</li></ol></div>
+    </div>
+    <div class="coin">© 2026 BARBAFIAMME · 1 GETTONE = 1 PARTITA</div>
+  </section>
+
+  <a class="btn" href="index.html">🎮 Vai a giocare</a>
+  <footer>Per stare nella classifica servono solo le iniziali: niente nomi completi.</footer>
+</div>
+
+<script src="classifica.js"></script>
+<script>
+(()=>{const C=window.Classifica;if(!C)return;
+  async function fill(lb){const g=lb.dataset.g,ol=lb.querySelector('ol');
+    try{const rows=await C.top(g,20);ol.innerHTML='';
+      if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
+      rows.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
+        if(i>=5)li.className='extra';li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g].fmt(r.score);ol.append(li)});
+      if(rows.length>5){const b=document.createElement('button');b.type='button';b.className='more';const lab=()=>{const o=lb.classList.contains('open');b.textContent=o?'MOSTRA MENO ▲':'MOSTRA TUTTI I '+rows.length+' ▼';b.setAttribute('aria-expanded',o)};lab();
+        b.addEventListener('click',()=>{lb.classList.toggle('open');lab()});lb.append(b)}}
+    catch(e){ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA<br>RIPROVA PIÙ TARDI</li>'}}
+  document.querySelectorAll('.lb').forEach(fill);
+  // tutti i giochi nella stessa Sala dei Record: anche quelli dei Piccoli Inventori
+  const COLORS=['#9be15d','#c79bff','#ff6fa8','#ffc93c','#5fd7ff','#ff8a5c'],boards=document.querySelector('.boards');
+  fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{(Array.isArray(list)?list:[]).filter(g=>g&&/^[a-z0-9-]{1,60}$/.test(g.slug||'')).forEach((g,k)=>{
+    const cl=g.classifica||{},unit=cl.unit||'punti';C.register(g.slug,{title:g.titolo,unit,asc:!!cl.asc});
+    const lb=document.createElement('div');lb.className='lb';lb.dataset.g=g.slug;lb.style.setProperty('--c',COLORS[k%COLORS.length]);
+    lb.innerHTML='<h3></h3><small></small><ol><li class="empty">CARICAMENTO...</li></ol>';lb.querySelector('h3').textContent=g.titolo||g.slug;
+    lb.querySelector('small').textContent='primi 20 · di '+(g.nome||'?')+' · '+(cl.asc||unit==='tempo'?'tempo più veloce':'più '+unit);
+    boards.append(lb);fill(lb)})}).catch(()=>{})})();
+</script>
+<script src="menu.js?v=2"></script>
+</body>
+</html>

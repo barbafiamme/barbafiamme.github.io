@@ -80,7 +80,8 @@ textarea{min-height:140px;resize:vertical}
 </head>
 <body>
 <div class="wrap">
-  <div class="toplinks"><a class="back" href="./">← Torna ai giochi</a><a class="back" href="anteprima.html">I miei giochi</a></div>
+  <nav class="bf-menu" data-page="crea"></nav>
+  <div class="toplinks"><a class="back" href="anteprima.html">I miei giochi</a></div>
   <h1>Crea il tuo <span>gioco</span></h1>
   <p class="lead">Hai fatto un disegno? Mandacelo con la tua idea e lo trasformiamo in un videogioco, come quelli di Agostino.</p>
 
@@ -104,13 +105,15 @@ textarea{min-height:140px;resize:vertical}
             <option value="pirati">Pirati all'Arrembaggio</option>
             <option value="granpremio">Gran Premio dei Disegni</option>
             <option value="squadriglia">Squadriglia contro il Buio</option>
+            <option value="trenini">Trenini, chi arriva prima</option>
+            <option value="piscina">Piscina veloce</option>
           </optgroup>
         </select>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend>Il disegno</legend>
+      <legend>Il disegno <small id="drawOpt" hidden>(facoltativo se cambi un gioco)</small></legend>
       <label class="drop" id="drop">
         <input type="file" id="foto" accept="image/*">
         <span class="ph" id="ph"><b>Tocca qui per la foto</b><span>oppure trascina l'immagine</span></span>
@@ -119,7 +122,7 @@ textarea{min-height:140px;resize:vertical}
       <p class="hint">Solo disegni: niente foto di persone, nomi completi o indirizzi.</p>
     </fieldset>
 
-    <fieldset>
+    <fieldset id="titleBox">
       <label class="lbl" for="titolo">Come si chiama il gioco?</label>
       <input type="text" id="titolo" maxlength="60" placeholder="Es. La corsa dei draghi" autocomplete="off">
     </fieldset>
@@ -182,8 +185,16 @@ textarea{min-height:140px;resize:vertical}
   try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
   fetch('amici.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{list=(Array.isArray(list)?list:[]).filter(g=>/^[a-z0-9-]{1,60}$/.test(g.slug||''));
     if(!list.length)return;const grp=document.createElement('optgroup');grp.label='Giochi dei Piccoli Inventori';
-    list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');grp.append(o)});$('gioco').prepend(grp);$('gioco').selectedIndex=0}).catch(()=>{});
-  form.addEventListener('change',e=>{if(e.target.name==='tipo')$('gameBox').hidden=form.tipo.value!=='modifica'});
+    list.forEach(g=>{const o=document.createElement('option');o.value=g.slug;o.textContent=(g.titolo||g.slug)+(g.nome?' (di '+g.nome+')':'');grp.append(o)});$('gioco').prepend(grp);$('gioco').selectedIndex=0;preselect()}).catch(()=>{});
+  // arrivo da "Cambialo" nella pagina segreta: modifica già scelta, con il gioco ancora in prova
+  const want=(()=>{const q=new URLSearchParams(location.search),g=q.get('gioco');return /^[a-z0-9-]{1,60}$/.test(g||'')?{g,t:(q.get('titolo')||g).slice(0,50)}:null})();
+  function preselect(){if(!want)return;const sel=$('gioco');
+    if(![...sel.options].some(o=>o.value===want.g)){let grp=sel.querySelector('optgroup[data-prova]');
+      if(!grp){grp=document.createElement('optgroup');grp.label='Giochi ancora in prova';grp.dataset.prova='1';sel.prepend(grp)}
+      const o=document.createElement('option');o.value=want.g;o.textContent=want.t;grp.append(o)}
+    sel.value=want.g;form.tipo.value='modifica';$('gameBox').hidden=false;$('drawOpt').hidden=false;$('titleBox').hidden=true}
+  preselect();
+  form.addEventListener('change',e=>{if(e.target.name==='tipo'){const m=form.tipo.value==='modifica';$('gameBox').hidden=!m;$('drawOpt').hidden=!m;$('titleBox').hidden=m}});
   // dettatura: il bambino racconta l'idea a voce
   (()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
     const box=$('voiceBox'),mic=$('mic'),lab=$('micLabel'),hint=$('vhint'),ta=$('idea');box.hidden=false;
@@ -214,21 +225,21 @@ textarea{min-height:140px;resize:vertical}
   drop.addEventListener('drop',e=>{e.preventDefault();take(e.dataTransfer.files[0])});
   const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
   form.addEventListener('submit',async e=>{e.preventDefault();
-    const tipo=form.tipo.value,titolo=$('titolo').value.trim(),idea=$('idea').value.trim(),autore=$('autore').value.trim(),codice=$('codice').value.trim();
-    if(!blob)return say('Manca la foto del disegno.','err');
+    const tipo=form.tipo.value,sel=$('gioco'),titolo=tipo==='modifica'?('Modifica: '+((sel.options[sel.selectedIndex]||{}).text||sel.value)).slice(0,60):$('titolo').value.trim(),idea=$('idea').value.trim(),autore=$('autore').value.trim(),codice=$('codice').value.trim();
+    if(!blob&&tipo!=='modifica')return say('Manca la foto del disegno.','err');
     if(idea.length<10)return say('Racconta la tua idea con qualche parola in più.','err');
     if(!autore)return say('Scrivi il nome del bambino o della bambina.','err');
     if(!codice)return say('Scrivi il codice segreto.','err');
     if(!cfg.url)return say('Il sito non è collegato all\'archivio. Riprova più tardi.','err');
-    send.disabled=true;say('Invio il disegno…','wait');
+    send.disabled=true;say(blob?'Invio il disegno…':'Invio la richiesta…','wait');
     const H={apikey:cfg.key,Authorization:'Bearer '+cfg.key};
     try{
-      const b64=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=rej;fr.readAsDataURL(blob)});
+      const b64=!blob?null:await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=rej;fr.readAsDataURL(blob)});
       const token=(crypto.randomUUID?crypto.randomUUID():null);if(!token){send.disabled=false;return say('Questo browser è troppo vecchio per inviare. Prova con un altro.','err')}
-      const row={token,tipo,gioco:tipo==='modifica'?$('gioco').value:null,titolo:titolo||null,descrizione:idea,nome_bambino:autore,disegno:'allegato',disegno_b64:b64,codice};
+      const row={token,tipo,gioco:tipo==='modifica'?$('gioco').value:null,titolo:titolo||null,descrizione:idea,nome_bambino:autore,disegno:blob?'allegato':'nessuno',disegno_b64:b64,codice};
       const r=await fetch(cfg.url+'/rest/v1/richieste',{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},H),body:JSON.stringify(row)});
       if(!r.ok){send.disabled=false;let det='';try{const j=await r.json();det=[j.code,j.message].filter(Boolean).join(' ')}catch(_){}
-        const rls=/row-level security/i.test(det),ago=tipo==='modifica'&&['pirati','granpremio','squadriglia'].includes($('gioco').value);
+        const rls=/row-level security/i.test(det),ago=tipo==='modifica'&&['pirati','granpremio','squadriglia','trenini','piscina'].includes($('gioco').value);
         const msg=rls?(ago?'Per cambiare i giochi di Barbafiamme serve il codice di Agostino.':'Il codice segreto non è giusto. Controllalo e riprova.'):'La richiesta non è stata salvata. Riprova tra poco.';
         return say(msg+(det&&!rls?' (dettaglio: '+det+')':''),'err')}
       try{localStorage.setItem('bf_artista',autore);localStorage.setItem('bf_codice',codice);
@@ -258,10 +269,11 @@ textarea{min-height:140px;resize:vertical}
     pollNow=poll;pollT=setTimeout(poll,10000)}
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pollNow){clearTimeout(pollT);pollNow()}});
   $('copy').addEventListener('click',async()=>{const i=$('secret');try{await navigator.clipboard.writeText(i.value);$('copy').textContent='Copiato!'}catch(e){i.select()}});
-  $('another').addEventListener('click',()=>{form.reset();blob=null;preview.hidden=true;ph.hidden=false;drop.classList.remove('has');status.hidden=true;send.disabled=false;$('gameBox').hidden=true;
+  $('another').addEventListener('click',()=>{form.reset();blob=null;preview.hidden=true;ph.hidden=false;drop.classList.remove('has');status.hidden=true;send.disabled=false;$('gameBox').hidden=true;$('drawOpt').hidden=true;$('titleBox').hidden=false;
     try{$('autore').value=localStorage.getItem('bf_artista')||'';$('codice').value=localStorage.getItem('bf_codice')||''}catch(e){}
     stopWait();$('done').hidden=true;form.hidden=false});
 })();
 </script>
+<script src="menu.js?v=2"></script>
 </body>
 </html>

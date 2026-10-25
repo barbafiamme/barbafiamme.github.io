@@ -47,47 +47,13 @@ h1 .b{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-blo
 #player{position:fixed;inset:0;background:#000;z-index:10;display:flex}
 #player iframe{flex:1;width:100%;height:100%;border:0;background:#000}
 #player .close{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 8px);width:48px;height:48px;border-radius:50%;border:3px solid var(--ink);background:var(--paper);box-shadow:3px 3px 0 var(--ink);font-size:24px;line-height:1;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
-.hof{position:relative;background:#14111f;color:#ffe9a8;border:4px solid var(--ink);border-radius:22px;box-shadow:7px 8px 0 var(--ink);padding:20px clamp(14px,3vw,24px) 18px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
-.hof::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 2px,transparent 2px 4px);pointer-events:none}
-.hof-title{margin:0;font-family:'Press Start 2P',ui-monospace,monospace;font-weight:400;font-size:clamp(15px,3.8vw,24px);line-height:1.3;color:#9be15d;text-shadow:0 0 10px rgba(155,225,93,.7),3px 3px 0 #000}
-.hof-sub{margin:0;font-weight:700;color:#cfc6ff}
-.boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:14px;align-items:start}
-.lb{border:3px solid var(--c);border-radius:14px;padding:12px 12px 14px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px;min-width:0;position:relative;z-index:1}
-.lb h3{margin:0;font-family:var(--display);font-weight:400;font-size:20px;line-height:1.05;color:var(--c)}
-.lb small{font-size:13px;font-weight:700;color:#a99fd0}
-.lb ol{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
-.lb li{display:grid;grid-template-columns:2em 1fr auto;align-items:center;gap:8px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:12px;padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.06)}
-.lb li:first-child{background:rgba(255,201,60,.18)}
-.lb li .m{font-size:18px;font-family:system-ui,sans-serif;text-align:center}
-.lb li b{font-weight:400;letter-spacing:.12em;color:#fff}
-.lb li .v{color:#ffb400;white-space:nowrap}
-.lb li.empty{display:block;text-align:center;font-size:10px;line-height:1.7;color:#7fe3ff;background:none}
-.lb:not(.open) li.extra{display:none}
-.lb .more{margin-top:4px;font-family:'Press Start 2P',ui-monospace,monospace;font-size:10px;padding:9px 8px;border:2px solid var(--c);border-radius:10px;background:transparent;color:var(--c);cursor:pointer}
-.sec{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1.05;margin:0}
-.artists{display:flex;flex-direction:column;gap:16px}
-.artist-list{display:flex;flex-direction:column;gap:18px}
-.artist{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 6px 0 var(--ink);padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
-.artist h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;display:flex;align-items:center;gap:10px}
-.artist h3 span{font-family:var(--body);font-weight:800;font-size:14px;color:var(--muted)}
-.artist .ini{width:40px;height:40px;border-radius:50%;background:var(--leaf);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
-.pins{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:14px}
-.pin{margin:0;background:#fff;padding:8px 8px 10px;box-shadow:0 8px 14px -8px rgba(31,29,43,.4);display:flex;flex-direction:column;gap:6px;min-width:0}
-.pin:nth-child(odd){transform:rotate(-1.2deg)}.pin:nth-child(even){transform:rotate(1deg)}
-.pin button{padding:0;border:0;background:none;cursor:zoom-in;display:block}
-.pin img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#f4f2ec}
-.pin figcaption{font-weight:800;font-size:15px}
-#zoom{position:fixed;inset:0;z-index:20;background:rgba(31,29,43,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
-#zoom img{max-width:100%;max-height:75vh;border:4px solid var(--paper);background:#fff}
-#zoom p{margin:0;color:var(--paper);font-weight:800;font-size:18px;text-align:center}
-#zoom button{font:inherit;font-weight:800;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:var(--paper);cursor:pointer}
-@media (prefers-reduced-motion:reduce){.pin{transform:none!important}}
 footer{font-size:15px;color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="toplinks"><a class="back" href="./">← Barbafiamme</a><a class="back" href="anteprima.html">I miei giochi</a></div>
+  <nav class="bf-menu" data-page="amici"></nav>
+  <div class="toplinks"><a class="back" href="anteprima.html">I miei giochi</a></div>
   <header>
     <span class="tag">I giochi degli amici di Barbafiamme</span>
     <h1><span class="a">Piccoli</span> <span class="b">Inventori</span></h1>
@@ -95,17 +61,6 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
   </header>
 
   <main class="grid" id="grid" aria-live="polite"></main>
-
-  <section class="hof" id="hof" aria-labelledby="hof-title" hidden>
-    <h2 class="hof-title" id="hof-title">RECORD DEI PICCOLI INVENTORI</h2>
-    <p class="hof-sub">Gioca e scrivi le tue iniziali a fine partita per entrare in classifica!</p>
-    <div class="boards" id="boards"></div>
-  </section>
-
-  <section class="artists" id="artists" aria-labelledby="art-title" hidden>
-    <h2 class="sec" id="art-title">I disegni dei Piccoli Inventori</h2>
-    <div id="artistList" class="artist-list"></div>
-  </section>
 
   <section class="maker" aria-labelledby="mk">
     <div><h2 id="mk">Vuoi il tuo gioco qui?</h2><p>Manda il tuo disegno con la tua idea: diventa un videogioco tutto tuo.</p></div>
@@ -115,14 +70,11 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
   <footer>Ogni gioco viene controllato prima di comparire in questa pagina.</footer>
 </div>
 
-<div id="zoom" hidden role="dialog" aria-modal="true" aria-label="Disegno ingrandito"><img id="zoomImg" alt=""><p id="zoomCap"></p><button type="button" id="zoomClose">Chiudi</button></div>
-
 <div id="player" hidden>
   <iframe id="frame" title="Gioco" allow="autoplay; fullscreen"></iframe>
   <button class="close" id="close" type="button" aria-label="Torna ai giochi">⌂</button>
 </div>
 
-<script src="classifica.js"></script>
 <script>
 (()=>{
   const grid=document.getElementById('grid'),player=document.getElementById('player'),frame=document.getElementById('frame');
@@ -140,35 +92,9 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
       const img=a.querySelector('.shot');img.src='disegni-amici/'+g.slug+'.jpg';img.alt='Disegno di '+(g.nome||'un bambino');
       a.querySelector('h2').textContent=g.titolo||g.slug;a.querySelector('.by').textContent='Disegnato da '+(g.nome||'un piccolo inventore');
       a.querySelector('.desc').textContent=g.descrizione||'';a.querySelector('.play').addEventListener('click',()=>open(g.slug));grid.append(a)});
-    records(list);artists(list);
   }).catch(empty);
-  // record: una classifica per ogni gioco approvato
-  const COLORS=['#9be15d','#ffc93c','#5fd7ff','#ff8a5c','#c79bff','#ff6fa8'];
-  function records(list){const C=window.Classifica;if(!C)return;const boards=document.getElementById('boards');document.getElementById('hof').hidden=false;
-    list.forEach((g,k)=>{const cl=g.classifica||{};C.register(g.slug,{title:g.titolo,unit:cl.unit||'punti',asc:!!cl.asc});
-      const lb=document.createElement('div');lb.className='lb';lb.style.setProperty('--c',COLORS[k%COLORS.length]);
-      lb.innerHTML='<h3></h3><small></small><ol><li class="empty">CARICAMENTO...</li></ol>';lb.querySelector('h3').textContent=g.titolo||g.slug;
-      lb.querySelector('small').textContent='di '+(g.nome||'?')+' · '+(cl.asc?'il più veloce':'più '+(cl.unit||'punti'));boards.append(lb);
-      const ol=lb.querySelector('ol');
-      C.top(g.slug,20).then(rows=>{ol.innerHTML='';if(!rows.length){ol.innerHTML='<li class="empty">NESSUN RECORD<br>SII IL PRIMO!</li>';return}
-        rows.forEach((r,i)=>{const li=document.createElement('li');if(i>=5)li.className='extra';li.innerHTML='<span class="m"></span><b></b><span class="v"></span>';
-          li.querySelector('.m').textContent=['🥇','🥈','🥉'][i]||String(i+1);li.querySelector('b').textContent=r.name;li.querySelector('.v').textContent=C.GAMES[g.slug].fmt(r.score);ol.append(li)});
-        if(rows.length>5){const b=document.createElement('button');b.type='button';b.className='more';const lab=()=>{const o=lb.classList.contains('open');b.textContent=o?'MOSTRA MENO ▲':'MOSTRA TUTTI I '+rows.length+' ▼';b.setAttribute('aria-expanded',o)};lab();b.addEventListener('click',()=>{lb.classList.toggle('open');lab()});lb.append(b)}})
-      .catch(()=>{ol.innerHTML='<li class="empty">CLASSIFICA IN PAUSA</li>'})})}
-  // disegni raggruppati per bambino
-  const zoom=document.getElementById('zoom'),zi=document.getElementById('zoomImg'),zc=document.getElementById('zoomCap');
-  document.getElementById('zoomClose').addEventListener('click',()=>{zoom.hidden=true});zoom.addEventListener('click',e=>{if(e.target===zoom)zoom.hidden=true});
-  addEventListener('keydown',e=>{if(e.key==='Escape')zoom.hidden=true});
-  function artists(list){const by=new Map();list.forEach(g=>{const n=(g.nome||'Piccolo inventore').trim();if(!by.has(n))by.set(n,[]);by.get(n).push(g)});
-    const box=document.getElementById('artistList');document.getElementById('artists').hidden=false;
-    [...by.keys()].sort((a,b)=>a.localeCompare(b,'it')).forEach(n=>{const games=by.get(n);const sec=document.createElement('article');sec.className='artist';
-      sec.innerHTML='<h3><span class="ini" aria-hidden="true"></span><b></b> <span></span></h3><div class="pins"></div>';
-      sec.querySelector('.ini').textContent=n.charAt(0).toUpperCase();sec.querySelector('h3 b').textContent=n;sec.querySelector('h3 span:last-child').textContent=games.length===1?'1 disegno':games.length+' disegni';
-      games.forEach(g=>{const f=document.createElement('figure');f.className='pin';f.innerHTML='<button type="button"><img loading="lazy" alt=""></button><figcaption></figcaption>';
-        const src='disegni-amici/'+g.slug+'.jpg',img=f.querySelector('img');img.src=src;img.alt='Disegno di '+n+' per '+(g.titolo||g.slug);f.querySelector('figcaption').textContent='→ '+(g.titolo||g.slug);
-        f.querySelector('button').addEventListener('click',()=>{zi.src=src;zi.alt=img.alt;zc.textContent=(g.titolo||g.slug)+' · disegnato da '+n;zoom.hidden=false});sec.querySelector('.pins').append(f)});
-      box.append(sec)})}
 })();
 </script>
+<script src="menu.js?v=2"></script>
 </body>
 </html>
