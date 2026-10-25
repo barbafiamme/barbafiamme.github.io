@@ -1,0 +1,171 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Addobba l'albero</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--scrim:rgba(31,29,43,.55);--muted:#6b6880;--display:'Bungee',Impact,'Arial Black',sans-serif;--body:'Baloo 2','Trebuchet MS',system-ui,sans-serif}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#1c2b6b;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;display:block;width:100%;height:100%}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(28px,7vw,42px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.4}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.ctl:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+#hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill small{font-family:var(--body);font-weight:700;font-size:12px;display:block;line-height:1;color:var(--muted)}
+#controls{position:fixed;left:0;right:0;bottom:0;padding:0 14px calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:2}
+.ctl{pointer-events:auto;width:128px;height:96px;border-radius:26px;border:3px solid var(--ink);background:rgba(255,253,246,.9);font-family:var(--display);font-size:20px;color:var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer;touch-action:none}
+.ctl span{display:block;font-size:38px;line-height:1}
+.ctl.on{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);filter:brightness(.9)}
+#board{min-height:0}
+</style></head><body>
+<canvas id="game"></canvas>
+<div id="hud" hidden>
+  <div class="pill"><small>ADDOBBI</small><span id="score">0</span>/<span id="max">10</span></div>
+  <div class="pill"><small>TEMPO</small><span id="time">60</span></div>
+</div>
+<div id="controls" hidden>
+  <button class="ctl" id="bL" aria-label="Vai a sinistra"><span>◀</span></button>
+  <button class="ctl" id="bR" aria-label="Vai a destra"><span>▶</span></button>
+</div>
+<div class="overlay" id="start"><div class="panel">
+  <h1>Addobba <span>l'albero</span></h1>
+  <p>È quasi Natale! Aiuta la ragazza a decorare l'albero, ma attenta al gatto dispettoso che porta via gli addobbi!</p>
+  <ul>
+    <li>Muovi la ragazza con i tasti <b>◀ ▶</b> (o le frecce, o trascina il dito).</li>
+    <li>Cammina sulle palline colorate per raccoglierle, poi vai all'albero per appenderle.</li>
+    <li>Se il gatto arriva, corri vicino a lui: scappa via!</li>
+  </ul>
+  <button class="btn" id="go">Via!</button>
+</div></div>
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="endT">Che bell'albero!</h2>
+  <p id="endP"></p>
+  <div id="board"></div>
+  <button class="btn" id="again">Ancora!</button>
+</div></div>
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('addobba-albero-natale',{title:'Addobba l\'albero',unit:'punti'});
+(function(){
+const cv=document.getElementById('game'),cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,S=1,dpr=1;
+function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);S=Math.max(.6,Math.min(W/420,H/720,1.5))}
+addEventListener('resize',resize);resize();
+const TOTAL=60,NS=10,COL=['#e2336b','#2f9de4','#ffc93c','#8a4fd8','#ff7a2f'];
+let st='ready',left=TOTAL,girl,cat,slots,balls,spawn=0,keys={L:0,R:0},drag=null,stolen=0,flakes=[],puffs=[];
+for(let i=0;i<50;i++)flakes.push([Math.random(),Math.random(),Math.random()*6,.4+Math.random()]);
+function groundY(){return H-(120*S+Math.max(0,Math.min(40,H*.02)))}
+function treeDims(){const h=Math.min(250*S,groundY()*.55);return {x:W/2,h,w:h*.75,base:groundY()-8*S}}
+function slotPos(i){const T=treeDims(),rows=[[.17,4],[.38,3],[.58,2],[.76,1]];let k=i;
+  for(const r of rows){if(k<r[1]){const half=.5*T.w*(1-r[0])*.62,n=r[1];return {x:T.x+(n===1?0:(k/(n-1)*2-1)*half),y:T.base-T.h*r[0]}}k-=r[1]}return {x:T.x,y:T.base}}
+function onTree(){return slots.filter(s=>s>=0).length}
+function reset(){left=TOTAL;spawn=.3;stolen=0;balls=[];puffs=[];slots=new Array(NS).fill(-1);
+  girl={x:W*.25,dir:1,carry:-1};cat={x:-60,dir:1,state:'wait',t:2.5,flee:0};drag=null;
+  $('score').textContent=0;$('max').textContent=NS;$('time').textContent=TOTAL}
+function start(){reset();st='play';$('start').hidden=true;$('end').hidden=true;$('hud').hidden=false;$('controls').hidden=false;last=performance.now()}
+function finish(full){st='over';$('hud').hidden=true;$('controls').hidden=true;
+  const n=onTree(),score=full?NS+Math.ceil(left):n;
+  $('endT').textContent=full?'Albero finito!':n>=7?'Che bell\'albero!':n>0?'Bel lavoro!':'Riprova, ce la fai!';
+  $('endP').textContent=full?'Hai addobbato tutto l\'albero con '+Math.ceil(left)+' secondi di anticipo: '+score+' punti!':n>0?'Sull\'albero ci sono '+n+(n===1?' addobbo':' addobbi')+'. Il gatto ne ha presi '+stolen+'.':'Questa volta il gatto è stato più furbo. Un altro giro?';
+  $('end').hidden=false;
+  if(window.Classifica)Classifica.mount($('board'),'addobba-albero-natale',score)}
+$('go').onclick=start;$('again').onclick=start;
+function hold(b,k){const on=e=>{e.preventDefault();keys[k]=1;b.classList.add('on')},off=e=>{e.preventDefault();keys[k]=0;b.classList.remove('on')};
+  b.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,off))}
+hold($('bL'),'L');hold($('bR'),'R');
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a'){keys.L=1;e.preventDefault()}if(e.key==='ArrowRight'||e.key==='d'){keys.R=1;e.preventDefault()}
+  if((e.key==='Enter'||e.key===' ')&&st!=='play'){const b=!$('start').hidden?$('go'):!$('end').hidden?$('again'):null;if(b&&document.activeElement.tagName!=='INPUT'){e.preventDefault();b.click()}}});
+addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.L=0;if(e.key==='ArrowRight'||e.key==='d')keys.R=0});
+cv.addEventListener('pointerdown',e=>{if(st==='play'){drag=e.clientX;cv.setPointerCapture(e.pointerId)}});
+cv.addEventListener('pointermove',e=>{if(drag!=null)drag=e.clientX});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+function update(dt){
+  const sp=290*S,T=treeDims(),el=TOTAL-left;
+  if(keys.L){girl.x-=sp*dt;girl.dir=-1}if(keys.R){girl.x+=sp*dt;girl.dir=1}
+  if(drag!=null){const d=drag-girl.x;if(Math.abs(d)>4){girl.x+=Math.sign(d)*Math.min(Math.abs(d),sp*1.6*dt);girl.dir=Math.sign(d)}}
+  girl.x=Math.max(30*S,Math.min(W-30*S,girl.x));
+  left-=dt;$('time').textContent=Math.max(0,Math.ceil(left));
+  // palline per terra
+  spawn-=dt;if(spawn<=0&&balls.length<3&&onTree()+balls.length+(girl.carry>=0?1:0)<NS+2){spawn=1.2;
+    let x;for(let k=0;k<8;k++){x=(.08+Math.random()*.84)*W;if(Math.abs(x-T.x)>T.w*.3&&Math.abs(x-girl.x)>60*S)break}
+    balls.push({x,c:Math.floor(Math.random()*COL.length),t:0})}
+  for(const b of balls){b.t+=dt;if(girl.carry<0&&Math.abs(b.x-girl.x)<34*S){girl.carry=b.c;b.dead=1;puffs.push({x:b.x,y:groundY()-20*S,t:0,s:'✨'})}}
+  balls=balls.filter(b=>!b.dead);
+  // appende all'albero
+  if(girl.carry>=0&&Math.abs(girl.x-T.x)<T.w*.32){const i=slots.indexOf(-1);if(i>=0){slots[i]=girl.carry;girl.carry=-1;const p=slotPos(i);puffs.push({x:p.x,y:p.y,t:0,s:'✨'});$('score').textContent=onTree();
+    if(onTree()>=NS){finish(true);return}}}
+  // gatto
+  if(cat.state==='wait'){cat.t-=dt;if(cat.t<=0){cat.dir=Math.random()<.5?1:-1;cat.x=cat.dir>0?-50*S:W+50*S;cat.state='come'}}
+  else if(cat.state==='come'){const cs=(120+el*2.2)*S;cat.x+=cat.dir*cs*dt;
+    if(Math.abs(cat.x-T.x)<T.w*.3){if(onTree()>0){cat.state='grab';cat.t=.9}else{cat.state='flee'}}}
+  else if(cat.state==='grab'){cat.t-=dt;if(cat.t<=0){const occ=[];slots.forEach((c,i)=>{if(c>=0)occ.push(i)});
+    if(occ.length){const i=occ[Math.floor(Math.random()*occ.length)],p=slotPos(i);balls.push({x:Math.max(30*S,Math.min(W-30*S,p.x+(Math.random()-.5)*80*S)),c:slots[i],t:0});slots[i]=-1;stolen++;puffs.push({x:p.x,y:p.y,t:0,s:'😼'});$('score').textContent=onTree()}
+    cat.state='flee'}}
+  else if(cat.state==='flee'){cat.dir=cat.x<T.x?-1:1;cat.x+=cat.dir*260*S*dt;if(cat.x<-70*S||cat.x>W+70*S){cat.state='wait';cat.t=Math.max(1.5,3.2-el/40)}}
+  // la ragazza spaventa il gatto
+  if((cat.state==='come'||cat.state==='grab')&&Math.abs(cat.x-girl.x)<46*S){cat.state='flee';puffs.push({x:cat.x,y:groundY()-50*S,t:0,s:'💨'})}
+  puffs.forEach(p=>p.t+=dt);puffs=puffs.filter(p=>p.t<.6);
+  if(left<=0)finish(false)}
+function ball(x,y,r,c){cx.fillStyle=c;cx.strokeStyle='#1f1d2b';cx.lineWidth=2.5;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.55)';cx.beginPath();cx.arc(x-r*.3,y-r*.3,r*.28,0,7);cx.fill();
+  cx.fillStyle='#1f1d2b';cx.fillRect(x-r*.18,y-r-4*S,r*.36,4*S)}
+function drawTree(){const T=treeDims();cx.save();cx.lineJoin='round';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  cx.fillStyle='#8a5a2b';cx.fillRect(T.x-T.w*.07,T.base-T.h*.1,T.w*.14,T.h*.12);cx.strokeRect(T.x-T.w*.07,T.base-T.h*.1,T.w*.14,T.h*.12);
+  cx.fillStyle='#2fb344';
+  [[.08,.5],[.3,.38],[.5,.27],[.68,.17]].forEach(l=>{const y0=T.base-T.h*l[0],hw=T.w*l[1];cx.beginPath();cx.moveTo(T.x,y0-T.h*.34);cx.lineTo(T.x+hw,y0);cx.lineTo(T.x-hw,y0);cx.closePath();cx.fill();cx.stroke()});
+  cx.fillStyle='#ffd83a';const sy=T.base-T.h-4*S,sr=15*S;cx.beginPath();for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,rr=i%2?sr*.45:sr;cx.lineTo(T.x+Math.cos(a)*rr,sy+sr*.3+Math.sin(a)*rr)}cx.closePath();cx.fill();cx.stroke();
+  for(let i=0;i<NS;i++){const p=slotPos(i);cx.globalAlpha=slots[i]>=0?1:.28;if(slots[i]>=0)ball(p.x,p.y,11*S,COL[slots[i]]);else{cx.setLineDash([4,4]);cx.lineWidth=2;cx.beginPath();cx.arc(p.x,p.y,10*S,0,7);cx.stroke();cx.setLineDash([])}}
+  cx.restore();cx.globalAlpha=1}
+function drawGirl(x,gy,s,dir,carry){cx.save();cx.translate(x,gy);cx.scale(s*dir,s);cx.lineJoin='round';cx.lineCap='round';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  const moving=keys.L||keys.R||drag!=null,bob=Math.sin(performance.now()/130)*(moving?2.5:0);cx.translate(0,bob);
+  cx.fillStyle='#ffd23c';cx.beginPath();cx.ellipse(-12,0,11,6,0,0,7);cx.ellipse(12,0,11,6,0,0,7);cx.fill();cx.stroke();// scarpe
+  cx.strokeStyle='#e8856b';cx.lineWidth=6;cx.beginPath();cx.moveTo(-9,-4);cx.lineTo(-9,-26);cx.moveTo(9,-4);cx.lineTo(9,-26);cx.stroke();// gambe
+  cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  cx.fillStyle='#22a6d8';cx.beginPath();cx.moveTo(-14,-46);cx.lineTo(14,-46);cx.lineTo(26,-18);cx.lineTo(-26,-18);cx.closePath();cx.fill();cx.stroke();// gonna
+  cx.fillStyle='#7a3fc4';cx.beginPath();cx.moveTo(-14,-72);cx.lineTo(14,-72);cx.lineTo(15,-44);cx.lineTo(-15,-44);cx.closePath();cx.fill();cx.stroke();// maglia
+  cx.strokeStyle='#e8856b';cx.lineWidth=6;cx.beginPath();cx.moveTo(-14,-68);cx.lineTo(-24,-50);cx.moveTo(14,-68);cx.lineTo(carry>=0?22:24,carry>=0?-92:-50);cx.stroke();// braccia
+  cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  cx.fillStyle='#8a4b24';cx.beginPath();cx.ellipse(0,-90,23,26,0,0,7);cx.fill();cx.stroke();// capelli
+  cx.fillStyle='#e8856b';cx.beginPath();cx.ellipse(0,-88,16,20,0,0,7);cx.fill();cx.stroke();// viso
+  cx.fillStyle='#1f1d2b';cx.beginPath();cx.arc(-6,-92,2,0,7);cx.arc(6,-92,2,0,7);cx.fill();
+  cx.lineWidth=2;cx.beginPath();cx.arc(0,-84,6,.2,Math.PI-.2);cx.stroke();
+  if(carry>=0)ball(22,-100,10,COL[carry]);
+  cx.restore()}
+function drawCat(x,gy,s,dir,t){cx.save();cx.translate(x,gy);cx.scale(s*dir,s);cx.lineJoin='round';cx.lineCap='round';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  const hop=Math.abs(Math.sin(t*14))*4;cx.translate(0,-hop);
+  cx.strokeStyle='#8a8a96';cx.lineWidth=7;cx.beginPath();cx.moveTo(-14,-20);cx.quadraticCurveTo(-34,-24,-30,-46);cx.stroke();// coda
+  cx.strokeStyle='#1f1d2b';cx.lineWidth=3;
+  cx.fillStyle='#9a9aa6';cx.beginPath();cx.ellipse(0,-20,18,20,0,0,7);cx.fill();cx.stroke();// corpo
+  cx.beginPath();cx.moveTo(-14,-52);cx.lineTo(-12,-72);cx.lineTo(-2,-58);cx.moveTo(14,-52);cx.lineTo(12,-72);cx.lineTo(2,-58);cx.fill();cx.stroke();// orecchie
+  cx.fillStyle='#f0845c';cx.beginPath();cx.ellipse(0,-46,17,15,0,0,7);cx.fill();cx.stroke();// muso
+  cx.fillStyle='#1f1d2b';cx.beginPath();cx.arc(-6,-49,2.2,0,7);cx.arc(6,-49,2.2,0,7);cx.fill();
+  cx.lineWidth=2;cx.beginPath();cx.moveTo(0,-45);cx.lineTo(0,-42);cx.moveTo(-5,-39);cx.quadraticCurveTo(0,-36,5,-39);cx.stroke();
+  cx.restore()}
+function draw(){
+  const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#14215e');g.addColorStop(1,'#3d58b8');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  const T=performance.now()/1000;cx.fillStyle='#fff';
+  for(const f of flakes){const y=((f[1]+T*.03*f[3])%1)*H,x=(f[0]+Math.sin(T+f[2])*.01)*W;cx.globalAlpha=.8;cx.beginPath();cx.arc(x,y,2.4*S*f[3],0,7);cx.fill()}
+  cx.globalAlpha=1;
+  const gY=groundY();
+  cx.fillStyle='#f4f8ff';cx.fillRect(0,gY,W,H-gY);cx.fillStyle='#cfdcf5';cx.fillRect(0,gY,W,5);
+  if(!slots)return;
+  drawTree();
+  for(const b of balls){const bob=Math.sin(b.t*5)*3*S;ball(b.x,gY-14*S+bob,10*S,COL[b.c]);cx.globalAlpha=.5+.5*Math.sin(b.t*8);cx.fillStyle='#ffd83a';cx.fillRect(b.x-2,gY-44*S,4,10*S);cx.globalAlpha=1}
+  if(cat.state!=='wait')drawCat(cat.x,gY,S*.9,cat.dir,T);
+  drawGirl(girl.x,gY,S*.95,girl.dir,girl.carry);
+  for(const p of puffs){cx.globalAlpha=1-p.t/.6;cx.font=(26*S)+'px sans-serif';cx.textAlign='center';cx.fillText(p.s,p.x,p.y-p.t*40)}
+  cx.globalAlpha=1}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(st==='play')update(dt);draw();requestAnimationFrame(loop)}
+reset();requestAnimationFrame(loop);
+window.__bf={get s(){return {st,tree:onTree(),stolen,carry:girl.carry,balls:balls.map(b=>b.x),girl:girl.x,tx:treeDims().x}},to:x=>{girl.x=x}};
+})();
+</script></body></html>
