@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Piccoli Inventori · Barbafiamme</title>
+<script src="interruttore.js?v=1"></script>
 <meta name="description" content="I videogiochi nati dai disegni dei bambini amici di Barbafiamme.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&family=Press+Start+2P&display=swap">
 <style>
@@ -63,8 +64,8 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
   <main class="grid" id="grid" aria-live="polite"></main>
 
   <section class="maker" aria-labelledby="mk">
-    <div><h2 id="mk">Vuoi il tuo gioco qui?</h2><p>Manda il tuo disegno con la tua idea: diventa un videogioco tutto tuo.</p></div>
-    <a class="btn big" href="crea.html">✏️ Crea il tuo gioco</a>
+    <div><h2 id="mk">Vuoi il tuo gioco qui?</h2><p data-crea-on>Manda il tuo disegno con la tua idea: diventa un videogioco tutto tuo.</p><p data-crea-off></p></div>
+    <a class="btn big" href="crea.html" data-crea-on>✏️ Crea il tuo gioco</a>
   </section>
 
   <footer>Ogni gioco viene controllato prima di comparire in questa pagina.</footer>
