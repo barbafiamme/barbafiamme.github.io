@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>I miei giochi · Barbafiamme</title>
+<script src="interruttore.js?v=1"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
 <style>
 /* Layout: the creator's private shelf — one paper card per request, the game opens full screen */
@@ -88,7 +89,7 @@ h1 span{background:var(--sun);padding:0 .12em;border-radius:8px;display:inline-b
       if(d.nota){const n=document.createElement('p');n.className='nota';n.textContent=d.nota;card.append(n)}
       if(d.gioco_html){const p=document.createElement('button');p.type='button';p.className='btn play';p.textContent='Gioca! ▶';p.addEventListener('click',()=>open(d.gioco_html));card.append(p)}
       if(d.stato==='anteprima'&&/^[a-z0-9-]{1,60}$/.test(d.slug||'')){const c=document.createElement('a');c.className='btn play change';
-        c.href='crea.html?gioco='+encodeURIComponent(d.slug)+'&titolo='+encodeURIComponent((d.titolo||'Il mio gioco').slice(0,50));c.textContent='✏️ Cambialo';card.append(c)}
+        c.href='crea.html?gioco='+encodeURIComponent(d.slug)+'&titolo='+encodeURIComponent((d.titolo||'Il mio gioco').slice(0,50));c.textContent='✏️ Cambialo';c.setAttribute('data-crea-on','');card.append(c)}
       if(d.stato==='ricevuta'||d.stato==='nuova'){const n=document.createElement('p');n.className='by';n.textContent='Di solito il gioco è pronto in circa 8 minuti: ricarica la pagina tra poco.';card.append(n)}
     }catch(e){card.querySelector('.badge').textContent='Non riesco a controllare adesso, riprova più tardi'}});
 })();

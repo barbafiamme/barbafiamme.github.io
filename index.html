@@ -6,6 +6,7 @@
 <meta name="description" content="Barbafiamme: i videogiochi nati dai disegni di Agostino.">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
 <title>Barbafiamme</title>
+<script src="interruttore.js?v=1"></script>
 <script>if(location.hash==="#record"||location.hash==="#hof")location.replace("record.html")</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&family=Press+Start+2P&display=swap">
 <style>
@@ -243,9 +244,10 @@ body.playing{overflow:hidden}
   <section class="maker" aria-labelledby="maker-title">
     <div class="maker-txt">
       <h2 id="maker-title">Hai fatto un disegno?</h2>
-      <p>Mandacelo con la tua idea: diventa un videogioco tutto tuo, nella pagina dei <b>Piccoli Inventori</b>.</p>
+      <p data-crea-on>Mandacelo con la tua idea: diventa un videogioco tutto tuo, nella pagina dei <b>Piccoli Inventori</b>.</p>
+      <p data-crea-off></p>
     </div>
-    <div class="maker-btns"><a class="mk-btn" href="crea.html">✏️ Crea il tuo gioco</a><a class="mk-btn ghost" href="amici.html">🎮 Piccoli Inventori</a><a class="mk-btn ghost" href="anteprima.html">I miei giochi</a></div>
+    <div class="maker-btns"><a class="mk-btn" href="crea.html" data-crea-on>✏️ Crea il tuo gioco</a><a class="mk-btn ghost" href="amici.html">🎮 Piccoli Inventori</a><a class="mk-btn ghost" href="anteprima.html">I miei giochi</a></div>
   </section>
 
   <footer>Disegni e idee di Agostino, giochi costruiti insieme a papà.</footer>
