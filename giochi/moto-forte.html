@@ -51,7 +51,7 @@ h2{font-size:clamp(26px,6vw,36px)}
   <h1>Moto <span>Forte</span></h1>
   <p>Scegli la pista! Devi superare <b>5 moto</b> e arrivare al <b>rettilineo</b> finale. Cerca i <b>bidoni di benzina ⛽</b> sulla strada: senza benzina non arrivi al traguardo! Se la tua moto da pista si rovina, entra nel <b>box</b> a destra: c'è la moto di ricambio, con il pieno e un turbo!</p>
   <div class="picks" id="picks"></div>
-  <p><b>Come si gioca:</b> la moto corre da sola. Usa le frecce ◀ ▶ (o i tasti freccia) per sterzare. Nelle curve la moto si piega! Premi <b>⚡ TURBO</b> (o la barra spaziatrice) per correre più forte.</p>
+  <p><b>Come si gioca:</b> la moto corre da sola. Usa le frecce ◀ ▶ (o i tasti freccia) per sterzare, oppure <b>piega il telefono o il tablet</b> come un manubrio: la moto si piega insieme a te! Nelle curve la moto si piega! Premi <b>⚡ TURBO</b> (o la barra spaziatrice) per correre più forte.</p>
   <button class="btn" id="startBtn" type="button">Via!</button>
 </div></div>
 
@@ -161,7 +161,7 @@ function sPit(x,y,s,sp){
 }
 
 /* ---------- stato ---------- */
-let state='menu',sel=0,st,hearts,turbo,charges,fuel,tank,cans,emptyT,bump,tm,rivals,bg,steerV,lean,cd,endT,flashT=0,keys={L:0,R:0},ptr={L:0,R:0};
+let state='menu',sel=0,st,hearts,turbo,charges,fuel,tank,cans,emptyT,bump,tm,rivals,bg,steerV,lean,cd,endT,flashT=0,keys={L:0,R:0},ptr={L:0,R:0},tiltOn=false,tiltV=0,tiltBase=null;
 function newRace(){
   st={x:0,z:PZ+300,sp:0};hearts=3;turbo=0;charges=1;tank=finishZ*.7;fuel=tank;emptyT=0;
   cans=CANP.map((f,i)=>({z:Math.round(finishSeg*f)*SEG+SEG/2,o:CANL[i],got:false}));bump=0;tm=0;bg=0;lean=0;steerV=0;
@@ -191,7 +191,8 @@ function update(dt){
   let sp=st.sp/VMAX;
   if(state==='race'){
     tm+=dt;
-    const steer=(keys.R||ptr.R?1:0)-(keys.L||ptr.L?1:0);
+    let steer=(keys.R||ptr.R?1:0)-(keys.L||ptr.L?1:0);
+    if(!steer&&tiltOn)steer=tiltV;
     steerV+=(steer-steerV)*Math.min(1,dt*10);
     st.x+=steerV*2.6*(.35+.65*sp)*dt;
     st.x-=seg.curve*sp*sp*.55*dt;
@@ -223,7 +224,7 @@ function update(dt){
     st.sp*=Math.pow(.2,dt);st.z+=st.sp*dt;
     endT-=dt;if(endT<=0&&$('end').hidden)showEnd();
   }
-  const sl=clamp(seg.curve*.2*sp+steerV*.14*sp,-.55,.55);
+  const sl=clamp(seg.curve*.2*sp+steerV*.3*(.4+.6*sp),-.6,.6);
   lean+=(sl-lean)*Math.min(1,dt*8);
   hud();
 }
@@ -309,6 +310,24 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
   if(state!=='menu')update(dt)
   draw();requestAnimationFrame(frame)}
 
+/* ---------- inclinazione del telefono / tablet ---------- */
+function onTilt(e){
+  if(e.gamma==null&&e.beta==null)return;
+  const a=((screen.orientation&&screen.orientation.angle)||window.orientation||0)%360,an=a<0?a+360:a;
+  const g=e.gamma||0,b=e.beta||0;
+  const t=an===90?b:an===270?-b:an===180?-g:g;
+  if(tiltBase===null||state==='menu')tiltBase=t;
+  let d=t-tiltBase;if(d>180)d-=360;if(d<-180)d+=360;
+  const m=Math.abs(d)<4?0:(Math.abs(d)-4)/21;
+  tiltV=clamp(Math.sign(d)*m,-1,1);tiltOn=true;
+}
+function startTilt(){
+  try{
+    const D=window.DeviceOrientationEvent;if(!D)return;
+    addEventListener('deviceorientation',onTilt);
+    if(typeof D.requestPermission==='function')D.requestPermission().catch(()=>{});
+  }catch(_){}
+}
 /* ---------- comandi ---------- */
 addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A'){keys.L=1;e.preventDefault()}
   else if(e.key==='ArrowRight'||e.key==='d'||e.key==='D'){keys.R=1;e.preventDefault()}
@@ -329,7 +348,7 @@ TRACKS.forEach((t,i)=>{const b=document.createElement('button');b.type='button';
   const sw=document.createElement('div');sw.className='sw';sw.style.background='linear-gradient(180deg,'+t.sky[0]+' 0 45%,'+t.grass[0]+' 45% 60%,'+t.road[0]+' 60%)';
   b.append(sw,document.createTextNode(t.e+' '+t.n));
   b.onclick=()=>{sel=i;[...picks.children].forEach((x,j)=>x.setAttribute('aria-pressed',j===i));build(TRACKS[i]);newRace();draw()};picks.append(b)});
-function go(){
+function go(){startTilt();
   build(TRACKS[sel]);newRace();state='count';cd=3.99;
   $('start').hidden=true;$('end').hidden=true;$('count').hidden=false;
   ['pSorp','pTime','pLife','pFuel','L','R','TB'].forEach(i=>$(i).hidden=false);$('msg').hidden=true;
