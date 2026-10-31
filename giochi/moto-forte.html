@@ -127,11 +127,11 @@ function bike(x,y,h,body,suit,lean,accent){
 }
 function sTree(x,y,s,v,k){
   LW=Math.max(1,s*14);
-  if(k==='tree'){const h=800+v*500;rr(x-45*s,y-h*.3,90*s,h*.3,10*s,'#8a5a2b');
+  if(k==='tree'){const h=(800+v*500)*s;rr(x-45*s,y-h*.3,90*s,h*.3,10*s,'#8a5a2b');
     circ(x,y-h*.42,230*s,'#2f9a45');circ(x-170*s,y-h*.32,170*s,'#3aac50');circ(x+170*s,y-h*.32,170*s,'#3aac50');circ(x,y-h*.6,170*s,'#45b95a')}
-  else if(k==='cactus'){const h=600+v*500;rr(x-55*s,y-h,110*s,h,50*s,'#2f9a45');rr(x-200*s,y-h*.62,60*s,h*.34,28*s,'#2f9a45');rr(x-200*s,y-h*.4,200*s,60*s,28*s,'#2f9a45');
+  else if(k==='cactus'){const h=(600+v*500)*s;rr(x-55*s,y-h,110*s,h,50*s,'#2f9a45');rr(x-200*s,y-h*.62,60*s,h*.34,28*s,'#2f9a45');rr(x-200*s,y-h*.4,200*s,60*s,28*s,'#2f9a45');
     rr(x+140*s,y-h*.78,60*s,h*.34,28*s,'#2f9a45');rr(x,y-h*.46,200*s,60*s,28*s,'#2f9a45')}
-  else if(k==='pine'){const h=900+v*500;rr(x-40*s,y-h*.2,80*s,h*.2,6*s,'#7a4a24');
+  else if(k==='pine'){const h=(900+v*500)*s;rr(x-40*s,y-h*.2,80*s,h*.2,6*s,'#7a4a24');
     for(let i=0;i<3;i++){const b=y-h*.15-i*h*.27,w=(300-i*70)*s;poly([x-w,b,x+w,b,x,b-h*.38],'#2d7d57');ctx.lineWidth=LW;ctx.strokeStyle='#1f1d2b';ctx.stroke();poly([x-w*.5,b-h*.19,x+w*.5,b-h*.19,x,b-h*.38],'#fff')}}
   else{const w=700+v*500,h=900+v*1400,c=['#e3342f','#2a4fd0','#8a3fd0','#ff8a5c','#1fa8a0'][Math.floor(v*50)%5];
     rr(x-w/2*s,y-h*s,w*s,h*s,20*s,c);
@@ -268,7 +268,7 @@ function render(){
     q(a.x-a.w,a.y,a.x+a.w,a.y,b.x+b.w,b.y,b.x-b.w,b.y,T_.road[band]);
     if(band){[-.34,.34].forEach(f=>{const la=a.w/36,lb=b.w/36;q(a.x+a.w*f-la,a.y,a.x+a.w*f+la,a.y,b.x+b.w*f+lb,b.y,b.x+b.w*f-lb,b.y,'#fff')})}
     if(sg.i===finishSeg||sg.i===finishSeg+1){for(let k=0;k<12;k++){const f1=-1+k/6,f2=-1+(k+1)/6;q(a.x+a.w*f1,a.y,a.x+a.w*f2,a.y,b.x+b.w*f2,b.y,b.x+b.w*f1,b.y,(k+sg.i-finishSeg)%2?'#fff':'#1f1d2b')}}
-    sg.sc.forEach(s=>sTree(a.x+a.w*s.o,a.y,a.w/ROADW*.5,s.v,s.k));
+    if(a.y<=H)sg.sc.forEach(s=>sTree(a.x+a.w*s.o,a.y,a.w/ROADW*.5,s.v,s.k));
     sg.dyn.forEach(d=>{
       const sc=a.sc+(b.sc-a.sc)*d.pct,xx=a.x+(b.x-a.x)*d.pct,yy=a.y+(b.y-a.y)*d.pct,ww=a.w+(b.w-a.w)*d.pct;
       if(d.t==='p')sPit(xx+ww*d.o,yy,ww/ROADW,d.p);
