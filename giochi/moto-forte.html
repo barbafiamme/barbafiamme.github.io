@@ -49,7 +49,7 @@ h2{font-size:clamp(26px,6vw,36px)}
 
 <div class="overlay" id="start"><div class="panel">
   <h1>Moto <span>Forte</span></h1>
-  <p>Scegli la pista! Devi superare <b>5 moto</b> e arrivare al <b>rettilineo</b> finale. Cerca i <b>bidoni di benzina ⛽</b> sulla strada: senza benzina non arrivi al traguardo! Se la tua moto si rovina, entra nel <b>box</b> a destra: c'è la moto di ricambio, con il pieno e un turbo!</p>
+  <p>Scegli la pista! Devi superare <b>5 moto</b> e arrivare al <b>rettilineo</b> finale. Cerca i <b>bidoni di benzina ⛽</b> sulla strada: senza benzina non arrivi al traguardo! Se la tua moto da pista si rovina, entra nel <b>box</b> a destra: c'è la moto di ricambio, con il pieno e un turbo!</p>
   <div class="picks" id="picks"></div>
   <p><b>Come si gioca:</b> la moto corre da sola. Usa le frecce ◀ ▶ (o i tasti freccia) per sterzare. Nelle curve la moto si piega! Premi <b>⚡ TURBO</b> (o la barra spaziatrice) per correre più forte.</p>
   <button class="btn" id="startBtn" type="button">Via!</button>
@@ -118,21 +118,21 @@ function bike(x,y,h,body,suit,lean,accent){
   const u=h/120;LW=Math.max(1,1.8*u);
   ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y,42*u,6*u,0,0,7);ctx.fill();
   ctx.save();ctx.translate(x,y);ctx.rotate(lean);
-  // ruote grandi nere, come nei disegni
-  [-1,1].forEach(s=>{rr(s*24*u-12*u,-46*u,24*u,46*u,10*u,'#222');
-    ctx.strokeStyle='#555';ctx.lineWidth=Math.max(1,1.4*u);for(let k=1;k<4;k++){ctx.beginPath();ctx.moveTo(s*24*u-10*u,-46*u+k*11*u);ctx.lineTo(s*24*u+10*u,-46*u+k*11*u);ctx.stroke()}});
-  // corpo
-  rr(-19*u,-50*u,38*u,40*u,12*u,body);
-  rr(-5*u,-50*u,10*u,40*u,3*u,accent,false);
-  rr(-8*u,-24*u,16*u,6*u,2*u,'#ff3b3b');
-  // alettone dietro
-  ctx.lineCap='round';
-  [-1,1].forEach(s=>{ctx.beginPath();ctx.moveTo(s*14*u,-48*u);ctx.lineTo(s*14*u,-66*u);ctx.lineWidth=5*u;ctx.strokeStyle='#1f1d2b';ctx.stroke()});
-  rr(-38*u,-76*u,76*u,11*u,4*u,suit);
-  rr(-40*u,-82*u,6*u,22*u,2*u,accent);rr(34*u,-82*u,6*u,22*u,2*u,accent);
-  // pilota
-  rr(-12*u,-66*u,24*u,22*u,8*u,suit);
-  circ(0,-80*u,11*u,accent);rr(-8*u,-85*u,16*u,6*u,3*u,'#1f1d2b',false);
+  // moto da pista vista da dietro: UNA sola ruota posteriore, grande e nera
+  rr(-9*u,-52*u,18*u,52*u,8*u,'#222');
+  ctx.strokeStyle='#666';ctx.lineWidth=Math.max(1,1.4*u);for(let k=1;k<5;k++){ctx.beginPath();ctx.moveTo(-8*u,-52*u+k*10*u);ctx.lineTo(8*u,-52*u+k*10*u);ctx.stroke()}
+  // carena e codino colorati
+  rr(-13*u,-74*u,26*u,34*u,10*u,body);
+  rr(-3*u,-74*u,6*u,34*u,2*u,accent,false);
+  rr(-7*u,-52*u,14*u,5*u,2*u,'#ff3b3b');
+  // piccolo alettone
+  rr(-24*u,-80*u,48*u,7*u,3*u,suit);
+  rr(-26*u,-86*u,5*u,16*u,2*u,accent);rr(21*u,-86*u,5*u,16*u,2*u,accent);
+  // pilota chinato in avanti, con le ginocchia fuori
+  rr(-24*u,-70*u,10*u,22*u,5*u,suit);rr(14*u,-70*u,10*u,22*u,5*u,suit);
+  rr(-14*u,-92*u,28*u,28*u,10*u,suit);
+  rr(-30*u,-88*u,12*u,8*u,4*u,suit);rr(18*u,-88*u,12*u,8*u,4*u,suit);
+  circ(0,-100*u,10*u,accent);rr(-7*u,-104*u,14*u,5*u,3*u,'#1f1d2b',false);
   ctx.restore();
 }
 function sTree(x,y,s,v,k){
