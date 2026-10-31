@@ -1,4 +1,5 @@
 [
+  {"slug":"cavalieri-delle-stelle","titolo":"I Cavalieri delle Stelle","nome":"Federico","descrizione":"Sali i 12 templi e sfida in un combattimento uno contro uno i Cavalieri d'Oro, dall'Ariete ai Pesci, per salvare la Principessa Stellina!","classifica":{"unit":"punti","asc":false}},
   {"slug":"drago-sputafuoco","titolo":"Drago sputafuoco","nome":"Agata Fede","descrizione":"Il drago ha fame: sputa fuoco e cattura più rettili che puoi in un minuto!","classifica":{"unit":"rettili","asc":false}},
   {"slug":"addobba-albero-natale","titolo":"Addobba l'albero","nome":"Agata","descrizione":"Appendi le palline sull'albero di Natale, ma attenta al gatto dispettoso che le porta via!","classifica":{"unit":"punti","asc":false}},
   {"slug":"strega-catturazucche","titolo":"Strega catturazucche","nome":"Agata","descrizione":"La strega prende più zucche che può in un minuto, ma attenta al fantasma che se le mangia!","classifica":{"unit":"zucche","asc":false}},
