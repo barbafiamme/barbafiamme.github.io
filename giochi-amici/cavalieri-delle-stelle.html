@@ -244,7 +244,7 @@ function crest(f,T,dark){const gl='#f2d04a',ac=f.col;
   }}
 function knight(f){
   const d=f.dir,x=f.x,T=Date.now()/180,air=f.y<-2,mv=f.vx&&!air?1:0,sw=Math.sin(T*3);
-  const gold=!!f.gold,main=gold?'#e8b820':f.col,acx=gold?f.col:f.trim,dark=shade(main,-.55),skin='#f6d9b8',hair=gold?shade(f.col,-.3):'#3a2a1c';
+  const gold=!!f.gold,main=gold?'#e8b820':f.col,acx=gold?f.col:f.trim,dark=shade(main,-.55),skin='#e6b283',hair=gold?shade(f.col,-.3):'#3a2a1c';
   const bob=air?0:(mv?Math.abs(sw)*3:Math.sin(T)*1.5),cape=Math.sin(T*1.5)*4+(mv?-12:0)+(air?8:0);
   const kick=f.atk&&f.kind==3,sup=f.atk&&f.kind==2,pun=f.atk&&f.kind==1;
   const e=Math.sin(Math.min(1,(f.fxT||0)/(kick?10:8))*Math.PI);
@@ -259,9 +259,12 @@ function knight(f){
   else if(mv){fF=[16+sw*20,-Math.max(0,Math.cos(T*3))*9];fB=[-16-sw*20,-Math.max(0,-Math.cos(T*3))*9]}
   else{fF=[22,0];fB=[-20,0]}
   [[fB,-.55],[fF,0]].forEach(([ft,sd],k)=>{const bn=ik(k?4:-4,hipY,ft[0],ft[1],50,50,-1);
-    limb(k?4:-4,hipY,bn[0],bn[1],18,sd?shade(main,-.35):dark);
-    limb(bn[0],bn[1],bn[2],bn[3]-6,17,sd?shade(main,-.3):main);
-    ctx.fillStyle=acx;ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(bn[0],bn[1],7,0,7);ctx.fill();ctx.stroke();// ginocchiera
+    const lc=sd?shade(skin,-.3):skin,lk=k?4:-4;
+    limb(lk,hipY,bn[0],bn[1],29,gold?(sd?shade(main,-.35):shade(main,-.1)):lc);
+    ctx.fillStyle='rgba(255,255,255,.22)';ctx.beginPath();ctx.ellipse((lk+bn[0])/2+2,(hipY+bn[1])/2-2,6,16,Math.atan2(bn[1]-hipY,bn[0]-lk)-Math.PI/2,0,7);ctx.fill();
+    limb(bn[0],bn[1],bn[2],bn[3]-6,22,sd?shade(main,-.3):main);
+    ctx.fillStyle=sd?shade(skin,-.3):skin;ctx.beginPath();ctx.ellipse((bn[0]*2+bn[2])/3,(bn[1]*2+bn[3])/3,11,15,Math.atan2(bn[3]-bn[1],bn[2]-bn[0])-Math.PI/2,0,7);ctx.fill();ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle=acx;ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(bn[0],bn[1],9,0,7);ctx.fill();ctx.stroke();// ginocchiera
     poly([bn[2]-6,bn[3]-9,bn[2]+4,bn[3]-9,bn[2]+17,bn[3]+1,bn[2]-6,bn[3]+1],shade(main,k?0:-.3),'#1f1d2b')});
   // busto
   const lean=f.hit>0?-.28:kick?-.2*e-.04:(pun?.14*e+.04:(sup?.12:(f.guard?.06:(mv?.07:.03))));
@@ -277,18 +280,22 @@ function knight(f){
   else if(air){hF=[26,-80];hB=[-6,-92]}
   else{hF=[26+sw*mv*8,-64];hB=[12,-80-mv*sw*4]}
   const aB=ik(sB[0],sB[1],hB[0],hB[1],34,34,1);
-  limb(sB[0],sB[1],aB[0],aB[1],14,shade(main,-.55));limb(aB[0],aB[1],aB[2],aB[3],16,shade(main,-.25));
+  limb(sB[0],sB[1],aB[0],aB[1],22,shade(skin,-.35));limb(aB[0],aB[1],aB[2],aB[3],19,shade(skin,-.25));ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse((sB[0]+aB[0])/2,(sB[1]+aB[1])/2-3,8,11,0,0,7);ctx.fill();
   ctx.fillStyle=acx;ctx.beginPath();ctx.arc(aB[2],aB[3],7,0,7);ctx.fill();ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.stroke();
-  // corazza slanciata
-  poly([-11,0,11,0,13,10,-13,10],lin(0,0,0,10,acx),dark);
-  for(let i=-12;i<=12;i+=8)poly([i,10,i+8,10,i+4,26],shade(main,-.1),dark);
-  poly([-11,0,11,0,25,-44,23,-62,-23,-62,-25,-44],lin(-18,0,18,0,main),dark);
-  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(-18,-56,4,40);
-  poly([-22,-52,22,-52,19,-46,-19,-46],acx);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(-1,-50,2,26);for(let r=0;r<3;r++)ctx.fillRect(-9,-26+r*5,18,1.6);ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.ellipse(-10,-42,9,6,0,0,7);ctx.ellipse(12,-42,9,6,0,0,7);ctx.fill();poly([-12,-18,12,-18,11,-12,-11,-12],acx);
-  ctx.beginPath();ctx.arc(2,-34,8,0,7);ctx.fillStyle=gold?'#fff6d0':acx;ctx.fill();ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.stroke();
-  ctx.fillStyle=gold?f.col:main;ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.sign?f.sign[1]:f.emb,2,-33);ctx.textBaseline='alphabetic';
+  // busto muscoloso
+  poly([-11,0,11,0,34,-44,30,-66,-30,-66,-34,-44],lin(-20,0,20,0,skin),'#1f1d2b');
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.ellipse(-16,-30,5,18,.15,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(90,40,20,.65)';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(1,-34);ctx.lineTo(1,-2);[-8,-17,-26].forEach(yy=>{ctx.moveTo(-9,yy);ctx.quadraticCurveTo(1,yy+3,11,yy)});ctx.stroke();
+  [-1,1].forEach(sg=>{ctx.beginPath();ctx.ellipse(1+sg*13,-47,14,10,sg*.15,0,7);ctx.fillStyle=gold?'#e8b820':shade(skin,.12);ctx.fill();ctx.strokeStyle=gold?dark:'rgba(90,40,20,.75)';ctx.lineWidth=2;ctx.stroke()});
+  ctx.strokeStyle='rgba(90,40,20,.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-26,-30);ctx.quadraticCurveTo(-30,-45,-26,-58);ctx.moveTo(28,-30);ctx.quadraticCurveTo(32,-45,28,-58);ctx.stroke();
+  if(gold){ctx.beginPath();ctx.arc(1,-47,6,0,7);ctx.fillStyle=f.col;ctx.fill();ctx.strokeStyle=dark;ctx.stroke();ctx.fillStyle='#fff6d0';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.sign[1],1,-46);ctx.textBaseline='alphabetic'}
+  else{poly([-30,-62,-18,-66,28,-6,20,-2],acx,dark);
+    ctx.fillStyle=main;ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.emb,3,-33);ctx.textBaseline='alphabetic'}
+  poly([-14,-4,14,-4,15,6,-15,6],acx,dark);
+  poly([-15,6,15,6,22,28,-22,28],lin(0,6,0,28,gold?'#e8b820':main),dark);for(let i=-12;i<=12;i+=8)poly([i,6,i+7,6,i+4,26],shade(main,-.15),dark);
+  ctx.beginPath();ctx.arc(1,1,5,0,7);ctx.fillStyle='#f2d04a';ctx.fill();ctx.strokeStyle=dark;ctx.stroke();
   // collo, testa
-  ctx.fillStyle=shade(skin,-.15);ctx.fillRect(-1,-72,8,12);
+  ctx.fillStyle=shade(skin,-.2);ctx.fillRect(-5,-74,16,14);
   ctx.save();ctx.translate(3,-84);
   ctx.fillStyle=hair;ctx.beginPath();ctx.moveTo(-6,-12);ctx.quadraticCurveTo(-24+cape*.4,-8,-26+cape*.6,24);ctx.quadraticCurveTo(-12,8,-4,6);ctx.fill();
   ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(1,0,11,13,0,0,7);ctx.fill();
@@ -301,14 +308,19 @@ function knight(f){
   poly([-11,-3,-8,10,-3,10,-5,-3],shade(gold?'#f2d04a':main,-.2),dark);// paraguancia
   ctx.restore();
   // spallaccio
-  ctx.beginPath();ctx.ellipse(6,-58,17,12,-.2,0,7);ctx.fillStyle=lin(0,-66,0,-50,gold?'#f2d04a':main);ctx.fill();ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.beginPath();ctx.ellipse(6,-58,21,15,-.2,0,7);ctx.fillStyle=lin(0,-70,0,-48,gold?'#f2d04a':main);ctx.fill();ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.stroke();
   if(gold)[-8,3,14,24].forEach((sx,k)=>poly([sx-4,-64,sx+1,-84+k*3,sx+5,-64],'#3a0a14',dark));
   if(!gold&&f.crest==3){poly([-2,-60,-26,-92,-18,-56],'#fff',dark)}
   // braccio vicino
   const aF=ik(sF[0],sF[1],hF[0],hF[1],34,34,1);
-  limb(sF[0],sF[1],aF[0],aF[1],15,shade(main,-.5));limb(aF[0],aF[1],aF[2],aF[3],18,main);ctx.fillStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.ellipse((aF[0]+sF[0])/2+1,(aF[1]+sF[1])/2-3,6,8,0,0,7);ctx.fill();
+  limb(sF[0],sF[1],aF[0],aF[1],26,skin);limb(aF[0],aF[1],aF[2],aF[3],21,skin);
+  {const an=Math.atan2(aF[1]-sF[1],aF[0]-sF[0])-Math.PI/2;
+  ctx.fillStyle=shade(skin,.15);ctx.beginPath();ctx.ellipse((aF[0]+sF[0])/2,(aF[1]+sF[1])/2,12,17,an,0,7);ctx.fill();ctx.strokeStyle='rgba(90,40,20,.7)';ctx.lineWidth=1.8;ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.beginPath();ctx.ellipse((aF[0]+sF[0])/2-2,(aF[1]+sF[1])/2-4,4,9,an,0,7);ctx.fill();
+  ctx.fillStyle=shade(skin,.08);ctx.beginPath();ctx.ellipse((aF[0]*3+aF[2])/4,(aF[1]*3+aF[3])/4,10,14,Math.atan2(aF[3]-aF[1],aF[2]-aF[0])-Math.PI/2,0,7);ctx.fill();ctx.stroke();
+  limb(aF[0]*.35+aF[2]*.65,aF[1]*.35+aF[3]*.65,aF[2],aF[3],18,acx)}
   if(pun&&e>.4){ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=3;[-8,0,8].forEach(o=>{ctx.beginPath();ctx.moveTo(aF[2]+10,aF[3]+o);ctx.lineTo(aF[2]+34,aF[3]+o);ctx.stroke()})}
-  ctx.fillStyle=acx;ctx.beginPath();ctx.arc(aF[2],aF[3],8,0,7);ctx.fill();ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=acx;ctx.beginPath();ctx.arc(aF[2],aF[3],10,0,7);ctx.fill();ctx.strokeStyle='#1f1d2b';ctx.lineWidth=2;ctx.stroke();
   if(f.guard){const gr=ctx.createRadialGradient(38,-72,6,38,-72,60);gr.addColorStop(0,'rgba(255,255,255,.75)');gr.addColorStop(1,'rgba(120,190,255,.3)');
     ctx.fillStyle=gr;ctx.beginPath();ctx.arc(38,-72,58,-1.4,1.4);ctx.lineTo(38,-72);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(38,-72,58,-1.4,1.4);ctx.stroke()}
   if(kick&&e>.4){ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=4;ctx.beginPath();ctx.arc(10,60,100,-1.0,-0.2);ctx.stroke()}
