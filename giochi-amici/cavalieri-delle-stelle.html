@@ -33,7 +33,7 @@ h2{font-size:clamp(26px,6vw,34px)}
 </div>
 <div class="overlay" id="start"><div class="panel">
   <h1>I Cavalieri <span>delle Stelle</span></h1>
-  <p>La Principessa Stellina è in pericolo! Sali i 12 templi e sfida i 12 Cavalieri d'Oro, uno alla volta, dall'Ariete ai Pesci.</p>
+  <p>La dea Atena è in pericolo! Sali i 12 templi e sfida i 12 Cavalieri d'Oro, uno alla volta, dall'Ariete ai Pesci.</p>
   <p><b>Scegli il tuo cavaliere:</b> <span id="hname">Ilio</span></p>
   <div class="heroes" id="heroes"></div>
   <ul><li>◀ ▶ per muoverti, ⤴ per saltare, 👊 per il pugno, 🦶 per il calcio (anche in aria!), 🛡 per pararti.</li><li>Quando la barra ✨ è piena, lancia il Super colpo!</li><li>Tastiera: frecce o A/D, freccia su o W = salto, Spazio = pugno, L = calcio, S = scudo, K = super.</li></ul>
@@ -134,7 +134,7 @@ function finish(win){
   const score=Math.max(1,pts+lvl*20);
   setTimeout(()=>{
     $('controls').hidden=true;
-    $('endT').textContent=win?'Hai salvato la Principessa! 🌟':'Che bella battaglia!';
+    $('endT').textContent=win?'Hai salvato la dea Atena! 🌟':'Che bella battaglia!';
     $('endP').textContent=win?'Hai battuto tutti e 12 i Cavalieri d\'Oro! Punti: '+score:'Hai superato '+lvl+' templi su 12. Punti: '+score+'. Riprova: puoi arrivare più in alto!';
     $('end').hidden=false;
     if(window.Classifica)Classifica.mount($('board'),'cavalieri-delle-stelle',score)},900)}
@@ -167,10 +167,36 @@ function draw(){
     // bracieri con fuoco
     [40,760].forEach((bx,i)=>{ctx.fillStyle='#6b4a2a';ctx.fillRect(bx-4,GY-70,8,60);ctx.fillStyle='#8a5a2a';ctx.beginPath();ctx.moveTo(bx-18,GY-72);ctx.lineTo(bx+18,GY-72);ctx.lineTo(bx+10,GY-52);ctx.lineTo(bx-10,GY-52);ctx.fill();
       const w=Math.sin(Date.now()/90+i*2)*3;ctx.fillStyle='#ff7a1a';ctx.beginPath();ctx.moveTo(bx-12,GY-72);ctx.quadraticCurveTo(bx-10+w,GY-100,bx+w,GY-112);ctx.quadraticCurveTo(bx+12,GY-95,bx+12,GY-72);ctx.fill();ctx.fillStyle='#ffd23c';ctx.beginPath();ctx.moveTo(bx-6,GY-72);ctx.quadraticCurveTo(bx+w,GY-92,bx+w*.5,GY-98);ctx.quadraticCurveTo(bx+7,GY-86,bx+6,GY-72);ctx.fill()});
-    // Principessa in tunica greca
-    ctx.fillStyle='#fffaf0';ctx.beginPath();ctx.moveTo(396,GY-132);ctx.lineTo(420,GY-132);ctx.lineTo(438,GY-22);ctx.lineTo(378,GY-22);ctx.fill();ctx.fillStyle='#e8c14a';ctx.fillRect(394,GY-100,28,5);
-    ctx.fillStyle='#5a3a8c';ctx.beginPath();ctx.arc(408,GY-144,13,0,7);ctx.fill();ctx.fillStyle='#f6d9b8';ctx.beginPath();ctx.arc(408,GY-142,9,0,7);ctx.fill();
-    ctx.strokeStyle='#3d8a3d';ctx.lineWidth=3;ctx.beginPath();ctx.arc(408,GY-150,10,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+    // Atena, dea della saggezza: bellissima, con aura dorata
+    {const ax=408,ay=GY,t=Date.now()/400;
+     const au=ctx.createRadialGradient(ax,ay-120,6,ax,ay-120,95);au.addColorStop(0,'rgba(255,245,190,.75)');au.addColorStop(1,'rgba(255,230,140,0)');ctx.fillStyle=au;ctx.fillRect(ax-100,ay-230,200,230);
+     // capelli lunghi e morbidi
+     ctx.fillStyle='#6b3a1c';ctx.beginPath();ctx.moveTo(ax-14,ay-152);ctx.bezierCurveTo(ax-34,ay-120,ax-30,ay-84,ax-20+Math.sin(t)*3,ay-62);ctx.bezierCurveTo(ax-8,ay-84,ax-6,ay-110,ax-4,ay-130);ctx.fill();
+     ctx.beginPath();ctx.moveTo(ax+14,ay-152);ctx.bezierCurveTo(ax+34,ay-120,ax+30,ay-84,ax+20-Math.sin(t)*3,ay-62);ctx.bezierCurveTo(ax+8,ay-84,ax+6,ay-110,ax+4,ay-130);ctx.fill();
+     // tunica (peplo) con pieghe e cintura dorata
+     const tg=ctx.createLinearGradient(ax-34,0,ax+34,0);tg.addColorStop(0,'#cfe3ff');tg.addColorStop(.5,'#ffffff');tg.addColorStop(1,'#bcd0f0');
+     ctx.fillStyle=tg;ctx.beginPath();ctx.moveTo(ax-14,ay-134);ctx.quadraticCurveTo(ax,ay-140,ax+14,ay-134);ctx.lineTo(ax+16,ay-102);ctx.quadraticCurveTo(ax+42,ay-50,ax+40,ay-14);ctx.lineTo(ax-40,ay-14);ctx.quadraticCurveTo(ax-42,ay-50,ax-16,ay-102);ctx.closePath();ctx.fill();
+     ctx.strokeStyle='rgba(120,150,200,.55)';ctx.lineWidth=1.5;[-24,-12,0,12,24].forEach(o=>{ctx.beginPath();ctx.moveTo(ax+o*.4,ay-98);ctx.quadraticCurveTo(ax+o*1.2,ay-50,ax+o*1.5,ay-16);ctx.stroke()});
+     ctx.fillStyle='#f2d04a';ctx.fillRect(ax-16,ay-106,32,6);ctx.fillRect(ax-40,ay-20,80,6);
+     ctx.fillStyle='#d9362e';for(let k=-36;k<36;k+=12)ctx.fillRect(ax+k,ay-19,6,4);
+     // mantello azzurro e spalline d'oro
+     ctx.fillStyle='rgba(70,130,220,.8)';ctx.beginPath();ctx.moveTo(ax-14,ay-134);ctx.quadraticCurveTo(ax-44,ay-90,ax-36,ay-40);ctx.lineTo(ax-24,ay-60);ctx.lineTo(ax-12,ay-110);ctx.fill();
+     ctx.fillStyle='#f2d04a';ctx.beginPath();ctx.arc(ax-14,ay-134,5,0,7);ctx.arc(ax+14,ay-134,5,0,7);ctx.fill();
+     // braccia eleganti, lancia dorata
+     ctx.strokeStyle='#f6d9b8';ctx.lineCap='round';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(ax+14,ay-132);ctx.quadraticCurveTo(ax+30,ay-112,ax+34,ay-96);ctx.moveTo(ax-14,ay-132);ctx.quadraticCurveTo(ax-26,ay-112,ax-20,ay-100);ctx.stroke();
+     ctx.strokeStyle='#e8c14a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(ax+34,ay-14);ctx.lineTo(ax+34,ay-190);ctx.stroke();poly([ax+34,ay-206,ax+29,ay-188,ax+39,ay-188],'#fff6c0','#b58a1a');
+     // collo e viso gentile
+     ctx.fillStyle='#f0cfa6';ctx.fillRect(ax-3,ay-142,6,10);
+     ctx.fillStyle='#f9e0c2';ctx.beginPath();ctx.ellipse(ax,ay-154,10,12,0,0,7);ctx.fill();
+     ctx.fillStyle='rgba(255,140,150,.45)';ctx.beginPath();ctx.arc(ax-6,ay-150,3,0,7);ctx.arc(ax+6,ay-150,3,0,7);ctx.fill();
+     ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(ax-4,ay-156,2.6,1.9,0,0,7);ctx.ellipse(ax+4,ay-156,2.6,1.9,0,0,7);ctx.fill();
+     ctx.fillStyle='#2f8fd6';ctx.beginPath();ctx.arc(ax-4,ay-156,1.4,0,7);ctx.arc(ax+4,ay-156,1.4,0,7);ctx.fill();
+     ctx.strokeStyle='#4a2a14';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(ax-7,ay-159);ctx.quadraticCurveTo(ax-4,ay-161,ax-1.5,ay-159);ctx.moveTo(ax+1.5,ay-159);ctx.quadraticCurveTo(ax+4,ay-161,ax+7,ay-159);ctx.stroke();
+     ctx.strokeStyle='#d8505e';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(ax-3,ay-147);ctx.quadraticCurveTo(ax,ay-144.5,ax+3,ay-147);ctx.stroke();
+     // capelli sulla fronte e corona d'alloro dorata
+     ctx.fillStyle='#6b3a1c';ctx.beginPath();ctx.moveTo(ax-11,ay-156);ctx.quadraticCurveTo(ax,ay-176,ax+11,ay-156);ctx.quadraticCurveTo(ax,ay-163,ax-11,ay-156);ctx.fill();
+     ctx.fillStyle='#f2d04a';for(let k=-4;k<=4;k++){ctx.beginPath();ctx.ellipse(ax+k*2.7,ay-165+Math.abs(k)*.9,2.8,1.3,k*.35,0,7);ctx.fill()}
+     ctx.fillStyle='#fff';[[-24,-190],[26,-176],[-18,-210],[14,-216]].forEach(([dx,dy],k)=>{const a=.5+.5*Math.sin(t*2+k);ctx.globalAlpha=a;star(ax+dx,ay+dy+60,4,'#fff6b0')});ctx.globalAlpha=1}
     knight(E);knight(P);
     fl.forEach(f=>{ctx.globalAlpha=f.t/30;ctx.fillStyle='#fff';ctx.strokeStyle='#d9362e';ctx.lineWidth=4;ctx.font='bold 30px Impact,sans-serif';ctx.textAlign='center';ctx.strokeText(f.s,f.x,f.y-(30-f.t));ctx.fillText(f.s,f.x,f.y-(30-f.t))});ctx.globalAlpha=1;
     ctx.restore();
@@ -224,7 +250,7 @@ function knight(f){
   const e=Math.sin(Math.min(1,(f.fxT||0)/(kick?10:8))*Math.PI);
   ctx.save();ctx.translate(x,GY+f.y);ctx.scale(d,1);
   if(f.hit>0)ctx.globalAlpha=.6+.4*Math.sin(f.hit*2);
-  if(gold||f.sup>=100){const a=ctx.createRadialGradient(0,-100,10,0,-100,130);a.addColorStop(0,gold?'rgba(200,30,60,.32)':'rgba(255,240,150,.5)');a.addColorStop(1,gold?'rgba(120,0,40,0)':'rgba(255,230,120,0)');ctx.fillStyle=a;ctx.fillRect(-140,-240,280,260)}
+  if(gold||f.sup>=100){const a=ctx.createRadialGradient(0,-100,10,0,-100,130);a.addColorStop(0,gold?'rgba(200,0,30,.5)':'rgba(255,240,150,.5)');a.addColorStop(1,gold?'rgba(120,0,40,0)':'rgba(255,230,120,0)');ctx.fillStyle=a;ctx.fillRect(-140,-240,280,260)}
   ctx.fillStyle='rgba(0,0,0,.3)';const sh=1+f.y/200;ctx.beginPath();ctx.ellipse(0,-f.y,34*sh,7*sh,0,0,7);ctx.fill();
   // gambe (anca a -100)
   const hipY=-100+bob*.5;let fF,fB;
@@ -233,8 +259,8 @@ function knight(f){
   else if(mv){fF=[16+sw*20,-Math.max(0,Math.cos(T*3))*9];fB=[-16-sw*20,-Math.max(0,-Math.cos(T*3))*9]}
   else{fF=[22,0];fB=[-20,0]}
   [[fB,-.55],[fF,0]].forEach(([ft,sd],k)=>{const bn=ik(k?4:-4,hipY,ft[0],ft[1],50,50,-1);
-    limb(k?4:-4,hipY,bn[0],bn[1],13,sd?shade(main,-.35):dark);
-    limb(bn[0],bn[1],bn[2],bn[3]-6,14,sd?shade(main,-.3):main);
+    limb(k?4:-4,hipY,bn[0],bn[1],18,sd?shade(main,-.35):dark);
+    limb(bn[0],bn[1],bn[2],bn[3]-6,17,sd?shade(main,-.3):main);
     ctx.fillStyle=acx;ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(bn[0],bn[1],7,0,7);ctx.fill();ctx.stroke();// ginocchiera
     poly([bn[2]-6,bn[3]-9,bn[2]+4,bn[3]-9,bn[2]+17,bn[3]+1,bn[2]-6,bn[3]+1],shade(main,k?0:-.3),'#1f1d2b')});
   // busto
@@ -243,7 +269,7 @@ function knight(f){
   // mantello
   poly([-8,-60,-16,-58,-34+cape,-6,-42+cape*1.3,46,-22+cape,40,-8,-4],shade(acx,gold?0:-.1),dark);
   // braccio lontano
-  const sB=[-5,-58],sF=[5,-58];let hB,hF;
+  const sB=[-9,-58],sF=[9,-58];let hB,hF;
   if(f.guard){hB=[20,-78];hF=[26,-66]}
   else if(sup){hB=[44,-66];hF=[48,-62]}
   else if(pun){hF=[26+e*66,-64];hB=[16,-78]}
@@ -251,14 +277,14 @@ function knight(f){
   else if(air){hF=[26,-80];hB=[-6,-92]}
   else{hF=[26+sw*mv*8,-64];hB=[12,-80-mv*sw*4]}
   const aB=ik(sB[0],sB[1],hB[0],hB[1],34,34,1);
-  limb(sB[0],sB[1],aB[0],aB[1],9,shade(main,-.55));limb(aB[0],aB[1],aB[2],aB[3],11,shade(main,-.25));
+  limb(sB[0],sB[1],aB[0],aB[1],14,shade(main,-.55));limb(aB[0],aB[1],aB[2],aB[3],16,shade(main,-.25));
   ctx.fillStyle=acx;ctx.beginPath();ctx.arc(aB[2],aB[3],7,0,7);ctx.fill();ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.stroke();
   // corazza slanciata
   poly([-11,0,11,0,13,10,-13,10],lin(0,0,0,10,acx),dark);
   for(let i=-12;i<=12;i+=8)poly([i,10,i+8,10,i+4,26],shade(main,-.1),dark);
-  poly([-11,0,11,0,18,-44,15,-62,-15,-62,-18,-44],lin(-18,0,18,0,main),dark);
-  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(-12,-56,4,40);
-  poly([-15,-52,15,-52,13,-46,-13,-46],acx);poly([-12,-18,12,-18,11,-12,-11,-12],acx);
+  poly([-11,0,11,0,25,-44,23,-62,-23,-62,-25,-44],lin(-18,0,18,0,main),dark);
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(-18,-56,4,40);
+  poly([-22,-52,22,-52,19,-46,-19,-46],acx);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(-1,-50,2,26);for(let r=0;r<3;r++)ctx.fillRect(-9,-26+r*5,18,1.6);ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.ellipse(-10,-42,9,6,0,0,7);ctx.ellipse(12,-42,9,6,0,0,7);ctx.fill();poly([-12,-18,12,-18,11,-12,-11,-12],acx);
   ctx.beginPath();ctx.arc(2,-34,8,0,7);ctx.fillStyle=gold?'#fff6d0':acx;ctx.fill();ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle=gold?f.col:main;ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.sign?f.sign[1]:f.emb,2,-33);ctx.textBaseline='alphabetic';
   // collo, testa
@@ -268,19 +294,19 @@ function knight(f){
   ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(1,0,11,13,0,0,7);ctx.fill();
   const fight=f.atk||f.hit>0;
   ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(6,-2,3.8,2.8,0,0,7);ctx.fill();ctx.fillStyle=gold?'#e01818':'#1f1d2b';ctx.beginPath();ctx.arc(7.2,-2,gold?2.6:2,0,7);ctx.fill();if(gold){ctx.fillStyle='rgba(255,60,40,.35)';ctx.beginPath();ctx.arc(7,-2,7,0,7);ctx.fill()}
-  ctx.strokeStyle='#2a1a10';ctx.lineWidth=2;ctx.lineWidth=gold?3:2;ctx.beginPath();ctx.moveTo(2,gold?-10:fight?-9:-7);ctx.lineTo(11,gold?-4:fight?-5:-8);ctx.stroke();
+  ctx.strokeStyle='#2a1a10';ctx.lineWidth=2;ctx.lineWidth=gold?4.5:2;ctx.beginPath();ctx.moveTo(1,gold?-12:fight?-9:-7);ctx.lineTo(12,gold?-3:fight?-5:-8);ctx.stroke();if(gold){ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(5,8);ctx.lineTo(6.5,13);ctx.lineTo(8,8);ctx.moveTo(9,8);ctx.lineTo(10.5,13);ctx.lineTo(12,8);ctx.fill()}
   ctx.lineWidth=1.5;ctx.beginPath();if(gold){ctx.moveTo(4,8);ctx.quadraticCurveTo(8,5,12,8);ctx.moveTo(6,7);ctx.lineTo(7,10);ctx.moveTo(10,7);ctx.lineTo(10,10)}else{ctx.moveTo(5,7);ctx.quadraticCurveTo(8,fight?10:8,11,6)}ctx.stroke();
   crest(f,T,dark);
   poly([-11,-3,-10,-14,0,-18,11,-12,12,-6,6,-9,-4,-9],lin(0,-18,0,-3,gold?'#f2d04a':main),dark);// elmo
   poly([-11,-3,-8,10,-3,10,-5,-3],shade(gold?'#f2d04a':main,-.2),dark);// paraguancia
   ctx.restore();
   // spallaccio
-  ctx.beginPath();ctx.ellipse(5,-58,11,8,-.2,0,7);ctx.fillStyle=lin(0,-66,0,-50,gold?'#f2d04a':main);ctx.fill();ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.stroke();
-  if(gold&&[0,1,7,9].includes(SIGNS.indexOf(f.sign)))[-4,5,14].forEach((sx,k)=>poly([sx-3,-62,sx+1,-76+k*2,sx+4,-62],acx,dark));
+  ctx.beginPath();ctx.ellipse(6,-58,17,12,-.2,0,7);ctx.fillStyle=lin(0,-66,0,-50,gold?'#f2d04a':main);ctx.fill();ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.stroke();
+  if(gold)[-8,3,14,24].forEach((sx,k)=>poly([sx-4,-64,sx+1,-84+k*3,sx+5,-64],'#3a0a14',dark));
   if(!gold&&f.crest==3){poly([-2,-60,-26,-92,-18,-56],'#fff',dark)}
   // braccio vicino
   const aF=ik(sF[0],sF[1],hF[0],hF[1],34,34,1);
-  limb(sF[0],sF[1],aF[0],aF[1],10,shade(main,-.5));limb(aF[0],aF[1],aF[2],aF[3],12,main);
+  limb(sF[0],sF[1],aF[0],aF[1],15,shade(main,-.5));limb(aF[0],aF[1],aF[2],aF[3],18,main);ctx.fillStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.ellipse((aF[0]+sF[0])/2+1,(aF[1]+sF[1])/2-3,6,8,0,0,7);ctx.fill();
   if(pun&&e>.4){ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=3;[-8,0,8].forEach(o=>{ctx.beginPath();ctx.moveTo(aF[2]+10,aF[3]+o);ctx.lineTo(aF[2]+34,aF[3]+o);ctx.stroke()})}
   ctx.fillStyle=acx;ctx.beginPath();ctx.arc(aF[2],aF[3],8,0,7);ctx.fill();ctx.strokeStyle='#1f1d2b';ctx.lineWidth=1.5;ctx.stroke();
   if(f.guard){const gr=ctx.createRadialGradient(38,-72,6,38,-72,60);gr.addColorStop(0,'rgba(255,255,255,.75)');gr.addColorStop(1,'rgba(120,190,255,.3)');
