@@ -68,5 +68,12 @@
   "gioco": "Piscina veloce",
   "descrizione": "Una piscina blu con tre nuotatori in costume verde, arancione e rosso. Da qui è nata la Piscina veloce.",
   "alt": "Disegno di una piscina blu con tre nuotatori che nuotano, con il costume verde, arancione e rosso"
+ },
+ {
+  "src": "disegni/moto-forte.jpg",
+  "titolo": "Moto Forte",
+  "gioco": "Moto Forte",
+  "descrizione": "Moto da corsa, il box con la moto di ricambio e la rampa. In gioco è diventata Moto Forte.",
+  "alt": "Disegno di moto e auto da corsa, una rampa nera e il box con la moto di ricambio"
  }
 ]

@@ -49,10 +49,11 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .card.pirate .play{background:#ff8a5c}
 .card.train .play{background:#7fd66b}
 .card.pool .play{background:#4fc3f7}
+.card.moto .play{background:#ff5a4f;color:#fff}
 #player.pirate .close{left:max(206px,calc(50% - 26px));bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:52px;height:52px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
 #player.pirate .close::after{content:"⌂";font-size:26px;line-height:1}
-#player.train .close,#player.pool .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
-#player.train .close::after,#player.pool .close::after{content:"⌂";font-size:24px;line-height:1}
+#player.train .close,#player.pool .close,#player.moto .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
+#player.train .close::after,#player.pool .close::after,#player.moto .close::after{content:"⌂";font-size:24px;line-height:1}
 .play:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .play:focus-visible,.close:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 .sec-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1;margin:6px 0 -8px}
@@ -237,6 +238,22 @@ body.playing{overflow:hidden}
         <p>Dieci vasche avanti e indietro, prima con la tavoletta e poi senza. Schizza, schizza, schizza e supera tutti!</p>
         <div class="chips"><span class="chip">2 round</span><span class="chip">10 vasche</span><span class="chip">Facile</span></div>
         <button class="play" type="button" data-game="giochi/piscina.html" data-kind="pool">Gioca!</button>
+      </div>
+    </article>
+    <article class="card moto">
+      <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Una moto da corsa sulla pista con altre moto davanti">
+        <rect width="320" height="180" fill="#7fd0ff"/><rect y="70" width="320" height="110" fill="#58b84a"/>
+        <path d="M120 70H200L290 180H30Z" fill="#6b6b78"/><path d="M120 70L30 180M200 70L290 180" stroke="#e3342f" stroke-width="6"/>
+        <path d="M160 74V90M160 104V128M160 142V180" stroke="#fff" stroke-width="5"/>
+        <g stroke="#1f1d2b" stroke-width="2" stroke-linejoin="round"><rect x="146" y="84" width="10" height="12" rx="3" fill="#8a3fd0"/><circle cx="151" cy="80" r="4" fill="#e0c4ff"/><rect x="176" y="100" width="14" height="16" rx="4" fill="#f2891f"/><circle cx="183" cy="95" r="5" fill="#ffe3a8"/></g>
+        <g stroke="#1f1d2b" stroke-width="3" stroke-linejoin="round" transform="translate(160 176) scale(.7) rotate(-8)"><rect x="-7" y="-34" width="14" height="34" rx="5" fill="#2b2b33"/><rect x="-14" y="-58" width="28" height="26" rx="9" fill="#2a4fd0"/><rect x="-17" y="-86" width="34" height="34" rx="12" fill="#e3342f"/><rect x="-30" y="-70" width="60" height="6" rx="3" fill="#2b2b33"/><circle cx="0" cy="-96" r="12" fill="#ffd23a"/></g>
+        <g stroke="#1f1d2b" stroke-width="2.5"><rect x="250" y="62" width="52" height="30" rx="4" fill="#f3ece0"/><rect x="246" y="52" width="60" height="14" rx="4" fill="#e3342f"/></g>
+      </svg>
+      <div class="body">
+        <h2>Moto Forte</h2>
+        <p>Supera cinque moto e arriva al rettilineo! Se la tua moto si rovina, entra nel box per prendere quella di ricambio.</p>
+        <div class="chips"><span class="chip">4 piste</span><span class="chip">5 sorpassi</span><span class="chip">Facile</span></div>
+        <button class="play" type="button" data-game="giochi/moto-forte.html" data-kind="moto">Gioca!</button>
       </div>
     </article>
   </main>
