@@ -1,4 +1,5 @@
 [
+  {"slug":"campionato","titolo":"Campionato","nome":"matti","descrizione":"Blu contro bianchi: fai più gol che puoi in 60 secondi sul campo da calcio!","classifica":{"unit":"punti","asc":false}},
   {"slug":"pista-di-auto-4-0","titolo":"Pista di auto 4.0","nome":"matti","descrizione":"Corri sulla pista del negozio, prendi le stelle ed evita i coni: chi arriva primo vince la Coppa!","classifica":{"unit":"punti","asc":false}},
   {"slug":"cavalieri-delle-stelle","titolo":"I Cavalieri delle Stelle","nome":"Federico","descrizione":"Sali i 12 templi e sfida in un combattimento uno contro uno i Cavalieri d'Oro, dall'Ariete ai Pesci, per salvare la Principessa Stellina!","classifica":{"unit":"punti","asc":false}},
   {"slug":"drago-sputafuoco","titolo":"Drago sputafuoco","nome":"Agata Fede","descrizione":"Il drago ha fame: sputa fuoco e cattura più rettili che puoi in un minuto!","classifica":{"unit":"rettili","asc":false}},
