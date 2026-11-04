@@ -46,7 +46,18 @@ function reset(kick){const r=R();
 function start(){goalsB=goalsW=0;t=60;hits=0;over=false;reset();running=true;pause=0;$('start').hidden=true;$('end').hidden=true;$('hud').hidden=false;last=performance.now();score();requestAnimationFrame(loop)}
 function score(){$('sc').textContent='⚽ Blu '+goalsB+' - '+goalsW+' Bianchi';$('tm').textContent=Math.ceil(t)+'s'}
 function toast(s){const e=$('toast');e.textContent=s;e.hidden=false;setTimeout(()=>e.hidden=true,900)}
-function kick(p,pw){const dx=ball.x-p.x,dy=ball.y-p.y,d=Math.hypot(dx,dy)||1;ball.vx=dx/d*pw;ball.vy=dy/d*pw}
+// calcio: mai contro il muro; il pallone esce dal giocatore; piccola pausa tra un calcio e l'altro
+function kick(p,pw,aim){let dx=ball.x-p.x,dy=ball.y-p.y,d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;
+ if(aim){let ax=aim.x-ball.x,ay=aim.y-ball.y;const a=Math.hypot(ax,ay)||1;dx=dx*.4+ax/a*.6;dy=dy*.4+ay/a*.6}
+ const m=ball.r*4,inG=ball.x>F.gx&&ball.x<F.gx+F.gw;
+ if(ball.x<F.x+m&&dx<.4)dx=.7;if(ball.x>F.x+F.w-m&&dx>-.4)dx=-.7;
+ if(!inG&&ball.y<F.y+m&&dy<.4)dy=.7;if(!inG&&ball.y>F.y+F.h-m&&dy>-.4)dy=-.7;
+ d=Math.hypot(dx,dy)||1;dx/=d;dy/=d;ball.vx=dx*pw;ball.vy=dy*pw;
+ const sep=p.r+ball.r+2;ball.x=p.x+dx*sep;ball.y=p.y+dy*sep;keepBall();p.cd=.18}
+function keepBall(){ball.x=Math.max(F.x+ball.r,Math.min(F.x+F.w-ball.r,ball.x));
+ const inG=ball.x>F.gx&&ball.x<F.gx+F.gw;if(!inG)ball.y=Math.max(F.y+ball.r,Math.min(F.y+F.h-ball.r,ball.y))}
+function apart(a,b,min){const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01;if(d<min){const k=(min-d)/2;a.x-=dx/d*k;a.y-=dy/d*k;b.x+=dx/d*k;b.y+=dy/d*k}}
+function inField(o){o.x=Math.max(F.x+o.r,Math.min(F.x+F.w-o.r,o.x));o.y=Math.max(F.y+o.r,Math.min(F.y+F.h-o.r,o.y))}
 function loop(now){if(!running)return;const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(loop)}
 function update(dt){const r=R(),sp=F.h*.5;
  if(pause>0){pause-=dt;if(pause<=0)reset();return}
@@ -61,16 +72,24 @@ function update(dt){const r=R(),sp=F.h*.5;
   if(o.k){tx=Math.max(F.gx+r,Math.min(F.gx+F.gw-r,ball.x));ty=F.y+r*1.6;if(ball.y<F.y+F.h*.3){tx=ball.x;ty=Math.max(F.y+r,ball.y-r)}}
   else{const near=Math.hypot(ball.x-o.x,ball.y-o.y)<F.h*.45;tx=near?ball.x:F.x+F.w/2;ty=near?ball.y:F.y+F.h*.4}
   const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy);if(d>4){o.x+=dx/d*Math.min(sp2*dt,d);o.y+=dy/d*Math.min(sp2*dt,d)}
-  if(Math.hypot(ball.x-o.x,ball.y-o.y)<o.r+ball.r){kick(o,F.h*(o.k?.9:.7));if(!o.k)ball.vy=Math.abs(ball.vy)*.8+F.h*.2}}
+  o.cd=Math.max(0,(o.cd||0)-dt);
+  if(!o.cd&&Math.hypot(ball.x-o.x,ball.y-o.y)<o.r+ball.r)kick(o,F.h*(o.k?.9:.7),{x:F.gx+F.gw/2,y:F.y+F.h})}
+ // nessuno si sovrappone: giocatori separati e dentro il campo
+ const all=[me,...opp];for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)apart(all[i],all[j],all[i].r+all[j].r);all.forEach(inField);
  for(const f of refs){f.a+=dt*.8;f.y=F.y+F.h*.5+Math.sin(f.a)*F.h*.3}
  // pallone
- if(Math.hypot(ball.x-me.x,ball.y-me.y)<me.r+ball.r){kick(me,F.h*1.1);hits++}
+ me.cd=Math.max(0,(me.cd||0)-dt);
+ if(!me.cd&&Math.hypot(ball.x-me.x,ball.y-me.y)<me.r+ball.r){kick(me,F.h*1.1,{x:F.gx+F.gw/2,y:F.y});hits++}
  ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;const fr=Math.pow(.35,dt);ball.vx*=fr;ball.vy*=fr;
  if(ball.x<F.x+ball.r){ball.x=F.x+ball.r;ball.vx=Math.abs(ball.vx)}
  if(ball.x>F.x+F.w-ball.r){ball.x=F.x+F.w-ball.r;ball.vx=-Math.abs(ball.vx)}
  const inG=ball.x>F.gx&&ball.x<F.gx+F.gw;
  if(ball.y<F.y){if(inG){goalsB++;goal('GOOOL! ⚽')}else{ball.y=F.y+ball.r;ball.vy=Math.abs(ball.vy)}}
  if(ball.y>F.y+F.h){if(inG){goalsW++;goal('Gol dei bianchi')}else{ball.y=F.y+F.h-ball.r;ball.vy=-Math.abs(ball.vy)}}
+ // sicurezza: pallone fermo in un angolo per più di un secondo → riparte verso il centro
+ const corner=(ball.x<F.x+ball.r*6||ball.x>F.x+F.w-ball.r*6)&&(ball.y<F.y+ball.r*6||ball.y>F.y+F.h-ball.r*6);
+ ball.stuck=corner&&Math.hypot(ball.vx,ball.vy)<F.h*.15?(ball.stuck||0)+dt:0;
+ if(ball.stuck>1){const dx=F.x+F.w/2-ball.x,dy=F.y+F.h/2-ball.y,d=Math.hypot(dx,dy)||1;ball.vx=dx/d*F.h*.8;ball.vy=dy/d*F.h*.8;ball.stuck=0}
  score()}
 function goal(s){toast(s);pause=1.2;ball.vx=ball.vy=0}
 function man(x,y,r,col,short,num){c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(x,y+r*.9,r*.9,r*.3,0,0,7);c.fill();
