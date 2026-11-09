@@ -1,0 +1,69 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sparabombe</title>
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--red:#e63946;--sun:#ffc93c}
+html,body{height:100%;margin:0;overflow:hidden;background:#fff;font-family:'Trebuchet MS',system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(31,29,43,.55);padding:16px;box-sizing:border-box;overflow-y:auto;z-index:5}
+.ov[hidden]{display:none}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:20px;box-shadow:6px 7px 0 var(--ink);max-width:520px;width:100%;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;margin:auto}
+h1{margin:0;font-size:34px;color:var(--red)}p,li{font-size:18px;margin:0;line-height:1.35}ul{margin:0;padding-left:20px}
+.btn{align-self:flex-start;font:bold 22px 'Trebuchet MS',sans-serif;background:var(--sun);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+#hud{position:fixed;top:10px;right:12px;display:flex;gap:8px;z-index:2;pointer-events:none}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-weight:bold;font-size:18px}
+#fire{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:110px;height:110px;border-radius:50%;border:3px solid var(--ink);background:rgba(230,57,70,.95);color:#fff;font:bold 20px 'Trebuchet MS',sans-serif;box-shadow:3px 3px 0 var(--ink);z-index:3;touch-action:none}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="hud" hidden><div class="pill" id="sc">Puntini: 0</div><div class="pill" id="lv">♥♥♥</div></div>
+<button id="fire" hidden>BOMBA!</button>
+<div class="ov" id="start"><div class="panel"><h1>Sparabombe</h1>
+<p>La navicella rossa deve far scoppiare i puntini colorati, amici di matti!</p>
+<ul><li>Muovi la navicella: trascina il dito, oppure usa le frecce ↑ ↓ ← →</li><li>Lancia la bomba: tocca BOMBA! oppure premi Spazio</li><li>Attento alle montagne marroni: toccarle fa perdere un cuore!</li></ul>
+<button class="btn" id="go">Si parte!</button></div></div>
+<div class="ov" id="end" hidden><div class="panel"><h1 id="et">Bravo!</h1><p id="ep"></p><div id="board"></div><button class="btn" id="again">Ancora!</button></div></div>
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('sparabombe',{title:'Sparabombe',unit:'puntini'});
+const cv=document.getElementById('c'),x=cv.getContext('2d'),$=i=>document.getElementById(i);
+let W,H;function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}rs();addEventListener('resize',rs);
+let run=false,sh,bombs,dots,mts,parts,score,lives,t,inv,spawn,mspawn,cd,keys={},tx=null,ty=null,speed;
+const COL=['#2f6fe4','#2bb673','#ffc93c','#ff8a1f','#9b5de5'];
+function reset(){sh={x:90,y:H/2};bombs=[];dots=[];mts=[];parts=[];score=0;lives=3;t=0;inv=0;spawn=0;mspawn=0;cd=0;speed=3;tx=ty=null;upd()}
+function upd(){$('sc').textContent='Puntini: '+score;$('lv').textContent='♥'.repeat(Math.max(lives,0))}
+function fireB(){if(!run||cd>0)return;bombs.push({x:sh.x+30,y:sh.y});cd=18}
+addEventListener('keydown',e=>{keys[e.key]=1;if(e.key===' '){e.preventDefault();fireB()}});addEventListener('keyup',e=>keys[e.key]=0);
+cv.addEventListener('pointerdown',e=>{tx=e.clientX;ty=e.clientY});cv.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch'){tx=e.clientX;ty=e.clientY}});
+addEventListener('pointerup',()=>{tx=ty=null});
+$('fire').addEventListener('pointerdown',e=>{e.stopPropagation();fireB()});
+function boom(px,py,c){for(let i=0;i<10;i++)parts.push({x:px,y:py,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,l:25,c})}
+function step(){t++;cd--;inv--;speed=3+Math.min(t/1500,3);
+ let dx=0,dy=0;if(keys.ArrowLeft)dx=-5;if(keys.ArrowRight)dx=5;if(keys.ArrowUp)dy=-5;if(keys.ArrowDown)dy=5;
+ if(tx!=null){sh.x+=Math.max(-6,Math.min(6,(tx-60-sh.x)*.2));sh.y+=Math.max(-6,Math.min(6,(ty-70-sh.y)*.2))}
+ sh.x=Math.max(30,Math.min(W*.6,sh.x+dx));sh.y=Math.max(60,Math.min(H-30,sh.y+dy));
+ if(--spawn<=0){dots.push({x:W+20,y:70+Math.random()*(H-200),r:14+Math.random()*8,c:COL[Math.random()*5|0],ph:Math.random()*6});spawn=40+Math.random()*30}
+ if(--mspawn<=0){const w=90+Math.random()*80,h=70+Math.random()*Math.min(H*.35,150);mts.push({x:W+10,w,h});mspawn=(w+120+Math.random()*180)/speed}
+ bombs.forEach(b=>b.x+=9);bombs=bombs.filter(b=>b.x<W+20);
+ dots.forEach(d=>{d.x-=speed*.8;d.y+=Math.sin(t/20+d.ph)*.8});dots=dots.filter(d=>d.x>-30);
+ mts.forEach(m=>m.x-=speed);mts=mts.filter(m=>m.x+m.w>-10);
+ for(const b of bombs)for(const d of dots)if(!d.dead&&!b.dead&&Math.hypot(b.x-d.x,b.y-d.y)<d.r+10){d.dead=b.dead=1;score++;boom(d.x,d.y,d.c);upd()}
+ dots=dots.filter(d=>!d.dead);bombs=bombs.filter(b=>!b.dead);
+ for(const m of mts){const top=H-m.h,px=sh.x,py=sh.y+18,rel=(px-m.x)/m.w;
+  if(rel>0&&rel<1){const ty2=H-m.h*(1-Math.abs(rel-.5)*2);if(py>ty2&&inv<=0){lives--;inv=90;boom(sh.x,sh.y,'#e63946');upd();if(lives<=0)over()}}}
+ parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.l--});parts=parts.filter(p=>p.l>0)}
+function draw(){x.fillStyle='#fff';x.fillRect(0,0,W,H);
+ x.fillStyle='#e8e8ec';for(let i=0;i<5;i++){const o=((i*260-t*.5)%(W+260)+W+260)%(W+260)-130;x.beginPath();x.moveTo(o,H-60);x.lineTo(o+120,H*.45);x.lineTo(o+240,H-60);x.fill()}
+ mts.forEach(m=>{x.fillStyle='#7b4a2d';x.strokeStyle='#4a2a14';x.lineWidth=3;x.beginPath();x.moveTo(m.x,H);x.lineTo(m.x+m.w/2,H-m.h);x.lineTo(m.x+m.w,H);x.closePath();x.fill();x.stroke()});
+ dots.forEach(d=>{x.fillStyle=d.c;x.strokeStyle='#1f1d2b';x.lineWidth=3;x.beginPath();x.arc(d.x,d.y,d.r,0,7);x.fill();x.stroke()});
+ bombs.forEach(b=>{x.fillStyle='#1f1d2b';x.beginPath();x.arc(b.x,b.y,9,0,7);x.fill();x.fillStyle='#ff8a1f';x.beginPath();x.arc(b.x-9,b.y,4,0,7);x.fill()});
+ parts.forEach(p=>{x.globalAlpha=p.l/25;x.fillStyle=p.c;x.fillRect(p.x,p.y,6,6)});x.globalAlpha=1;
+ if(run&&!(inv>0&&(inv>>2)%2)){x.save();x.translate(sh.x,sh.y);x.rotate(Math.PI/2);x.strokeStyle='#e63946';x.fillStyle='#ffe3e6';x.lineWidth=5;x.lineJoin='round';
+  x.beginPath();x.moveTo(0,-34);x.quadraticCurveTo(14,-20,14,0);x.lineTo(34,10);x.lineTo(14,14);x.lineTo(18,34);x.lineTo(0,22);x.lineTo(-18,34);x.lineTo(-14,14);x.lineTo(-34,10);x.lineTo(-14,0);x.quadraticCurveTo(-14,-20,0,-34);x.fill();x.stroke();x.restore();
+  x.fillStyle='#ff8a1f';x.beginPath();x.moveTo(sh.x-30,sh.y-8);x.lineTo(sh.x-55-Math.random()*12,sh.y);x.lineTo(sh.x-30,sh.y+8);x.fill()}}
+function loop(){if(run)step();draw();requestAnimationFrame(loop)}
+function over(){run=false;$('hud').hidden=$('fire').hidden=true;$('et').textContent=score>=15?'Fantastico!':'Bravo!';
+ $('ep').textContent='Hai fatto scoppiare '+score+' puntini. Riprova per farne ancora di più!';
+ $('board').innerHTML='';$('end').hidden=false;
+ if(window.Classifica)Classifica.mount($('board'),'sparabombe',Math.max(score,1))}
+function begin(){reset();$('start').hidden=$('end').hidden=true;$('hud').hidden=$('fire').hidden=false;run=true}
+$('go').onclick=begin;$('again').onclick=begin;reset();loop();
+</script></body></html>
