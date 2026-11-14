@@ -1,4 +1,5 @@
 [
+  {"slug":"tennis-verde-contro-dorato","titolo":"Tennis: Verde contro Dorato","nome":"matti","descrizione":"Verde Scuro contro Dorato: muovi il tuo campione, rimanda la pallina e chi fa 5 punti vince la Coppa d'oro! Si gioca anche in due.","classifica":{"unit":"colpi","asc":false}},
   {"slug":"sparabombe","titolo":"Sparabombe","nome":"matti","descrizione":"La navicella rossa lancia le bombe e fa scoppiare i puntini colorati: attenta alle montagne!","classifica":{"unit":"puntini","asc":false}},
   {"slug":"campionato","titolo":"Campionato","nome":"matti","descrizione":"Blu contro bianchi: fai più gol che puoi in 60 secondi sul campo da calcio!","classifica":{"unit":"punti","asc":false}},
   {"slug":"pista-di-auto-4-0","titolo":"Pista di auto 4.0","nome":"matti","descrizione":"Corri sulla pista del negozio, prendi le stelle ed evita i coni: chi arriva primo vince la Coppa!","classifica":{"unit":"punti","asc":false}},
