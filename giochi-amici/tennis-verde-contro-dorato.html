@@ -1,0 +1,166 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tennis: Verde contro Dorato</title>
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--scrim:rgba(31,29,43,.6);--display:Impact,'Arial Black',sans-serif;--body:'Trebuchet MS',system-ui,sans-serif}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#2f6b3a;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px 20px;box-sizing:border-box;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:520px;padding:20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:12px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05}
+h1{font-size:clamp(30px,8vw,44px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,34px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.4}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.btn{font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn.alt{background:#7fd38b}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.cup{font-size:80px;text-align:center;line-height:1;animation:bob 1s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-8px) rotate(4deg)}}
+.pill{position:fixed;background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:20px;box-shadow:3px 3px 0 var(--ink);white-space:nowrap;z-index:2;pointer-events:none}
+#sG{left:10px;top:calc(50% + 10px)}#sD{left:10px;top:calc(50% - 48px)}
+#toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:clamp(40px,11vw,80px);color:#fff;text-shadow:4px 4px 0 var(--ink);pointer-events:none;z-index:3;text-align:center;white-space:nowrap}
+.pad{position:fixed;display:flex;gap:14px;z-index:2}
+.pad button{width:78px;height:78px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:34px;font-family:var(--display);color:var(--ink);opacity:.85;touch-action:none;cursor:pointer}
+#padG{right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}#padG button{background:#7fd38b}
+#padD{right:12px;top:calc(env(safe-area-inset-top,0px) + 12px)}#padD button{background:#e9c25a}
+</style></head><body>
+<canvas id="game"></canvas>
+<div class="pill" id="sD" hidden>🟡 Dorato 0</div>
+<div class="pill" id="sG" hidden>🟢 Verde 0</div>
+<div id="toast" hidden></div>
+<div class="pad" id="padD" hidden><button data-p="1" data-d="-1" aria-label="Dorato a sinistra">◀</button><button data-p="1" data-d="1" aria-label="Dorato a destra">▶</button></div>
+<div class="pad" id="padG" hidden><button data-p="0" data-d="-1" aria-label="Verde a sinistra">◀</button><button data-p="0" data-d="1" aria-label="Verde a destra">▶</button></div>
+<div class="overlay" id="start"><div class="panel">
+<h1>Tennis: <span>Verde</span> contro Dorato</h1>
+<p>Il campione <b style="color:#1d6b33">Verde Scuro</b> sfida il campione <b style="color:#a07a12">Dorato</b>. Chi fa per primo <b>5 punti</b> vince la <b>Coppa d'oro</b>! 🏆</p>
+<ul><li>Muovi il tuo giocatore a destra e a sinistra: la racchetta colpisce la pallina da sola.</li>
+<li>Telefono: tieni il dito nella tua metà del campo, oppure usa i tasti ◀ ▶.</li>
+<li>Computer: Verde con le frecce, Dorato con A e D.</li>
+<li>Se la pallina ti passa dietro, il punto va all'altro!</li></ul>
+<div class="row"><button class="btn" id="go1">1 giocatore</button><button class="btn alt" id="go2">2 giocatori</button></div></div></div>
+<div class="overlay" id="end" hidden><div class="panel">
+<div class="cup">🏆</div>
+<h2 id="etitle">Partita finita!</h2><p id="etext"></p><div id="board"></div>
+<div class="row"><button class="btn" id="again">Rivincita!</button><button class="btn alt" id="menu">Cambia modo</button></div></div></div>
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('tennis-verde-contro-dorato',{title:'Tennis: Verde contro Dorato',unit:'colpi',asc:false});
+const $=id=>document.getElementById(id),cv=$('game'),c=cv.getContext('2d');
+const CW=400,CH=700,WIN=5;// campo logico
+let W,H,S,OX,OY,dpr;
+function size(){dpr=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;S=Math.min(W/(CW+40),H/(CH+60));OX=(W-CW*S)/2;OY=(H-CH*S)/2}
+addEventListener('resize',size);size();
+// giocatori: 0 = Verde (in basso), 1 = Dorato (in alto)
+const COL=[{shirt:'#1d6b33',shorts:'#f0d27a',band:'#7a2a3a',shoe:'#e8c9a0',hair:'#2a1b12',skin:'#f1c9a0',name:'Verde'},
+ {shirt:'#b68a2c',shorts:'#8aa63a',band:'#7a2a3a',shoe:'#8d8a85',hair:'#2a1b12',skin:'#e0b48a',name:'Dorato'}];
+let P,ball,score,hits,twoP=false,running=false,pause=0,last=0,keys={},touchT={},pad=[0,0],toastT=0,serveTo=0,flash=0;
+let actx=null,aiErr=0;
+function beep(f,d){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.type='triangle';g.gain.value=.12;g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g).connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function reset(){P=[{x:CW/2,y:CH-70,swing:0,tx:null},{x:CW/2,y:70,swing:0,tx:null,ai:CW/2}];score=[0,0];hits=[0,0];serveTo=0;newBall()}
+function newBall(){const d=serveTo===0?1:-1;ball={x:CW/2,y:CH/2,vx:(Math.random()-.5)*120,vy:200*d,sp:240,trav:0};pause=1.1;toast('Pronti!',1)}
+function toast(t,s){$('toast').textContent=t;$('toast').hidden=false;toastT=s}
+function hud(){$('sG').textContent='🟢 Verde '+score[0];$('sD').textContent=(twoP?'🟡 Dorato ':'🟡 Dorato (CPU) ')+score[1]}
+function start(two){twoP=two;reset();hud();['start','end'].forEach(i=>$(i).hidden=true);['sG','sD','padG'].forEach(i=>$(i).hidden=false);$('padD').hidden=!twoP;running=true;last=performance.now();requestAnimationFrame(loop)}
+function loop(t){if(!running)return;const dt=Math.min(.033,(t-last)/1000);last=t;step(dt);draw();requestAnimationFrame(loop)}
+const REACH=48,PSPD=430;
+function moveP(i,dt){const p=P[i];let dir=pad[i];
+ if(i===0){if(keys.ArrowLeft)dir-=1;if(keys.ArrowRight)dir+=1;if(!twoP){if(keys.a)dir-=1;if(keys.d)dir+=1}}
+ else if(twoP){if(keys.a)dir-=1;if(keys.d)dir+=1}
+ if(i===1&&!twoP){// computer: segue la pallina con un po' di ritardo
+  let target=CW/2;if(ball.vy<0){let x=ball.x+ball.vx*(ball.y-p.y)/-ball.vy;const L=12,R=CW-12,w=R-L;x=((x-L)%(2*w)+2*w)%(2*w);x=L+(x>w?2*w-x:x);target=x+18+aiErr}
+  p.ai+=(target-p.ai)*Math.min(1,dt*6);const d=p.ai-p.x,sp=260;p.x+=Math.max(-sp*dt,Math.min(sp*dt,d))}
+ else if(dir)p.x+=Math.sign(dir)*PSPD*dt;
+ else if(p.tx!=null){const d=p.tx-p.x;p.x+=Math.max(-PSPD*dt,Math.min(PSPD*dt,d))}
+ p.x=Math.max(30,Math.min(CW-30,p.x));if(p.swing>0)p.swing-=dt}
+function step(dt){if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').hidden=true}
+ if(flash>0)flash-=dt;moveP(0,dt);moveP(1,dt);if(pause>0){pause-=dt;return}
+ ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.trav+=Math.hypot(ball.vx,ball.vy)*dt;
+ if(ball.x<12){ball.x=12;ball.vx=Math.abs(ball.vx);beep(300,.05)}if(ball.x>CW-12){ball.x=CW-12;ball.vx=-Math.abs(ball.vx);beep(300,.05)}
+ // colpi
+ for(let i=0;i<2;i++){const p=P[i],dir=i===0?1:-1;// dir: verso in cui arriva la pallina
+  if(Math.sign(ball.vy)===dir&&Math.abs(ball.y-p.y)<22&&Math.abs(ball.x-(p.x+18*(i?-1:1)))<REACH){
+   const off=(ball.x-p.x)/REACH;ball.sp=Math.min(520,ball.sp+14);
+   let vx=off*240+(Math.random()-.5)*60;ball.vy=-dir*Math.sqrt(Math.max(1,ball.sp*ball.sp-vx*vx));
+   if(Math.abs(ball.vy)<180)ball.vy=-dir*180;ball.vx=vx;ball.y=p.y-dir*23;ball.trav=0;p.swing=.25;hits[i]++;if(i===0)aiErr=(Math.random()-.5)*2*(8+(ball.sp-240)*.28);beep(i?520:660,.08)}}
+ // punto
+ if(ball.y>CH+20)point(1);else if(ball.y<-20)point(0)}
+function point(w){score[w]++;hud();flash=.6;beep(w===0?880:330,.3);serveTo=1-w;
+ if(score[w]>=WIN){finish(w);return}
+ toast('Punto '+(w===0?'Verde!':'Dorato!'),1.1);ball={x:CW/2,y:CH/2,vx:0,vy:0,sp:240,trav:0};setTimeout(()=>{if(running)newBall()},900);pause=99}
+function finish(w){running=false;['sG','sD','padG','padD','toast'].forEach(i=>$(i).hidden=true);
+ let title,text,sc;
+ if(twoP){title='Coppa d\'oro a '+(w===0?'Verde Scuro':'Dorato')+'!';sc=Math.max(1,hits[0]+hits[1]);
+  text='Verde '+score[0]+' - '+score[1]+' Dorato. Che partita! Insieme avete fatto '+sc+' colpi.'}
+ else{sc=Math.max(1,hits[0]);
+  title=w===0?'Hai vinto la Coppa d\'oro!':'Bravo, che bella partita!';
+  text='Verde '+score[0]+' - '+score[1]+' Dorato. Hai fatto '+sc+' colpi di racchetta'+(w===0?'!':'. Alla prossima la coppa è tua!')}
+ $('etitle').textContent=title;$('etext').textContent=text;$('end').hidden=false;
+ if(window.Classifica)Classifica.mount($('board'),'tennis-verde-contro-dorato',sc)}
+// disegno
+function X(v){return OX+v*S}function Y(v){return OY+v*S}
+function player(i){const p=P[i],k=COL[i],s=S,x=X(p.x),y=Y(p.y),f=i===0?1:-1;// f=1 guarda in su
+ c.save();c.translate(x,y);c.scale(s,s);c.lineWidth=2.5;c.strokeStyle='#1f1d2b';
+ c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(0,26*f>0?24:24,22,7,0,0,7);c.fill();
+ // gambe
+ c.fillStyle=k.shorts;c.fillRect(-12,4,10,16);c.strokeRect(-12,4,10,16);c.fillRect(2,4,10,16);c.strokeRect(2,4,10,16);
+ c.fillStyle=k.shoe;c.fillRect(-13,19,12,6);c.strokeRect(-13,19,12,6);c.fillRect(1,19,12,6);c.strokeRect(1,19,12,6);
+ // corpo
+ c.fillStyle=k.shirt;c.beginPath();if(c.roundRect)c.roundRect(-15,-20,30,26,6);else c.rect(-15,-20,30,26);c.fill();c.stroke();
+ // braccio con racchetta
+ const ang=(p.swing>0?-0.9*Math.sin(p.swing/.25*Math.PI):0)*f;const side=i===0?1:-1;
+ c.save();c.translate(13*side,-14);c.rotate(ang);
+ c.fillStyle=k.shirt;c.fillRect(side>0?0:-14,-4,14,8);c.strokeRect(side>0?0:-14,-4,14,8);
+ c.fillStyle=k.band;c.fillRect(side>0?12:-18,-4,6,8);
+ c.strokeStyle='#5a3a22';c.lineWidth=3;c.beginPath();c.moveTo(18*side,0);c.lineTo(26*side,-8*f);c.stroke();
+ c.fillStyle='rgba(255,255,255,.75)';c.strokeStyle='#1f1d2b';c.lineWidth=2.5;c.beginPath();c.ellipse(32*side,-14*f,10,12,0,0,7);c.fill();c.stroke();
+ c.lineWidth=1;c.beginPath();for(let g=-6;g<=6;g+=4){c.moveTo(32*side+g,-24*f);c.lineTo(32*side+g,-4*f);c.moveTo(22*side,-14*f+g);c.lineTo(42*side,-14*f+g)}c.stroke();c.restore();
+ c.lineWidth=2.5;c.fillStyle=k.shirt;c.fillRect(-14*side-(side>0?4:-4)-2,-16,8,16);c.strokeRect(-14*side-(side>0?4:-4)-2,-16,8,16);
+ // testa
+ c.fillStyle=k.skin;c.beginPath();c.arc(0,-30,11,0,7);c.fill();c.stroke();
+ c.fillStyle=k.hair;c.beginPath();c.arc(0,-33,11,Math.PI,0);c.fill();
+ c.fillStyle='#1f1d2b';c.beginPath();c.arc(-4,-29,1.6,0,7);c.arc(4,-29,1.6,0,7);c.fill();
+ c.beginPath();c.lineWidth=1.6;c.arc(0,-26,4,.2,Math.PI-.2);c.stroke();
+ c.restore()}
+function draw(){c.setTransform(dpr,0,0,dpr,0,0);
+ c.fillStyle='#2f6b3a';c.fillRect(0,0,W,H);
+ c.fillStyle='rgba(255,255,255,.05)';for(let i=0;i<W;i+=40)c.fillRect(i,0,20,H);
+ // campo in terra rossa
+ c.fillStyle='#c8643b';c.fillRect(X(0),Y(0),CW*S,CH*S);
+ c.strokeStyle='#fff';c.lineWidth=Math.max(2,3*S);c.strokeRect(X(10),Y(10),(CW-20)*S,(CH-20)*S);
+ c.beginPath();c.moveTo(X(55),Y(10));c.lineTo(X(55),Y(CH-10));c.moveTo(X(CW-55),Y(10));c.lineTo(X(CW-55),Y(CH-10));
+ c.moveTo(X(55),Y(190));c.lineTo(X(CW-55),Y(190));c.moveTo(X(55),Y(CH-190));c.lineTo(X(CW-55),Y(CH-190));
+ c.moveTo(X(CW/2),Y(190));c.lineTo(X(CW/2),Y(CH-190));c.stroke();
+ if(flash>0){c.fillStyle='rgba(255,215,64,'+(flash*.5)+')';c.fillRect(X(0),Y(0),CW*S,CH*S)}
+ // giocatore in alto dietro la rete
+ player(1);
+ // rete
+ const ny=Y(CH/2);c.fillStyle='rgba(31,29,43,.25)';c.fillRect(X(-8),ny,(CW+16)*S,8*S);
+ c.strokeStyle='#1f1d2b';c.lineWidth=1;c.beginPath();
+ for(let x=-6;x<=CW+6;x+=10){c.moveTo(X(x),ny-14*S);c.lineTo(X(x),ny)}for(let y=-14;y<=0;y+=5){c.moveTo(X(-6),ny+y*S);c.lineTo(X(CW+6),ny+y*S)}c.stroke();
+ c.fillStyle='#fff';c.fillRect(X(-6),ny-17*S,(CW+12)*S,4*S);c.fillStyle='#1f1d2b';c.fillRect(X(-12),ny-22*S,6*S,24*S);c.fillRect(X(CW+6),ny-22*S,6*S,24*S);
+ // pallina
+ const z=Math.abs(Math.sin(ball.trav/110*Math.PI))*18*(pause>0&&ball.vy===0?0:1);
+ c.fillStyle='rgba(0,0,0,.25)';c.beginPath();c.ellipse(X(ball.x),Y(ball.y),8*S,4*S,0,0,7);c.fill();
+ c.fillStyle='#d9f04a';c.strokeStyle='#1f1d2b';c.lineWidth=2;c.beginPath();c.arc(X(ball.x),Y(ball.y-z),8*S,0,7);c.fill();c.stroke();
+ c.strokeStyle='#fff';c.lineWidth=1.5;c.beginPath();c.arc(X(ball.x-6),Y(ball.y-z),6*S,-.9,.9);c.stroke();
+ player(0)}
+// controlli
+function setTouch(e){for(const t of e.changedTouches){const top=t.clientY<OY+CH/2*S;const i=twoP&&top?1:0;touchT[t.identifier]=i;P[i].tx=(t.clientX-OX)/S}}
+cv.addEventListener('touchstart',e=>{e.preventDefault();setTouch(e)},{passive:false});
+cv.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches){const i=touchT[t.identifier];if(i!=null)P[i].tx=(t.clientX-OX)/S}},{passive:false});
+const endT=e=>{for(const t of e.changedTouches){const i=touchT[t.identifier];if(i!=null)P[i].tx=null;delete touchT[t.identifier]}};
+cv.addEventListener('touchend',endT);cv.addEventListener('touchcancel',endT);
+let mouse=false;cv.addEventListener('mousedown',e=>{mouse=true;const i=twoP&&e.clientY<OY+CH/2*S?1:0;mouse=i;P[i].tx=(e.clientX-OX)/S});
+addEventListener('mousemove',e=>{if(mouse!==false)P[mouse].tx=(e.clientX-OX)/S});
+addEventListener('mouseup',()=>{if(mouse!==false){P[mouse].tx=null;mouse=false}});
+document.querySelectorAll('.pad button').forEach(b=>{const p=+b.dataset.p,d=+b.dataset.d;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();pad[p]=d;b.setPointerCapture&&b.setPointerCapture(e.pointerId)});
+ const up=()=>{if(pad[p]===d)pad[p]=0};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up)});
+addEventListener('keydown',e=>{keys[e.key.length>1?e.key:e.key.toLowerCase()]=1;if(e.key.startsWith('Arrow'))e.preventDefault()});
+addEventListener('keyup',e=>{delete keys[e.key.length>1?e.key:e.key.toLowerCase()]});
+$('go1').onclick=()=>start(false);$('go2').onclick=()=>start(true);$('again').onclick=()=>start(twoP);
+$('menu').onclick=()=>{$('end').hidden=true;$('start').hidden=false};
+reset();pause=0;$('toast').hidden=true;draw();
+</script></body></html>
