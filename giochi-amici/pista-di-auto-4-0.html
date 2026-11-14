@@ -19,6 +19,11 @@ h2{font-size:clamp(26px,6vw,34px)}
 #pad{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;padding:0 14px;pointer-events:none;z-index:2}
 #pad button{pointer-events:auto;width:88px;height:88px;font-size:40px;border-radius:50%;border:3px solid var(--ink);background:var(--sun);box-shadow:4px 4px 0 var(--ink);opacity:.9}
 #pad button:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+#cars{display:flex;flex-wrap:wrap;gap:10px}
+.pick{display:flex;flex-direction:column;align-items:center;gap:2px;width:76px;padding:6px 2px;background:#fff;border:3px solid var(--ink);border-radius:14px;font-family:var(--body);font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+.pick canvas{width:36px;height:56px}
+.pick[aria-pressed=true]{background:var(--sun);transform:translate(1px,1px)}
+.pick:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 #toast{position:fixed;left:50%;top:32%;transform:translateX(-50%);font-family:var(--display);font-size:clamp(40px,12vw,90px);color:#fff;text-shadow:4px 4px 0 var(--ink);pointer-events:none;z-index:3;white-space:nowrap}
 </style></head><body>
 <canvas id="game"></canvas>
@@ -28,23 +33,27 @@ h2{font-size:clamp(26px,6vw,34px)}
 <div class="overlay" id="start"><div class="panel">
 <h1>Pista di <span>auto 4.0</span></h1>
 <p>Corri sulla pista del negozio! <b>Chi arriva primo vince la Coppa</b> 🏆</p>
+<p><b>Scegli la tua macchina:</b></p><div id="cars" role="group" aria-label="Scegli la macchina"></div>
 <ul><li>Telefono: usa le frecce ◀ ▶ o tocca a sinistra e a destra.</li><li>Computer: frecce ← → oppure A e D.</li><li>Prendi le stelle ⭐ per correre più veloce. Evita i coni 🔶!</li></ul>
 <button class="btn" id="go">Via!</button></div></div>
 <div class="overlay" id="end" hidden><div class="panel">
 <h2 id="etitle"></h2><p id="etext"></p><div id="board"></div>
-<button class="btn" id="again">Un'altra corsa</button></div></div>
+<button class="btn" id="again">Un'altra corsa</button><button class="btn" id="change">Cambia macchina 🚗</button></div></div>
 <script src="../classifica.js"></script>
 <script>
 if(window.Classifica)Classifica.register('pista-di-auto-4-0',{title:'Pista di auto 4.0',unit:'punti'});
-const $=id=>document.getElementById(id),cv=$('game'),c=cv.getContext('2d');
+const $=id=>document.getElementById(id),cv=$('game');let c=cv.getContext('2d');
 let W,H,RW,RX,LW;
 function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;RW=Math.min(W*.72,360);RX=(W-RW)/2;LW=RW/3}
 addEventListener('resize',size);size();
-const LEN=7000,COL=['#e0382f','#2f6fe4','#f2a81d'];
+const LEN=7000;
+const CARS=[{n:'Verde',c:'#1fa25a'},{n:'Rossa',c:'#e0382f'},{n:'Blu',c:'#2f6fe4'},{n:'Gialla',c:'#f7d02c'},{n:'Bordeaux',c:'#7b1e3a'},{n:'Verde acqua',c:'#2ec4b6'},{n:'Arancione',c:'#f57c00'}];
+let myCol=CARS[0].c,COL=['#e0382f','#2f6fe4','#f7d02c'];
+function pickRivals(){const o=CARS.map(k=>k.c).filter(k=>k!==myCol);for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}COL=o.slice(0,3)}
 let me,rivals,items,t,running=false,last=0,keys={},stars,place,finished,prog0,scroll;
 const lx=l=>RX+LW*(l+.5);
 function mk(){items=[];for(let d=600;d<LEN-400;d+=180+Math.random()*160){const l=Math.floor(Math.random()*3);items.push({d,l,k:Math.random()<.45?'star':'cone',on:1})}}
-function start(){mk();me={lane:1,x:lx(1),d:0,v:0,tgt:1,slow:0,boost:0};
+function start(){pickRivals();mk();me={lane:1,x:lx(1),d:0,v:0,tgt:1,slow:0,boost:0};
  rivals=[0,2,1].map((l,i)=>({lane:l,x:lx(l),d:120+i*60,v:0,base:300+i*18+Math.random()*10,col:COL[i],nl:1+Math.random()*2}));
  stars=0;t=0;finished=false;place=0;running=true;last=performance.now();
  for(const e of['start','end'])$(e).hidden=true;$('hud').hidden=false;$('pad').hidden=!matchMedia('(pointer:coarse)').matches&&innerWidth>900;
@@ -89,16 +98,20 @@ function draw(){const py=H*.74,sc=1;c.fillStyle='#4cae6c';c.fillRect(0,0,W,H);
   else{c.fillStyle='#ff7a1a';c.strokeStyle='#1f1d2b';c.lineWidth=3;c.beginPath();c.moveTo(lx(it.l),y-20);c.lineTo(lx(it.l)+16,y+14);c.lineTo(lx(it.l)-16,y+14);c.closePath();c.fill();c.stroke();c.fillStyle='#fff';c.fillRect(lx(it.l)-8,y,16,5)}}
  const cw=Math.min(LW*.5,46);
  for(const r of rivals){const y=Y(r.d);if(y>-100&&y<H+100)car(r.x,y,r.col,cw)}
- car(me.x,py,'#1fa25a',cw);
+ car(me.x,py,myCol,cw);
  if(me.boost>0){c.fillStyle='#ffc93c';c.beginPath();c.moveTo(me.x-8,py+cw*.9);c.lineTo(me.x,py+cw*.9+30);c.lineTo(me.x+8,py+cw*.9);c.fill()}
  // barra di avanzamento
  const bx=12,by=H*.18,bh=H*.5;c.fillStyle='rgba(255,255,255,.7)';c.fillRect(bx,by,10,bh);c.font='16px serif';c.textAlign='center';c.fillText('🏆',bx+5,by-4);
  for(const r of rivals){c.fillStyle=r.col;c.beginPath();c.arc(bx+5,by+bh*(1-Math.min(1,r.d/LEN)),6,0,7);c.fill()}
- c.fillStyle='#1fa25a';c.strokeStyle='#1f1d2b';c.lineWidth=2;c.beginPath();c.arc(bx+5,by+bh*(1-Math.min(1,me.d/LEN)),8,0,7);c.fill();c.stroke()}
+ c.fillStyle=myCol;c.strokeStyle='#1f1d2b';c.lineWidth=2;c.beginPath();c.arc(bx+5,by+bh*(1-Math.min(1,me.d/LEN)),8,0,7);c.fill();c.stroke()}
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(keys[k])return;keys[k]=1;if(k==='arrowleft'||k==='a')steer(-1);if(k==='arrowright'||k==='d')steer(1);if(k.startsWith('arrow'))e.preventDefault()});
 addEventListener('keyup',e=>{delete keys[e.key.toLowerCase()]});
 cv.addEventListener('pointerdown',e=>steer(e.clientX<innerWidth/2?-1:1));
 for(const[id,d]of[['bl',-1],['br',1]])$(id).addEventListener('pointerdown',e=>{e.stopPropagation();steer(d)});
 $('go').onclick=start;$('again').onclick=start;
+$('change').onclick=()=>{$('end').hidden=true;$('start').hidden=false;$('go').focus()};
+function carIcon(col){const k=document.createElement('canvas');k.width=72;k.height=112;const s=c;c=k.getContext('2d');c.scale(2,2);car(16,28,col,18);c=s;return k}
+for(const k of CARS){const b=document.createElement('button');b.className='pick';b.type='button';b.setAttribute('aria-pressed',k.c===myCol);b.append(carIcon(k.c),k.n);
+ b.onclick=()=>{myCol=k.c;for(const x of $('cars').children)x.setAttribute('aria-pressed',x===b);draw()};$('cars').append(b)}
 me={x:lx(1),d:0,boost:0,slow:0};rivals=[0,2,1].map((l,i)=>({x:lx(l),d:120+i*60,col:COL[i]}));items=[];draw();
 </script></body></html>
