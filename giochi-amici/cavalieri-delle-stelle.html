@@ -53,7 +53,7 @@ function fit(){const dpr=devicePixelRatio||1;cv.width=innerWidth*dpr;cv.height=i
 addEventListener('resize',fit);fit();
 const SIGNS=[['Ariete','♈','#e8503a','Krios'],['Toro','♉','#8a6b3a','Tauros'],['Gemelli','♊','#f2c230','Castore'],['Cancro','♋','#8fb5c9','Karkinos'],['Leone','♌','#f08c1c','Leonida'],['Vergine','♍','#c9a0dc','Astrea'],['Bilancia','♎','#4fb3a0','Dike'],['Scorpione','♏','#7a1f3d','Skorpios'],['Sagittario','♐','#6a4fc4','Chirone'],['Capricorno','♑','#556b4a','Egipan'],['Acquario','♒','#2f8fe0','Ganimede'],['Pesci','♓','#e87fb0','Pontos']];
 const TAUNTS=['Non passerai!','Il mio tempio è invalicabile!','Ti schiaccerò!','Ahah, sei troppo piccolo!','Torna a casa, ragazzino!','Nessuno mi ha mai battuto!','Preparati a perdere!'];
-const HEROES=[['#2fa88a','Drago','#7be0c0',0,'✦','Ilio'],['#e8709a','Rosa','#fff0f6',1,'♥','Elena'],['#d9362e','Fenice','#ffb020',2,'✹','Icaro'],['#4f7fe0','Cigno','#f4f8ff',3,'❄','Orfeo'],['#e0b020','Stella','#fff6d0',4,'★','Stella']];
+const HEROES=[['#2fa88a','Drago','#7be0c0',0,'✦','Ilio'],['#e8709a','Rosa','#fff0f6',1,'♥','Elena'],['#d9362e','Fenice','#ffb020',2,'✹','Icaro'],['#4f7fe0','Cigno','#f4f8ff',3,'❄','Orfeo'],['#e0b020','Stella','#fff6d0',4,'★','Stella'],['#8a1c38','Lupo','#f2c6d0',5,'☾','Rubino']];
 let hero=HEROES[0];
 const hb=$('heroes');HEROES.forEach((h,i)=>{const b=document.createElement('button');b.className='hero'+(i?'':' sel');b.style.background=h[0];b.setAttribute('aria-label',h[5]+' il cavaliere '+h[1]);b.title=h[5];b.textContent=h[5].slice(0,5);b.style.color='#fff';b.style.textShadow='0 1px 2px #000';b.style.fontWeight='bold';b.onclick=()=>{hero=h;$('hname').textContent=h[5]+' il cavaliere '+h[1];sfx('sel');[...hb.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};hb.appendChild(b)});
 const keys={},pad={};
@@ -240,7 +240,8 @@ function crest(f,T,dark){const gl='#f2d04a',ac=f.col;
     case 1:ctx.lineWidth=2;poly([-10,-12,-12,-24,-4,-18,0,-28,4,-18,12,-24,10,-12],'#ffd7e8',dark);ctx.fillStyle='#e83a7a';ctx.beginPath();ctx.arc(-3,-27,4,0,7);ctx.arc(3,-27,4,0,7);ctx.fill();poly([-7,-25,7,-25,0,-14],'#e83a7a');break;
     case 2:[[-10,26],[0,36],[10,26]].forEach(([x,h],k)=>{const w=Math.sin(T*3+k)*2;ctx.fillStyle=k==1?'#ffd23c':'#ff7a1a';ctx.strokeStyle=dark;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x-6,-12);ctx.quadraticCurveTo(x-8+w,-12-h*.6,x+w,-12-h);ctx.quadraticCurveTo(x+8,-12-h*.5,x+6,-12);ctx.closePath();ctx.fill();ctx.stroke()});break;
     case 3:poly([-8,-14,-34,-40,-28,-12],'#fff',dark);poly([8,-14,30,-42,26,-12],'#dbeeff',dark);poly([-8,-14,-22,-30,-16,-12],'#bcd8ff');break;
-    case 4:star(0,-28,13,'#ffe45c',dark);break}
+    case 4:star(0,-28,13,'#ffe45c',dark);break
+    case 5:poly([-12,-12,-14,-36,-2,-16],ac,dark);poly([12,-12,14,-36,2,-16],ac,dark);poly([-10,-14,-11,-28,-4,-17],'#f2c6d0');poly([10,-14,11,-28,4,-17],'#f2c6d0');ctx.fillStyle='#fff6d0';ctx.beginPath();ctx.arc(0,-30,6,0,7);ctx.fill();ctx.fillStyle=ac;ctx.beginPath();ctx.arc(3,-32,5,0,7);ctx.fill();break}
   }}
 function knight(f){
   const d=f.dir,x=f.x,T=Date.now()/180,air=f.y<-2,mv=f.vx&&!air?1:0,sw=Math.sin(T*3);
