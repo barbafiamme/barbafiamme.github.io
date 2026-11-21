@@ -35,11 +35,12 @@ h2{font-size:clamp(26px,6vw,36px)}
 </div>
 <div class="overlay" id="start"><div class="panel">
   <h1>Corri, <span>Zampalesta!</span></h1>
-  <p>Zampalesta è il gattino più veloce del deserto. Dietro di lui arriva un'onda di lava che non finisce mai: aiutalo a scappare!</p>
+  <p>Zampalesta è il gattino più veloce del deserto. Ora corre velocissimo! Dietro di lui arriva lo <b>tsunami dell'infinito</b>, un'onda di lava che non finisce mai: aiutalo a scappare!</p>
   <ul>
     <li>Zampalesta corre da solo: tu premi <b>SALTA</b> (o la barra spaziatrice, o tocca lo schermo).</li>
     <li>Puoi saltare due volte di fila per fare un salto altissimo.</li>
     <li>Salta i sassi e le navi di terra con le ruote.</li>
+    <li>Più corri, più vai veloce: diventi un fulmine! ⚡</li>
     <li>Se inciampi, l'onda si avvicina. Prendi 5 stelle ⭐ per riprendere fiato!</li>
   </ul>
   <button class="btn" id="go">Via!</button>
@@ -61,16 +62,16 @@ function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=inne
 addEventListener('resize',resize);resize();
 const GY=()=>H-150*S-Math.min(40,H*.04); // ground line
 const PX=()=>Math.max(150*S,Math.min(W*.42,W-220*S));
-let st='ready',dist=0,speed,hearts,stars,obs,items,fx,pl,spawn,spawnS,inv,wavePh,waveX,t0,last=0,dunes=[];
+let st='ready',dist=0,speed,lvl,hearts,stars,obs,items,fx,pl,spawn,spawnS,inv,wavePh,waveX,t0,last=0,dunes=[];
 for(let i=0;i<8;i++)dunes.push([Math.random(),.5+Math.random()*.8]);
-function reset(){dist=1;speed=240;hearts=3;stars=0;obs=[];items=[];fx=[];spawn=1.4;spawnS=.8;inv=0;wavePh=0;t0=0;
+function reset(){dist=1;speed=360;lvl=0;hearts=3;stars=0;obs=[];items=[];fx=[];spawn=1.4;spawnS=.8;inv=0;wavePh=0;t0=0;
   pl={y:0,vy:0,jumps:0,run:0,hurt:0};waveX=-W;hud()}
 function hud(){$('score').textContent=Math.floor(dist);$('hearts').textContent='💚'.repeat(hearts)+'🤍'.repeat(3-hearts)+(stars?' ⭐'+stars:'')}
 function start(){reset();st='play';$('start').hidden=true;$('end').hidden=true;$('hud').hidden=false;$('controls').hidden=false;last=performance.now()}
 function finish(){st='over';$('hud').hidden=true;$('controls').hidden=true;
   const m=Math.max(1,Math.floor(dist));
-  $('endT').textContent=m>=800?'Zampalesta campione!':m>=350?'Che corsa velocissima!':'Bella corsa!';
-  $('endP').textContent='Zampalesta ha corso '+m+' metri! L’onda lo ha preso, ma lui ha fatto un bel tuffo ed è uscito sano e salvo, solo un po’ spettinato. Ci riprovi?';
+  $('endT').textContent=m>=1500?'Zampalesta campione!':m>=600?'Che corsa velocissima!':'Bella corsa!';
+  $('endP').textContent='Zampalesta ha corso '+m+' metri! Lo tsunami dell’infinito lo ha preso, ma lui ha fatto un bel tuffo ed è uscito sano e salvo, solo un po’ spettinato. Ci riprovi?';
   $('end').hidden=false;
   if(window.Classifica)Classifica.mount($('board'),'corri-zampalesta',m)}
 $('go').onclick=start;$('again').onclick=start;
@@ -84,7 +85,8 @@ addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&st!=='play'){const b=!$('start').hidden?$('go'):!$('end').hidden?$('again'):null;if(b){e.preventDefault();b.click()}}});
 function waveTarget(){return PX()-60*S-hearts*Math.min(70*S,PX()/4.2)}
 function update(dt){
-  t0+=dt;speed=Math.min(620,240+t0*5.5);const v=speed*S;
+  t0+=dt;speed=Math.min(1000,360+t0*9);const v=speed*S;
+  const nl=speed>=880?3:speed>=720?2:speed>=540?1:0;if(nl>lvl){lvl=nl;fx.push({k:'fast',x:W/2,y:H*.32,t:0})}
   dist+=speed*dt/40;
   // player physics
   pl.vy+=2300*S*dt;pl.y+=pl.vy*dt;if(pl.y>=0){pl.y=0;pl.vy=0;pl.jumps=0}
@@ -102,7 +104,7 @@ function update(dt){
     if(!s.got&&Math.abs(s.x-px)<34*S&&Math.abs((GY()+s.y)-(py-40*S))<50*S){s.got=1;stars++;fx.push({k:'star',x:s.x,y:GY()+s.y,t:0});
       if(stars>=5){stars=0;if(hearts<3){hearts++;fx.push({k:'yay',x:px,y:py-90*S,t:0})}else dist+=25}hud()}}
   items=items.filter(s=>!s.got&&s.x>-60*S);
-  fx.forEach(f=>f.t+=dt);fx=fx.filter(f=>f.t<1);
+  fx.forEach(f=>f.t+=f.k==='fast'?dt*.6:dt);fx=fx.filter(f=>f.t<1);
   wavePh+=dt;waveX+=(waveTarget()-waveX)*Math.min(1,dt*2.5);
   hud()}
 let caughtT=0;
@@ -126,8 +128,13 @@ function drawWave(){const x=waveX,top=GY()-230*S;cx.save();cx.lineJoin='round';
   // friendly but determined face
   const fy=top+120*S;cx.fillStyle='#1f1d2b';cx.beginPath();cx.arc(x-20*S,fy,6*S,0,7);cx.arc(x+8*S,fy,6*S,0,7);cx.fill();
   cx.lineWidth=4;cx.beginPath();cx.arc(x-6*S,fy+18*S,12*S,.2,Math.PI-.2);cx.stroke();
+  // infinity sign: the wave never ends
+  if(x>110*S){const ix=x>260*S?x-150*S:x-70*S,iy=top+150*S;cx.save();cx.translate(ix,iy);cx.rotate(Math.sin(wavePh*2)*.15);cx.scale(S,S);cx.lineWidth=10;cx.strokeStyle='#fffdf6';
+  cx.beginPath();for(let a=0;a<=6.3;a+=.1){const d=1+Math.sin(a)**2,px2=34*Math.cos(a)/d,py2=34*Math.sin(a)*Math.cos(a)/d;a?cx.lineTo(px2,py2):cx.moveTo(px2,py2)}cx.closePath();cx.stroke();
+  cx.lineWidth=4;cx.strokeStyle='#1f1d2b';cx.stroke();cx.restore();}
   // land boats riding the wave
   boat(x-90*S,top+30*S+Math.sin(wavePh*3)*8*S,.8,Math.sin(wavePh*2)*.2);
+  if(x>260*S)boat(x-220*S,top+40*S+Math.sin(wavePh*3+1.5)*8*S,.65,Math.sin(wavePh*2+1)*.2);
   cx.restore()}
 function boat(x,y,s,rot){cx.save();cx.translate(x,y);cx.rotate(rot||0);cx.scale(S*s,S*s);cx.lineWidth=3;cx.strokeStyle='#1f1d2b';
   cx.fillStyle='#8c5a2b';cx.beginPath();cx.moveTo(-40,-22);cx.lineTo(40,-22);cx.lineTo(30,4);cx.lineTo(-30,4);cx.closePath();cx.fill();cx.stroke();
@@ -145,7 +152,7 @@ function drawCat(){const x=PX(),y=GY()+pl.y;if(inv>0&&Math.floor(inv*10)%2&&st==
   cx.save();cx.translate(x,y);cx.scale(S,S);cx.lineWidth=3;cx.strokeStyle='#1f1d2b';cx.lineJoin='round';cx.lineCap='round';
   const air=pl.y<-2,ph=pl.run,lg=air?.6:Math.sin(ph)*.9;
   // speed lines
-  cx.strokeStyle='rgba(31,29,43,.5)';for(let i=0;i<3;i++){cx.beginPath();cx.moveTo(-40-i*6,-70+i*16);cx.lineTo(-70-i*10,-70+i*16);cx.stroke()}cx.strokeStyle='#1f1d2b';
+  cx.strokeStyle='rgba(31,29,43,.5)';const sl=(speed||360)/12;for(let i=0;i<4;i++){cx.beginPath();cx.moveTo(-40-i*6,-86+i*16);cx.lineTo(-40-i*6-sl-i*6,-86+i*16);cx.stroke()}cx.strokeStyle='#1f1d2b';
   // tail
   cx.fillStyle='#ff9a3c';cx.beginPath();cx.moveTo(-14,-48);cx.quadraticCurveTo(-46,-50+Math.sin(ph)*8,-40,-80);cx.lineWidth=8;cx.stroke();cx.lineWidth=3;
   // legs
@@ -176,6 +183,7 @@ function drawFx(){for(const f of fx){const a=1-f.t;cx.globalAlpha=Math.max(0,a);
   if(f.k==='puff'){cx.fillStyle='#fff3d6';for(let i=0;i<3;i++){cx.beginPath();cx.arc(f.x-20*S-i*10*S-f.t*60*S,f.y-4*S,(6+f.t*14)*S,0,7);cx.fill()}}
   else if(f.k==='star'){cx.fillStyle='#ffd400';cx.font=(22*S)+'px Bungee, sans-serif';cx.textAlign='center';cx.fillText('+⭐',f.x,f.y-f.t*50*S)}
   else if(f.k==='oops'||f.k==='yay'){cx.fillStyle=f.k==='oops'?'#e0371f':'#2d8a4e';cx.strokeStyle='#fffdf6';cx.lineWidth=5;cx.font=(26*S)+'px Bungee, sans-serif';cx.textAlign='center';const t=f.k==='oops'?'Ops!':'Fiato! 💚';cx.strokeText(t,f.x,f.y-f.t*30*S);cx.fillText(t,f.x,f.y-f.t*30*S)}
+  else if(f.k==='fast'){cx.fillStyle='#ff7a1a';cx.strokeStyle='#fffdf6';cx.lineWidth=6;cx.font=(34*S)+'px Bungee, sans-serif';cx.textAlign='center';const t=lvl>=3?'Velocità fulmine! ⚡':lvl>=2?'Super veloce! ⚡':'Più veloce! ⚡';cx.strokeText(t,f.x,f.y-f.t*20*S);cx.fillText(t,f.x,f.y-f.t*20*S)}
   cx.globalAlpha=1}}
 function draw(){bg();for(const s of items)drawStar(s);for(const o of obs)drawObs(o);drawCat();drawWave();drawFx();
   if(st==='caught'){cx.fillStyle='rgba(255,200,60,'+Math.min(.5,caughtT*.5)+')';cx.fillRect(0,0,W,H)}}
