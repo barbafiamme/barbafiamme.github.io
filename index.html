@@ -50,10 +50,11 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .card.train .play{background:#7fd66b}
 .card.pool .play{background:#4fc3f7}
 .card.moto .play{background:#ff5a4f;color:#fff}
+.card.rock .play{background:#b07cff;color:#fff}
 #player.pirate .close{left:max(206px,calc(50% - 26px));bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:52px;height:52px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
 #player.pirate .close::after{content:"⌂";font-size:26px;line-height:1}
-#player.train .close,#player.pool .close,#player.moto .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
-#player.train .close::after,#player.pool .close::after,#player.moto .close::after{content:"⌂";font-size:24px;line-height:1}
+#player.train .close,#player.pool .close,#player.moto .close,#player.rock .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
+#player.train .close::after,#player.pool .close::after,#player.moto .close::after,#player.rock .close::after{content:"⌂";font-size:24px;line-height:1}
 .play:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .play:focus-visible,.close:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 .sec-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1;margin:6px 0 -8px}
@@ -254,6 +255,29 @@ body.playing{overflow:hidden}
         <p>Supera cinque moto e arriva al rettilineo! Se la tua moto si rovina, entra nel box per prendere quella di ricambio.</p>
         <div class="chips"><span class="chip">4 piste</span><span class="chip">5 sorpassi</span><span class="chip">Facile</span></div>
         <button class="play" type="button" data-game="giochi/moto-forte.html" data-kind="moto">Gioca!</button>
+      </div>
+    </article>
+    <article class="card rock">
+      <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Una band rock sul palco con chitarra, batteria e cantante, e le note colorate che scendono">
+        <rect width="320" height="180" fill="#2a1b4d"/>
+        <path d="M60 0h10l40 112H20Z" fill="#ff5a4f" opacity=".25"/><path d="M200 0h10l50 112H160Z" fill="#4fc3f7" opacity=".25"/>
+        <rect y="104" width="320" height="14" fill="#e9a94f" stroke="#1f1d2b" stroke-width="2.5"/>
+        <g stroke="#1f1d2b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+          <rect x="14" y="58" width="30" height="46" rx="4" fill="#3a2a20"/><path d="M20 68h18M20 76h18M20 84h18M20 92h18M26 62v38M32 62v38" stroke="#c9a46a" stroke-width="1.2"/>
+          <rect x="60" y="34" width="22" height="44" rx="8" fill="#6b3b1f"/><circle cx="71" cy="44" r="9" fill="#ffe0b8"/><rect x="61" y="54" width="20" height="26" rx="6" fill="#e3342f"/><rect x="63" y="80" width="6" height="24" fill="#33304a"/><rect x="73" y="80" width="6" height="24" fill="#33304a"/>
+          <ellipse cx="68" cy="72" rx="10" ry="7" fill="#c97b2f"/><path d="M74 69l26-12" stroke-width="4"/>
+          <path d="M128 104V60M196 104V62"/><ellipse cx="128" cy="60" rx="12" ry="3" fill="#ffd23a"/><ellipse cx="196" cy="62" rx="12" ry="3" fill="#ffd23a"/>
+          <circle cx="162" cy="58" r="9" fill="#ffe0b8"/><rect x="152" y="66" width="20" height="20" rx="6" fill="#e3342f"/><circle cx="162" cy="92" r="13" fill="#fff"/>
+          <path d="M238 54l-8-10 10 4 2-12 5 11 7-8-1 13" fill="#ffd23a"/><circle cx="244" cy="58" r="9" fill="#ffe0b8"/><path d="M233 68l-10 36h42l-10-36Z" fill="#ffd23a"/><rect x="234" y="66" width="20" height="24" rx="6" fill="#e3342f"/><path d="M256 68l4-8"/><circle cx="261" cy="58" r="3.5" fill="#555"/>
+        </g>
+        <g stroke="#1f1d2b" stroke-width="3"><circle cx="110" cy="140" r="14" fill="#ff5a4f"/><circle cx="160" cy="160" r="14" fill="#ffc93c"/><circle cx="210" cy="132" r="14" fill="#4fc3f7"/></g>
+        <g font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle" fill="#1f1d2b"><text x="110" y="146">♪</text><text x="160" y="166">♪</text><text x="210" y="138">♪</text></g>
+      </svg>
+      <div class="body">
+        <h2>Cantanti Rock</h2>
+        <p>Scegli la tua band e lo strumento: chitarra, batteria, microfono o tastiera. Suona le note a tempo e sfida le altre tre band: vince chi suona meglio!</p>
+        <div class="chips"><span class="chip">4 band</span><span class="chip">4 strumenti</span><span class="chip">Facile</span></div>
+        <button class="play" type="button" data-game="giochi/cantanti-rock.html" data-kind="rock">Gioca!</button>
       </div>
     </article>
   </main>
