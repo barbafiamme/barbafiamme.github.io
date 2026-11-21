@@ -1,4 +1,5 @@
 [
+  {"slug":"sei-sette-tesoro-perduto","titolo":"Sei-Sette e il Tesoro Perduto","nome":"Filippo","descrizione":"O-no, scappa! Corri con Sei-Sette, salta i sassi, prendi la chiave e apri il forziere di Capitan Ricciolo prima della Banda dei Musoni!","classifica":{"unit":"monete","asc":false}},
   {"slug":"corri-zampalesta","titolo":"Corri, Zampalesta!","nome":"Filippo","descrizione":"Il gattino Zampalesta scappa dall'onda di lava: salta i sassi e le navi di terra e prendi le stelle per correre più lontano!","classifica":{"unit":"metri","asc":false}},
   {"slug":"tennis-verde-contro-dorato","titolo":"Tennis: Verde contro Dorato","nome":"matti","descrizione":"Verde Scuro contro Dorato: muovi il tuo campione, rimanda la pallina e chi fa 5 punti vince la Coppa d'oro! Si gioca anche in due.","classifica":{"unit":"colpi","asc":false}},
   {"slug":"sparabombe","titolo":"Sparabombe","nome":"matti","descrizione":"La navicella rossa lancia le bombe e fa scoppiare i puntini colorati: attenta alle montagne!","classifica":{"unit":"puntini","asc":false}},
