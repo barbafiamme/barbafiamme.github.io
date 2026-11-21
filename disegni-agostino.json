@@ -75,5 +75,12 @@
   "gioco": "Moto Forte",
   "descrizione": "Moto da corsa, il box con la moto di ricambio e la rampa. In gioco è diventata Moto Forte.",
   "alt": "Disegno di moto e auto da corsa, una rampa nera e il box con la moto di ricambio"
+ },
+ {
+  "src": "disegni/cantanti-rock.jpg",
+  "titolo": "La band rock",
+  "gioco": "Cantanti Rock",
+  "descrizione": "Il chitarrista coi capelli lunghi, l'amplificatore, il batterista e il cantante col mantello. Da qui è nato Cantanti Rock.",
+  "alt": "Disegno a matita di una band sul palco: un chitarrista con i capelli lunghi accanto all'amplificatore, un batterista con i piatti e un cantante con il microfono"
  }
 ]
