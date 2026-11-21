@@ -1,0 +1,296 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sei-Sette e il Tesoro Perduto</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--blue:#2f8be0;--scrim:rgba(31,29,43,.55);--muted:#6b6880;--display:'Bungee',Impact,'Arial Black',sans-serif;--body:'Baloo 2','Trebuchet MS',system-ui,sans-serif}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#8fd3ff;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;display:block;width:100%;height:100%}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;z-index:5}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(26px,7vw,40px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h1 b{color:var(--blue);font-weight:400}
+h2{font-size:clamp(24px,6vw,34px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.4}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.ctl:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+#hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+#hud .grp{display:flex;gap:8px}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 12px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill small{font-family:var(--body);font-weight:700;font-size:12px;display:block;line-height:1;color:var(--muted)}
+.pill i{font-style:normal;color:var(--blue)}
+#controls{position:fixed;left:0;right:0;bottom:0;padding:0 14px calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:2}
+#controls .grp{display:flex;gap:10px}
+.ctl{pointer-events:auto;width:96px;height:90px;border-radius:26px;border:3px solid var(--ink);background:rgba(255,253,246,.9);font-family:var(--display);font-size:18px;color:var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer;touch-action:none}
+.ctl span{display:block;font-size:36px;line-height:1}
+#bJ{width:120px;background:rgba(255,201,60,.95)}
+.ctl.on{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);filter:brightness(.9)}
+@media (max-width:380px){.ctl{width:82px}#bJ{width:104px}}
+#board{min-height:0}
+</style></head><body>
+<canvas id="game"></canvas>
+<div id="hud" hidden>
+  <div class="grp">
+    <div class="pill"><small>MONETE</small><span id="score">0</span></div>
+  </div>
+  <div class="grp">
+    <div class="pill"><small>LIVELLO</small><span id="lvl">1</span></div>
+    <div class="pill"><small>VITE</small><i>67</i>×<span id="lives">12</span></div>
+  </div>
+</div>
+<div id="controls" hidden>
+  <div class="grp">
+    <button class="ctl" id="bL" aria-label="Vai a sinistra"><span>◀</span></button>
+    <button class="ctl" id="bR" aria-label="Vai a destra"><span>▶</span></button>
+  </div>
+  <button class="ctl" id="bJ" aria-label="Salta"><span>▲</span>SALTA</button>
+</div>
+<div class="overlay" id="start"><div class="panel">
+  <h1><b>Sei-Sette</b> e il <span>Tesoro Perduto</span></h1>
+  <p>Il tesoro di Capitan Ricciolo è nascosto in fondo al sentiero! Aiuta Sei-Sette, il numero più simpatico del mondo, ad arrivarci prima della Banda dei Musoni.</p>
+  <ul>
+    <li>Corri con <b>◀ ▶</b> (o le frecce) e salta con <b>SALTA</b> (o la barra spaziatrice).</li>
+    <li>Salta i sassi e prendi tutte le monete d'oro.</li>
+    <li>Vicino al grande albero c'è il vecchio esploratore Bartolo: poi prendi la chiave e apri il forziere!</li>
+    <li>O-no, scappa! Se la Banda ti raggiunge perdi una vita.</li>
+  </ul>
+  <button class="btn" id="go">Via!</button>
+</div></div>
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="endT">Che avventura!</h2>
+  <p id="endP"></p>
+  <div id="board"></div>
+  <button class="btn" id="again">Ancora!</button>
+</div></div>
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('sei-sette-tesoro-perduto',{title:'Sei-Sette e il Tesoro Perduto',unit:'monete'});
+(function(){
+const cv=document.getElementById('game'),cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,S=1,dpr=1,VW=500,VH=800,GY=600;
+function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;
+  S=Math.max(.65,Math.min(W/520,H/560,1.4));VW=W/S;VH=H/S;GY=VH-Math.max(130,Math.min(170,VH*.2))}
+addEventListener('resize',resize);resize();
+
+const LEVELS=3,GRAV=1700,JUMP=-760,SPD=250,MAXL=12;
+let st='ready',lv=1,coins=0,lives=MAXL,p,banda,items,L,cam=0,hasKey=false,invul=0,msg='',msgT=0,pops=[],pause=0,keys={L:0,R:0,J:0},jumpBuf=0,clouds=[],won=false;
+for(let i=0;i<8;i++)clouds.push([Math.random()*2000,40+Math.random()*160,0.6+Math.random()*.6]);
+
+function say(t,d){msg=t;msgT=d||2.2}
+function buildLevel(n){
+  lv=n;L=2300+n*700;items=[];hasKey=false;
+  const tree=Math.round(L*.5);
+  let x=520;
+  while(true){x+=Math.max(230,330-n*25)+Math.random()*240;if(x>L-460)break;
+    if(Math.abs(x-tree)<170)continue;
+    items.push({k:'rock',x,r:20+Math.random()*8+(n>2?4:0)})}
+  const rocks=items.filter(o=>o.k==='rock');
+  for(let c=300;c<L-320;c+=105){
+    if(Math.abs(c-tree)<90)continue;
+    const near=rocks.find(o=>Math.abs(o.x-c)<70);
+    let h=near?150:(Math.floor(c/105)%5===2?120:34);
+    items.push({k:'coin',x:c,h,got:false})}
+  items.push({k:'tree',x:tree,done:false});
+  items.push({k:'key',x:L-280,got:false});
+  items.push({k:'chest',x:L-120,open:false});
+  p={x:120,y:0,vy:0,dir:1,ground:true,run:0};
+  banda={x:-440,run:0};cam=0;
+  $('lvl').textContent=n;
+  say(n===1?'O-no, scappa!':'Livello '+n+': scappa!',2)}
+function reset(){coins=0;lives=MAXL;won=false;pops=[];invul=0;pause=0;keys={L:0,R:0,J:0};jumpBuf=0;buildLevel(1);
+  $('score').textContent=0;$('lives').textContent=lives}
+function start(){reset();st='play';$('start').hidden=true;$('end').hidden=true;$('hud').hidden=false;$('controls').hidden=false;last=performance.now()}
+function finish(){st='over';$('hud').hidden=true;$('controls').hidden=true;
+  const score=Math.max(1,coins);
+  if(won){$('endT').textContent='Hai trovato il tesoro!';$('endP').textContent='Sei-Sette ha aperto il forziere di Capitan Ricciolo e la Banda dei Musoni è rimasta a bocca asciutta! Hai preso '+coins+' monete.'}
+  else{$('endT').textContent=lv>1?'Grande corsa!':'Bella avventura!';$('endP').textContent='Sei arrivato al livello '+lv+' con '+coins+(coins===1?' moneta':' monete')+'. Il tesoro ti aspetta: riprova, ce la fai!'}
+  $('end').hidden=false;
+  if(window.Classifica)Classifica.mount($('board'),'sei-sette-tesoro-perduto',score)}
+$('go').onclick=start;$('again').onclick=start;
+
+function hold(b,k){const on=e=>{e.preventDefault();keys[k]=1;if(k==='J')jumpBuf=.15;b.classList.add('on')},off=e=>{e.preventDefault();keys[k]=0;b.classList.remove('on')};
+  b.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,off))}
+hold($('bL'),'L');hold($('bR'),'R');hold($('bJ'),'J');
+addEventListener('keydown',e=>{const k=e.key;
+  if((k==='Enter'||k===' ')&&st!=='play'){const b=!$('start').hidden?$('go'):!$('end').hidden?$('again'):null;if(b&&document.activeElement.tagName!=='INPUT'){e.preventDefault();b.click()}return}
+  if(k==='ArrowLeft'||k==='a'){keys.L=1;e.preventDefault()}
+  if(k==='ArrowRight'||k==='d'){keys.R=1;e.preventDefault()}
+  if(k==='ArrowUp'||k===' '||k==='w'){if(!e.repeat)jumpBuf=.15;keys.J=1;e.preventDefault()}});
+addEventListener('keyup',e=>{const k=e.key;if(k==='ArrowLeft'||k==='a')keys.L=0;if(k==='ArrowRight'||k==='d')keys.R=0;if(k==='ArrowUp'||k===' '||k==='w')keys.J=0});
+
+function hurt(kb){if(invul>0)return;if(kb)p.x=Math.max(30,p.x-kb);lives--;$('lives').textContent=lives;invul=1.6;p.vy=-420;p.ground=false;
+  if(banda.x>p.x-320)banda.x=p.x-320;
+  say(lives>0?'Ahia! Forza Sei-Sette!':'Uffa!',1.4);
+  if(lives<=0){pause=1.1;st='ending'}}
+function update(dt){
+  if(st==='ending'){pause-=dt;if(pause<=0)finish();return}
+  if(msgT>0)msgT-=dt;
+  pops.forEach(o=>o.t+=dt);pops=pops.filter(o=>o.t<.6);
+  if(pause>0){pause-=dt;if(pause<=0){if(lv<LEVELS)buildLevel(lv+1);else{won=true;finish()}}return}
+  if(invul>0)invul-=dt;
+  // movimento
+  let mv=(keys.R?1:0)-(keys.L?1:0);
+  p.x+=mv*SPD*dt;if(mv)p.dir=mv;p.run+=Math.abs(mv)*dt;
+  p.x=Math.max(30,Math.min(L-60,p.x));
+  if(jumpBuf>0){jumpBuf-=dt;if(p.ground){p.vy=JUMP;p.ground=false;jumpBuf=0}}
+  if(!p.ground){p.vy+=GRAV*dt*(keys.J&&p.vy<0?.62:1);p.y+=p.vy*dt;if(p.y>=0){p.y=0;p.vy=0;p.ground=true}}
+  // banda dei musoni
+  const bs=150+lv*28;
+  banda.x+=bs*dt;banda.run+=dt;
+  if(banda.x<p.x-560)banda.x=p.x-560;
+  if(banda.x>p.x-46&&invul<=0)hurt();
+  // oggetti
+  for(const o of items){
+    if(o.k==='rock'){if(Math.abs(p.x-o.x)<o.r+14&&-p.y<o.r*1.5)hurt(o.r+50)}
+    else if(o.k==='coin'&&!o.got){if(Math.abs(p.x-o.x)<30&&Math.abs((-p.y+40)-o.h)<52){o.got=true;coins++;$('score').textContent=coins;pops.push({x:o.x,y:GY-o.h,t:0,txt:'+1'})}}
+    else if(o.k==='tree'&&!o.done){if(p.x>o.x){o.done=true;coins+=5;$('score').textContent=coins;pops.push({x:o.x,y:GY-200,t:0,txt:'+5'});say('Hai trovato Bartolo l\'esploratore! Ora prendi la chiave!',3)}}
+    else if(o.k==='key'&&!o.got){if(Math.abs(p.x-o.x)<34){o.got=true;hasKey=true;say('Hai la chiave! Corri al forziere!',2)}}
+    else if(o.k==='chest'&&!o.open){if(p.x>o.x-44){if(hasKey){o.open=true;coins+=10;$('score').textContent=coins;pops.push({x:o.x,y:GY-90,t:0,txt:'+10'});
+        say(lv<LEVELS?'Livello '+lv+' superato!':'IL TESORO DI CAPITAN RICCIOLO!',2);pause=2}
+      else{p.x=o.x-44;if(msgT<=0)say('Ti serve la chiave!',1.2)}}}
+  }
+  cam+=((p.x-VW*(VW<700?.55:.36))-cam)*Math.min(1,dt*6);cam=Math.max(-480,Math.min(L-VW+80,cam));
+}
+
+// ---------- disegno ----------
+const INK='#1f1d2b';
+function sx(x){return (x-cam)}
+function draw67(x,y,dir,run,flash){
+  if(flash&&Math.floor(performance.now()/90)%2)return;
+  cx.save();cx.translate(x,y);
+  const step=Math.sin(run*14);
+  cx.strokeStyle=INK;cx.lineWidth=3.5;cx.lineCap='round';cx.lineJoin='round';
+  // gambe
+  cx.beginPath();cx.moveTo(-14,-20);cx.lineTo(-14+step*7,0);cx.lineTo(-6+step*7,0);
+  cx.moveTo(16,-20);cx.lineTo(16-step*7,0);cx.lineTo(24-step*7,0);cx.stroke();
+  // braccia
+  cx.lineWidth=4;cx.beginPath();cx.moveTo(-30,-48);cx.quadraticCurveTo(-46,-46,-50-step*5,-28);
+  cx.moveTo(32,-48);cx.quadraticCurveTo(48,-46,52+step*5,-28);cx.stroke();cx.lineWidth=3.5;
+  // il 6 e il 7
+  cx.font='400 62px Bungee, Impact, "Arial Black", sans-serif';cx.textAlign='center';cx.textBaseline='alphabetic';
+  cx.lineWidth=7;cx.strokeStyle=INK;cx.strokeText('67',0,-16);
+  cx.fillStyle='#2f8be0';cx.fillText('67',0,-16);
+  cx.fillStyle='rgba(255,255,255,.35)';cx.fillText('67',-2,-19);cx.fillStyle='#2f8be0';cx.fillText('67',0,-17);
+  // faccia: occhi e sorriso
+  cx.fillStyle='#fff';cx.strokeStyle=INK;cx.lineWidth=2.5;
+  for(const ex of [-17,17]){cx.beginPath();cx.arc(ex+dir*2,-70,7,0,7);cx.fill();cx.stroke();
+    cx.fillStyle=INK;cx.beginPath();cx.arc(ex+dir*4,-70,3,0,7);cx.fill();cx.fillStyle='#fff'}
+  cx.lineWidth=3;cx.beginPath();cx.arc(0,-58,9,.25,Math.PI-.25);cx.stroke();
+  cx.restore()}
+function drawMusone(x,y,hair,dress,run,ph){
+  cx.save();cx.translate(x,y);const b=Math.abs(Math.sin(run*10+ph))*4;cx.translate(0,-b);
+  cx.strokeStyle=INK;cx.lineWidth=3;cx.lineJoin='round';
+  const st=Math.sin(run*10+ph);
+  cx.fillStyle='#2b2b33';
+  cx.beginPath();cx.ellipse(-8+st*4,-2,7,4,0,0,7);cx.ellipse(10-st*4,-2,7,4,0,0,7);cx.fill();cx.stroke();
+  if(dress){cx.beginPath();cx.moveTo(-10,-50);cx.lineTo(10,-50);cx.lineTo(20,-6);cx.lineTo(-20,-6);cx.closePath();cx.fill();cx.stroke()}
+  else{cx.fillRect(-14,-50,28,32);cx.strokeRect(-14,-50,28,32);cx.fillRect(-13,-20,10,16);cx.fillRect(3,-20,10,16);cx.strokeRect(-13,-20,10,16);cx.strokeRect(3,-20,10,16)}
+  // testa
+  cx.fillStyle='#f6c7a8';cx.beginPath();cx.arc(0,-68,18,0,7);cx.fill();cx.stroke();
+  cx.fillStyle=hair;cx.beginPath();cx.arc(0,-72,19,Math.PI*1.05,Math.PI*1.95);cx.closePath();cx.fill();cx.stroke();
+  if(dress){cx.fillRect(-20,-74,7,36);cx.fillRect(13,-74,7,36)}
+  // faccia musona (buffa, non paurosa)
+  cx.strokeStyle=INK;cx.lineWidth=2.5;
+  cx.beginPath();cx.moveTo(-11,-72);cx.lineTo(-3,-69);cx.moveTo(11,-72);cx.lineTo(3,-69);cx.stroke();
+  cx.fillStyle=INK;cx.beginPath();cx.arc(-6,-65,2.2,0,7);cx.arc(6,-65,2.2,0,7);cx.fill();
+  cx.beginPath();cx.arc(0,-53,6,Math.PI+.4,-.4);cx.stroke();
+  cx.fillStyle='#f39a9a';cx.globalAlpha=.6;cx.beginPath();cx.arc(-11,-60,3.5,0,7);cx.arc(11,-60,3.5,0,7);cx.fill();cx.globalAlpha=1;
+  cx.restore()}
+function drawRock(x,y,r){cx.save();cx.translate(x,y);cx.fillStyle='#55525f';cx.strokeStyle=INK;cx.lineWidth=3;
+  cx.beginPath();cx.ellipse(0,-r*.8,r,r*.85,0,0,7);cx.fill();cx.stroke();
+  cx.strokeStyle='#36333f';cx.lineWidth=2;cx.beginPath();
+  for(let i=0;i<5;i++){cx.moveTo(-r*.6+i*r*.25,-r*1.3+i*3);cx.lineTo(-r*.3+i*r*.25,-r*.4)}cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.25)';cx.beginPath();cx.ellipse(-r*.35,-r*1.15,r*.25,r*.15,-.5,0,7);cx.fill();cx.restore()}
+function drawCoin(x,y,t){const w=Math.abs(Math.cos(t*3+x*.01));cx.save();cx.translate(x,y);
+  cx.fillStyle='#ffcc2e';cx.strokeStyle=INK;cx.lineWidth=2.5;cx.beginPath();cx.ellipse(0,0,13*Math.max(.25,w),13,0,0,7);cx.fill();cx.stroke();
+  if(w>.5){cx.fillStyle='#e09a10';cx.font='bold 13px Bungee, Impact, sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText('★',0,1)}
+  cx.restore()}
+function drawTree(x,y,done){cx.save();cx.translate(x,y);cx.strokeStyle=INK;cx.lineWidth=3;
+  cx.fillStyle='#d9733a';cx.fillRect(-34,-190,68,190);cx.strokeRect(-34,-190,68,190);
+  cx.strokeStyle='#b55a26';cx.lineWidth=2;for(let i=0;i<7;i++){cx.beginPath();cx.moveTo(-28+i*9,-180);cx.lineTo(-30+i*9,-10);cx.stroke()}
+  cx.strokeStyle=INK;cx.lineWidth=3;cx.fillStyle='#54b848';cx.beginPath();
+  const bl=[[-40,-200,36],[0,-228,40],[40,-200,36],[-22,-250,30],[24,-252,30],[0,-190,34]];
+  for(const b of bl){cx.moveTo(b[0]+b[2],b[1]);cx.arc(b[0],b[1],b[2],0,7)}cx.fill();cx.stroke();
+  cx.fillStyle='#54b848';for(const b of bl){cx.beginPath();cx.arc(b[0],b[1],b[2]-3,0,7);cx.fill()}
+  // Bartolo l'esploratore: un teschietto sorridente con il cappello da esploratore
+  cx.translate(62,0);
+  cx.fillStyle='#f4efe2';cx.beginPath();cx.ellipse(0,-20,17,16,0,0,7);cx.fill();cx.stroke();
+  cx.fillRect(-9,-8,18,8);cx.strokeRect(-9,-8,18,8);
+  cx.fillStyle=INK;cx.beginPath();cx.ellipse(-6,-22,4,5,0,0,7);cx.ellipse(6,-22,4,5,0,0,7);cx.fill();
+  cx.lineWidth=2;cx.beginPath();cx.arc(0,-14,5,.3,Math.PI-.3);cx.stroke();
+  cx.fillStyle='#c9a45c';cx.lineWidth=2.5;cx.beginPath();cx.ellipse(0,-33,24,5,0,0,7);cx.fill();cx.stroke();
+  cx.beginPath();cx.moveTo(-13,-34);cx.quadraticCurveTo(-12,-52,0,-52);cx.quadraticCurveTo(12,-52,13,-34);cx.closePath();cx.fill();cx.stroke();
+  // mappa
+  cx.fillStyle='#fff3c4';cx.save();cx.translate(30,-6);cx.rotate(-.15);cx.fillRect(-12,-10,24,16);cx.strokeRect(-12,-10,24,16);
+  cx.strokeStyle='#d33';cx.lineWidth=2;cx.beginPath();cx.moveTo(2,-6);cx.lineTo(8,0);cx.moveTo(8,-6);cx.lineTo(2,0);cx.stroke();cx.restore();
+  cx.restore();
+  if(!done){cx.save();cx.translate(x+62,y-90+Math.sin(performance.now()/250)*5);cx.fillStyle='#fff';cx.strokeStyle=INK;cx.lineWidth=2.5;
+    cx.beginPath();cx.arc(0,0,15,0,7);cx.fill();cx.stroke();cx.fillStyle=INK;cx.font='bold 20px Bungee, Impact, sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText('!',0,1);cx.restore()}}
+function drawKey(x,y){cx.save();cx.translate(x,y-26+Math.sin(performance.now()/200)*4);cx.fillStyle='#ffcf33';cx.strokeStyle=INK;cx.lineWidth=3;
+  cx.beginPath();cx.arc(0,-14,11,0,7);cx.fill();cx.stroke();cx.fillStyle='#fffdf6';cx.beginPath();cx.arc(0,-14,4,0,7);cx.fill();cx.stroke();
+  cx.fillStyle='#ffcf33';cx.fillRect(-4,-4,8,26);cx.strokeRect(-4,-4,8,26);cx.fillRect(4,10,8,5);cx.strokeRect(4,10,8,5);cx.fillRect(4,17,6,5);cx.strokeRect(4,17,6,5);cx.restore()}
+function drawChest(x,y,open){cx.save();cx.translate(x,y);cx.strokeStyle=INK;cx.lineWidth=3;
+  if(open){cx.fillStyle='#ffd83a';cx.globalAlpha=.5+.3*Math.sin(performance.now()/120);cx.beginPath();cx.arc(0,-50,60,0,7);cx.fill();cx.globalAlpha=1}
+  cx.fillStyle='#e08a3c';cx.fillRect(-40,-46,80,46);cx.strokeRect(-40,-46,80,46);
+  cx.fillStyle='#ffcc2e';cx.fillRect(-40,-34,80,8);cx.strokeRect(-40,-34,80,8);
+  if(open){cx.fillStyle='#ffcc2e';for(let i=0;i<7;i++){cx.beginPath();cx.arc(-26+i*9,-48-(i%2)*6,7,0,7);cx.fill();cx.stroke()}
+    cx.fillStyle='#e08a3c';cx.beginPath();cx.moveTo(-40,-46);cx.lineTo(-48,-92);cx.lineTo(32,-92);cx.lineTo(40,-46);cx.closePath();cx.fill();cx.stroke()}
+  else{cx.beginPath();cx.moveTo(-40,-46);cx.quadraticCurveTo(0,-82,40,-46);cx.closePath();cx.fill();cx.stroke();
+    cx.fillStyle='#ffcc2e';cx.fillRect(-9,-48,18,18);cx.strokeRect(-9,-48,18,18);cx.fillStyle=INK;cx.beginPath();cx.arc(0,-41,3,0,7);cx.fill();cx.fillRect(-1.5,-41,3,7)}
+  cx.restore()}
+function draw(){
+  const T=performance.now()/1000;
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8fd3ff');g.addColorStop(1,'#e9f8ff');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  cx.setTransform(dpr*S,0,0,dpr*S,0,0);
+  // sole
+  cx.fillStyle='#ffd83a';cx.strokeStyle=INK;cx.lineWidth=3;cx.beginPath();cx.arc(VW-80,140,36,0,7);cx.fill();cx.stroke();
+  // nuvole
+  cx.fillStyle='#fff';for(const c of clouds){let x=((c[0]-cam*.15)%(VW+300)+VW+300)%(VW+300)-150;cx.save();cx.translate(x,c[1]);cx.scale(c[2],c[2]);
+    cx.beginPath();cx.arc(0,0,26,0,7);cx.arc(28,-10,30,0,7);cx.arc(58,0,24,0,7);cx.fill();cx.restore()}
+  // colline lontane
+  cx.fillStyle='#9ad37a';cx.beginPath();cx.moveTo(0,GY);
+  for(let x=0;x<=VW+20;x+=20){const wx=x+cam*.4;cx.lineTo(x,GY-70-Math.sin(wx*.006)*40-Math.sin(wx*.017)*14)}cx.lineTo(VW+20,GY);cx.fill();
+  // terra
+  cx.fillStyle='#c98b52';cx.fillRect(-10,GY,VW+20,VH-GY+10);
+  cx.fillStyle='#6cc04a';cx.fillRect(-10,GY-4,VW+20,12);cx.strokeStyle=INK;cx.lineWidth=3;cx.beginPath();cx.moveTo(-10,GY-4);cx.lineTo(VW+20,GY-4);cx.stroke();
+  cx.fillStyle='#b07640';for(let x=-((cam*1)%90);x<VW+20;x+=90){cx.beginPath();cx.ellipse(x+30,GY+40,10,5,0,0,7);cx.ellipse(x+70,GY+80,7,4,0,0,7);cx.fill()}
+  if(!items)return;
+  // traguardo / inizio
+  for(const o of items){const x=sx(o.x);if(x<-200||x>VW+200)continue;
+    if(o.k==='tree')drawTree(x,GY,o.done)}
+  for(const o of items){const x=sx(o.x);if(x<-80||x>VW+80)continue;
+    if(o.k==='rock')drawRock(x,GY,o.r);
+    else if(o.k==='coin'&&!o.got)drawCoin(x,GY-o.h,T);
+    else if(o.k==='key'&&!o.got)drawKey(x,GY);
+    else if(o.k==='chest')drawChest(x,GY,o.open)}
+  // banda
+  const bx=sx(banda.x);
+  if(bx>-200){drawMusone(bx-96,GY,'#e07a2e',false,banda.run,0);drawMusone(bx-48,GY,'#e07a2e',false,banda.run,1.3);drawMusone(bx,GY,'#3a2a22',true,banda.run,2.4)}
+  if(st==='play'&&bx<-30){cx.fillStyle='rgba(31,29,43,.7)';cx.font='bold 18px "Baloo 2", sans-serif';cx.textAlign='left';cx.fillText('◀ la Banda arriva!',12,GY-150)}
+  draw67(sx(p.x),GY+p.y,p.dir,p.run,invul>0&&st==='play');
+  for(const o of pops){cx.globalAlpha=1-o.t/.6;cx.fillStyle='#ffcc2e';cx.strokeStyle=INK;cx.lineWidth=4;cx.font='24px Bungee, Impact, sans-serif';cx.textAlign='center';
+    cx.strokeText(o.txt,sx(o.x),o.y-30-o.t*60);cx.fillText(o.txt,sx(o.x),o.y-30-o.t*60)}
+  cx.globalAlpha=1;
+  // barra del percorso
+  if(st!=='ready'){const bw=Math.min(260,VW-40),by=GY+20,bx0=(VW-bw)/2;cx.fillStyle='rgba(255,253,246,.85)';cx.strokeStyle=INK;cx.lineWidth=2.5;
+    cx.beginPath();cx.roundRect?cx.roundRect(bx0,by,bw,12,6):cx.rect(bx0,by,bw,12);cx.fill();cx.stroke();
+    cx.fillStyle='#2f8be0';cx.beginPath();cx.arc(bx0+bw*Math.min(1,p.x/L),by+6,8,0,7);cx.fill();cx.stroke();
+    cx.fillStyle='#e08a3c';cx.fillRect(bx0+bw-8,by-2,14,14);cx.strokeRect(bx0+bw-8,by-2,14,14)}
+  // messaggio
+  if(msgT>0&&st!=='ready'){cx.globalAlpha=Math.min(1,msgT*3);const fs=Math.min(28,VW/16);cx.font=fs+'px Bungee, Impact, sans-serif';cx.textAlign='center';cx.textBaseline='middle';
+    const words=msg.split(' '),lines=[];let cur='';for(const w of words){const t=cur?cur+' '+w:w;if(cx.measureText(t).width>VW-60&&cur){lines.push(cur);cur=w}else cur=t}lines.push(cur);
+    const y0=Math.max(110,GY*.34);
+    lines.forEach((l,i)=>{cx.lineWidth=6;cx.strokeStyle=INK;cx.strokeText(l,VW/2,y0+i*fs*1.25);cx.fillStyle='#ffcc2e';cx.fillText(l,VW/2,y0+i*fs*1.25)});
+    cx.globalAlpha=1;cx.textBaseline='alphabetic'}
+}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(st==='play'||st==='ending')update(dt);draw();requestAnimationFrame(loop)}
+reset();requestAnimationFrame(loop);
+window.__bf={get s(){return {st,lv,coins,lives,x:p.x,L,won}}};
+})();
+</script></body></html>
