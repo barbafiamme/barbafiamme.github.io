@@ -89,5 +89,12 @@
   "gioco": "Ladri a più non posso",
   "descrizione": "Il poliziotto col cappello blu sulla porta della stazione di polizia e il ladro arancione dietro le sbarre. Da qui è nato Ladri a più non posso.",
   "alt": "Disegno a pennarello: a sinistra un poliziotto blu nella porta marrone della stazione di polizia, a destra un ladro con la maglia arancione dietro le sbarre della prigione"
+ },
+ {
+  "src": "disegni/castelli-combattenti.jpg",
+  "titolo": "Il castello rosso",
+  "gioco": "Castelli combattenti",
+  "descrizione": "Il grande castello rosso con i merli, la porta scura, gli omini con la maglia verde e gli uccellini in cielo. Da qui sono nati i Castelli combattenti.",
+  "alt": "Disegno a pennarello di un grande castello rosso con i merli, una porta scura ad arco, due omini con la maglia verde sulle mura e due uccellini nel cielo"
  }
 ]

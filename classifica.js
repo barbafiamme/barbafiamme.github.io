@@ -14,7 +14,8 @@
     piscina:{title:'Piscina veloce',unit:'tempo',asc:true,fmt:v=>(v/100).toFixed(2)+' s'},
     'moto-forte':{title:'Moto Forte',unit:'punti',asc:false,fmt:v=>v+' punti'},
     'cantanti-rock':{title:'Cantanti Rock',unit:'punti',asc:false,fmt:v=>v+' punti'},
-    'ladri-a-piu-non-posso':{title:'Ladri a più non posso',unit:'punti',asc:false,fmt:v=>v+' punti'}
+    'ladri-a-piu-non-posso':{title:'Ladri a più non posso',unit:'punti',asc:false,fmt:v=>v+' punti'},
+    'castelli-combattenti':{title:'Castelli combattenti',unit:'punti',asc:false,fmt:v=>v+' punti'}
   };
   // giochi dei Piccoli Inventori: si registrano da soli con il loro slug
   function register(g,o){o=o||{};if(!/^[a-z0-9-]{1,60}$/.test(g))return;const u=o.unit||'punti';
