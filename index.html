@@ -52,10 +52,11 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .card.moto .play{background:#ff5a4f;color:#fff}
 .card.rock .play{background:#b07cff;color:#fff}
 .card.ladri .play{background:#2f5fd0;color:#fff}
+.card.castle .play{background:#d9342b;color:#fff}
 #player.pirate .close{left:max(206px,calc(50% - 26px));bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:52px;height:52px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
 #player.pirate .close::after{content:"⌂";font-size:26px;line-height:1}
-#player.train .close,#player.pool .close,#player.moto .close,#player.rock .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
-#player.train .close::after,#player.pool .close::after,#player.moto .close::after,#player.rock .close::after{content:"⌂";font-size:24px;line-height:1}
+#player.train .close,#player.pool .close,#player.moto .close,#player.rock .close,#player.castle .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
+#player.train .close::after,#player.pool .close::after,#player.moto .close::after,#player.rock .close::after,#player.castle .close::after{content:"⌂";font-size:24px;line-height:1}
 .play:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .play:focus-visible,.close:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
 .sec-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,5.5vw,34px);line-height:1;margin:6px 0 -8px}
@@ -304,6 +305,34 @@ body.playing{overflow:hidden}
         <p>Scegli il tuo poliziotto e porta in prigione i ladri della Banda Sacchetto. Al livello 2 devi fermare anche la loro Jeep!</p>
         <div class="chips"><span class="chip">3 poliziotti</span><span class="chip">2 livelli</span><span class="chip">Facile</span></div>
         <button class="play" type="button" data-game="giochi/ladri-a-piu-non-posso.html" data-kind="cops">Gioca!</button>
+      </div>
+    </article>
+    <article class="card castle">
+      <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Un castello rosso e un castello blu si sfidano: dal castello rosso parte un cavaliere a cavallo con spada e scudo, e vola una palla di cannone">
+        <rect width="320" height="180" fill="#8fd16f"/><rect width="320" height="58" fill="#cfeeff"/>
+        <path d="M118 30q8-8 14 0q6-8 14 0" fill="none" stroke="#1f1d2b" stroke-width="2.5"/>
+        <g stroke="#1f1d2b" stroke-width="3" stroke-linejoin="round">
+          <path d="M14 150V92h12v-12h14v12h12v-12h14v12h12v-12h14v12h10v58Z" fill="#d9342b"/>
+          <path d="M54 150v-24a13 13 0 0 1 26 0v24Z" fill="#2a1a14"/>
+          <path d="M214 140V90h11v-11h13v11h11v-11h13v11h11v-11h13v11h10v50Z" fill="#2f5fd0"/>
+          <path d="M252 140v-21a12 12 0 0 1 24 0v21Z" fill="#2a1a14"/>
+          <rect x="44" y="70" width="8" height="10" fill="#2e9e4a"/><circle cx="48" cy="65" r="5" fill="#ffd8b0"/>
+          <rect x="72" y="70" width="8" height="10" fill="#2e9e4a"/><circle cx="76" cy="65" r="5" fill="#ffd8b0"/>
+          <rect x="246" y="69" width="8" height="10" fill="#2e9e4a"/><circle cx="250" cy="64" r="5" fill="#ffd8b0"/>
+          <ellipse cx="152" cy="146" rx="24" ry="9" fill="#8a5a2b"/><path d="M168 141l12-14 8 6-12 12Z" fill="#8a5a2b"/>
+          <path d="M136 152l-3 14M144 154v13M160 154v13M168 152l3 14" stroke="#5a3a1a" stroke-width="4"/>
+          <rect x="144" y="118" width="13" height="18" rx="4" fill="#d9342b"/><circle cx="150" cy="111" r="6" fill="#ffd8b0"/>
+          <circle cx="142" cy="128" r="7" fill="#9e2219"/>
+        </g>
+        <path d="M157 122l14-18" stroke="#cfd6de" stroke-width="4" stroke-linecap="round"/>
+        <path d="M100 74q60-60 120-4" fill="none" stroke="#1f1d2b" stroke-width="2" stroke-dasharray="5 6"/>
+        <circle cx="170" cy="46" r="8" fill="#222"/>
+      </svg>
+      <div class="body">
+        <h2>Castelli combattenti</h2>
+        <p>Sette castelli si sfidano! Scegli il tuo, butta giù le mura col cannone e manda i cavalieri con spada e scudo a conquistare gli altri.</p>
+        <div class="chips"><span class="chip">7 castelli</span><span class="chip">Cannoni e cavalli</span><span class="chip">Facile</span></div>
+        <button class="play" type="button" data-game="giochi/castelli-combattenti.html" data-kind="castle">Gioca!</button>
       </div>
     </article>
   </main>
