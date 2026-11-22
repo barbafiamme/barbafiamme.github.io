@@ -1,0 +1,272 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ladri a più non posso</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#1f1d2b;--paper:#fffdf6;--sun:#ffc93c;--blue:#2f4fd8;--scrim:rgba(31,29,43,.55);--muted:#6b6880;--display:'Bungee',Impact,'Arial Black',sans-serif;--body:'Baloo 2','Trebuchet MS',system-ui,sans-serif}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#7cc36a;color:var(--ink);font-family:var(--body);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;display:block;width:100%;height:100%}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:var(--scrim);overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-sizing:border-box;z-index:5;touch-action:pan-y}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:22px 18px 24px 16px;box-shadow:6px 7px 0 var(--ink);width:100%;max-width:560px;padding:22px 20px 20px;box-sizing:border-box;margin:auto 0;display:flex;flex-direction:column;gap:14px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(28px,7vw,42px)}h1 span{background:var(--sun);padding:0 .15em;border-radius:6px}
+h2{font-size:clamp(26px,6vw,36px)}
+.panel p{margin:0;font-size:18px;line-height:1.35}
+.panel ul{margin:0;padding-left:20px;font-size:17px;line-height:1.4}
+.btn{align-self:flex-start;font-family:var(--display);font-size:22px;background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:12px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn:focus-visible,.ctl:focus-visible,.cop:focus-visible{outline:3px dashed #2f6fe4;outline-offset:3px}
+.cops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cop{font-family:var(--body);font-weight:800;font-size:16px;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:8px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink)}
+.cop canvas{width:64px;height:72px}
+.cop[aria-pressed="true"]{background:var(--sun);box-shadow:3px 3px 0 var(--ink)}
+#hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+#hud .grp{display:flex;gap:8px}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:4px 10px;font-family:var(--display);font-size:18px;box-shadow:3px 3px 0 var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill small{font-family:var(--body);font-weight:700;font-size:12px;display:block;line-height:1;color:var(--muted)}
+#pause{pointer-events:auto;width:56px;height:56px;border-radius:16px;border:3px solid var(--ink);background:var(--paper);font-size:26px;box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);font-family:var(--display)}
+#controls{position:fixed;left:0;bottom:0;padding:0 14px calc(env(safe-area-inset-bottom,0px) + 14px);display:grid;grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,64px);gap:4px;pointer-events:none;z-index:2}
+.ctl{pointer-events:auto;border-radius:18px;border:3px solid var(--ink);background:rgba(255,253,246,.9);font-size:30px;color:var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer;touch-action:none;padding:0}
+.ctl.on{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);filter:brightness(.9)}
+#bU{grid-column:2;grid-row:1}#bL{grid-column:1;grid-row:2}#bR{grid-column:3;grid-row:2}#bD{grid-column:2;grid-row:3}
+#msg{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-family:var(--display);font-size:clamp(26px,7vw,44px);color:#fff;text-shadow:3px 3px 0 var(--ink),-2px -2px 0 var(--ink);pointer-events:none;z-index:3;white-space:nowrap}
+#board{min-height:0}
+</style></head><body>
+<canvas id="game"></canvas>
+<div id="hud" hidden>
+  <div class="grp">
+    <div class="pill"><small>LIVELLO</small><span id="lvl">1</span></div>
+    <div class="pill"><small>PUNTI</small><span id="score">0</span></div>
+  </div>
+  <div class="grp">
+    <div class="pill"><small>LADRI</small><span id="left">2</span></div>
+    <div class="pill"><small>TEMPO</small><span id="time">60</span></div>
+    <button id="pause" aria-label="Pausa">II</button>
+  </div>
+</div>
+<div id="controls" hidden>
+  <button class="ctl" id="bU" aria-label="Su">▲</button>
+  <button class="ctl" id="bL" aria-label="Sinistra">◀</button>
+  <button class="ctl" id="bR" aria-label="Destra">▶</button>
+  <button class="ctl" id="bD" aria-label="Giù">▼</button>
+</div>
+<div id="msg" hidden></div>
+<div class="overlay" id="start"><div class="panel">
+  <h1>Ladri a <span>più non posso</span></h1>
+  <p>I ladri della Banda Sacchetto sono scappati con i sacchi di monete della banca! Scegli il tuo poliziotto e portali tutti in prigione.</p>
+  <div class="cops" id="cops"></div>
+  <ul>
+    <li>Muovi il poliziotto con le frecce (o i tasti <b>◀ ▶ ▲ ▼</b>), oppure tieni il dito dove vuoi andare.</li>
+    <li>Tocca un ladro per prenderlo: va dritto in prigione!</li>
+    <li>Prendi tutti i ladri prima che finisca il tempo. Al livello 2 arriva la Jeep dei ladri!</li>
+    <li>Il tasto <b>II</b> (o <b>P</b>) mette in pausa.</li>
+  </ul>
+  <button class="btn" id="go">Via!</button>
+</div></div>
+<div class="overlay" id="next" hidden><div class="panel">
+  <h2 id="nextT">Livello 2!</h2>
+  <p id="nextP"></p>
+  <button class="btn" id="nextB">Avanti!</button>
+</div></div>
+<div class="overlay" id="paused" hidden><div class="panel">
+  <h2>Pausa</h2>
+  <p>I ladri sono fermi ad aspettarti. Quando vuoi, si riparte!</p>
+  <button class="btn" id="resume">Riprendi</button>
+</div></div>
+<div class="overlay" id="end" hidden><div class="panel">
+  <h2 id="endT">Bravo poliziotto!</h2>
+  <p id="endP"></p>
+  <div id="board"></div>
+  <button class="btn" id="again">Ancora!</button>
+</div></div>
+<script src="../classifica.js"></script>
+<script>
+if(window.Classifica)Classifica.register('ladri-a-piu-non-posso',{title:'Ladri a più non posso',unit:'punti'});
+(function(){
+const cv=document.getElementById('game'),cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,S=1,dpr=1;
+function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);S=Math.max(.7,Math.min(W/480,H/760,1.4))}
+addEventListener('resize',resize);resize();
+
+const COPS=[
+  {name:'Agente Blu',coat:'#2f3fb0',pants:'#2f6fe4',skin:'#f6c9a0',hair:'#3b2412'},
+  {name:'Agente Stella',coat:'#c0398a',pants:'#3a3f8f',skin:'#e8b088',hair:'#7a3b10',braid:1},
+  {name:'Agente Lampo',coat:'#1f8a5b',pants:'#24344d',skin:'#9b6b47',hair:'#1a1a1a'}];
+let copIdx=0;
+const LEVELS=[
+  {robbers:2,jeeps:0,speed:120,time:60,text:''},
+  {robbers:3,jeeps:1,speed:135,time:60,text:'Arriva la Jeep dei ladri! Corre veloce sulla strada: toccala per fermarla e prendere il ladro che guida.'},
+  {robbers:4,jeeps:2,speed:150,time:70,text:'Ultimo livello: tutta la Banda Sacchetto, con due Jeep! Ce la puoi fare!'}];
+
+// arena: tutto lo schermo tranne la fascia in alto
+function arena(){const top=78,pad=16;return{x0:pad,y0:top,x1:W-pad,y1:H-pad}}
+function jailBox(){const a=arena(),w=110*S,h=90*S;return{x:a.x1-w-6,y:a.y0+6,w,h}}
+function stationBox(){const a=arena(),w=90*S,h=96*S;return{x:a.x0+6,y:a.y0+6,w,h}}
+
+let st='ready',lvl=0,score=0,left=0,timeLeft=0,last=0,cop,robbers,jeeps,flyers,pops,jailed,keys={L:0,R:0,U:0,D:0},ptr=null,msgT=0;
+function roadLoop(){const a=arena();const m=Math.min(W,H)*.22;return{x0:a.x0+m*.6,y0:a.y0+m+40*S,x1:a.x1-m*.6,y1:a.y1-m*.7}}
+
+function setupLevel(){const L=LEVELS[lvl],a=arena();
+  cop={x:(a.x0+a.x1)/2,y:(a.y0+a.y1)/2,dir:1,walk:0};
+  robbers=[];for(let i=0;i<L.robbers;i++){let x,y;do{x=a.x0+40+Math.random()*(a.x1-a.x0-80);y=a.y0+140*S+Math.random()*Math.max(40,a.y1-a.y0-180*S-robLow())}while(Math.hypot(x-cop.x,y-cop.y)<170*S);
+    robbers.push({x,y,vx:0,vy:0,wa:Math.random()*6.28,walk:Math.random()*6,dir:1})}
+  jeeps=[];for(let i=0;i<L.jeeps;i++)jeeps.push({p:i*.5,dir:i%2?-1:1,stopped:false,x:0,y:0,ang:0});
+  flyers=[];pops=[];jailed=0;timeLeft=L.time;left=L.robbers+L.jeeps;
+  $('lvl').textContent=lvl+1;$('left').textContent=left;$('time').textContent=Math.ceil(timeLeft);$('score').textContent=score;
+  showMsg('Livello '+(lvl+1)+'!')}
+function showMsg(t){$('msg').textContent=t;$('msg').hidden=false;msgT=1.6}
+function play(){st='play';['start','end','next','paused'].forEach(i=>$(i).hidden=true);$('hud').hidden=false;$('controls').hidden=false;last=performance.now()}
+function start(){lvl=0;score=0;setupLevel();play()}
+function levelDone(){const bonus=Math.ceil(timeLeft);score+=bonus;$('score').textContent=score;
+  if(lvl>=LEVELS.length-1){finish(true);return}
+  st='between';$('hud').hidden=true;$('controls').hidden=true;$('msg').hidden=true;
+  $('nextT').textContent='Livello '+(lvl+2)+'!';
+  $('nextP').textContent='Tutti in prigione! Bonus tempo: '+bonus+' punti. '+LEVELS[lvl+1].text;
+  $('next').hidden=false;$('nextB').focus()}
+function finish(won){st='over';$('hud').hidden=true;$('controls').hidden=true;$('msg').hidden=true;
+  const pts=Math.max(1,score);
+  $('endT').textContent=won?'Super poliziotto!':lvl>0?'Che bravo poliziotto!':score>0?'Bella caccia!':'Ci sei quasi!';
+  $('endP').textContent=won?'Hai preso tutta la Banda Sacchetto e riportato le monete in banca! Hai fatto '+pts+' punti.':
+    'Il tempo è finito, ma hai fatto '+pts+(pts===1?' punto':' punti')+' e sei arrivato al livello '+(lvl+1)+'. Un altro giro?';
+  $('end').hidden=false;
+  if(window.Classifica)Classifica.mount($('board'),'ladri-a-piu-non-posso',pts)}
+function pause(){if(st!=='play')return;st='pause';$('paused').hidden=false;$('resume').focus()}
+function resume(){if(st!=='pause')return;$('paused').hidden=true;st='play';last=performance.now()}
+
+// scelta del poliziotto
+const copsEl=$('cops');
+COPS.forEach((c,i)=>{const b=document.createElement('button');b.className='cop';b.type='button';b.setAttribute('aria-pressed',i===0);
+  const m=document.createElement('canvas');m.width=128;m.height=144;const g=m.getContext('2d');g.scale(2,2);drawCop(g,32,52,1.25,c,0,1);
+  b.appendChild(m);b.appendChild(document.createTextNode(c.name));
+  b.onclick=()=>{copIdx=i;[...copsEl.children].forEach((x,j)=>x.setAttribute('aria-pressed',j===i))};copsEl.appendChild(b)});
+
+$('go').onclick=start;$('again').onclick=start;$('nextB').onclick=()=>{lvl++;setupLevel();play()};
+$('pause').onclick=e=>{e.stopPropagation();pause()};$('resume').onclick=resume;
+function hold(b,k){const on=e=>{e.preventDefault();e.stopPropagation();keys[k]=1;b.classList.add('on')},off=e=>{e.preventDefault();keys[k]=0;b.classList.remove('on')};
+  b.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,off))}
+hold($('bL'),'L');hold($('bR'),'R');hold($('bU'),'U');hold($('bD'),'D');
+const KM={ArrowLeft:'L',a:'L',ArrowRight:'R',d:'R',ArrowUp:'U',w:'U',ArrowDown:'D',s:'D'};
+addEventListener('keydown',e=>{const k=KM[e.key];if(k){keys[k]=1;e.preventDefault()}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(st==='play')pause();else if(st==='pause')resume();e.preventDefault()}
+  if((e.key==='Enter'||e.key===' ')&&st!=='play'&&document.activeElement.tagName!=='INPUT'){
+    const b=!$('start').hidden?$('go'):!$('next').hidden?$('nextB'):!$('paused').hidden?$('resume'):!$('end').hidden?$('again'):null;if(b){e.preventDefault();b.click()}}});
+addEventListener('keyup',e=>{const k=KM[e.key];if(k)keys[k]=0});
+cv.addEventListener('pointerdown',e=>{if(st!=='play')return;ptr={x:e.clientX,y:e.clientY,id:e.pointerId};try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+cv.addEventListener('pointermove',e=>{if(ptr&&ptr.id===e.pointerId){ptr.x=e.clientX;ptr.y=e.clientY}});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,e=>{if(ptr&&ptr.id===e.pointerId)ptr=null}));
+addEventListener('blur',()=>{keys={L:0,R:0,U:0,D:0};ptr=null;pause()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
+
+function clampIn(o,m,low){const a=arena();o.x=Math.max(a.x0+m,Math.min(a.x1-m,o.x));o.y=Math.max(a.y0+m+24*S,Math.min(a.y1-m-(low||0),o.y))}
+// i ladri non si nascondono sotto i tasti: lasciano libera la fascia in basso
+function robLow(){return W<760?236:0}
+function loopPos(p){const r=roadLoop(),w=r.x1-r.x0,h=r.y1-r.y0,per=2*(w+h);let d=((p%1)+1)%1*per;
+  if(d<w)return{x:r.x0+d,y:r.y0,ang:0};d-=w;if(d<h)return{x:r.x1,y:r.y0+d,ang:Math.PI/2};d-=h;
+  if(d<w)return{x:r.x1-d,y:r.y1,ang:Math.PI};d-=w;return{x:r.x0,y:r.y1-d,ang:-Math.PI/2}}
+function catchAt(x,y,pts,label){const j=jailBox();flyers.push({x,y,tx:j.x+j.w*(.25+Math.random()*.5),ty:j.y+j.h*.6,t:0});
+  pops.push({x,y,t:0,txt:'+'+pts});score+=pts;left--;$('score').textContent=score;$('left').textContent=left;showMsg(label)}
+
+function update(dt){const L=LEVELS[lvl];
+  if(msgT>0){msgT-=dt;if(msgT<=0)$('msg').hidden=true}
+  timeLeft-=dt;$('time').textContent=Math.max(0,Math.ceil(timeLeft));
+  // poliziotto
+  let mx=keys.R-keys.L,my=keys.D-keys.U;
+  if(ptr){const dx=ptr.x-cop.x,dy=ptr.y-cop.y,d=Math.hypot(dx,dy);if(d>8){mx=dx/d;my=dy/d}}
+  const ml=Math.hypot(mx,my);const sp=230*S;
+  if(ml>0){cop.x+=mx/ml*sp*dt;cop.y+=my/ml*sp*dt;cop.walk+=dt*12;if(mx)cop.dir=mx>0?1:-1}
+  clampIn(cop,18*S);
+  // ladri
+  const a=arena();
+  for(let i=robbers.length-1;i>=0;i--){const r=robbers[i];const dx=r.x-cop.x,dy=r.y-cop.y,d=Math.hypot(dx,dy)||1;
+    let tx,ty;
+    if(d<190*S){tx=dx/d;ty=dy/d;// scappa, e scivola di lato se è contro il muro
+      const nearX=r.x<a.x0+50||r.x>a.x1-50,nearY=r.y<a.y0+70*S||r.y>a.y1-50-robLow();
+      if(nearX){tx=0;ty=(dy>=0?1:-1)}if(nearY){ty=0;tx=(dx>=0?1:-1)}if(nearX&&nearY){tx=r.x<(a.x0+a.x1)/2?1:-1;ty=r.y<(a.y0+a.y1)/2?1:-1}
+    }else{r.wa+=(Math.random()-.5)*dt*3;tx=Math.cos(r.wa)*.5;ty=Math.sin(r.wa)*.5}
+    const rs=L.speed*S*(d<190*S?1:.6);r.vx+=(tx*rs-r.vx)*Math.min(1,dt*5);r.vy+=(ty*rs-r.vy)*Math.min(1,dt*5);
+    r.x+=r.vx*dt;r.y+=r.vy*dt;r.walk+=dt*10;if(Math.abs(r.vx)>5)r.dir=r.vx>0?1:-1;clampIn(r,18*S,robLow());
+    if(d<40*S){robbers.splice(i,1);catchAt(r.x,r.y,10,'Preso!')}}
+  // jeep
+  const lp=roadLoop(),per=2*((lp.x1-lp.x0)+(lp.y1-lp.y0));
+  jeeps.forEach(j=>{if(j.stopped){j.t+=dt;return}j.p+=j.dir*(L.speed+80)*S*dt/per;const q=loopPos(j.p);j.x=q.x;j.y=q.y;j.ang=q.ang+(j.dir<0?Math.PI:0);
+    if(Math.hypot(j.x-cop.x,j.y-cop.y)<44*S){j.stopped=true;j.t=0;catchAt(j.x,j.y,20,'Jeep fermata!')}});
+  flyers.forEach(f=>{f.t+=dt*1.4});for(let i=flyers.length-1;i>=0;i--)if(flyers[i].t>=1){flyers.splice(i,1);jailed++}
+  pops.forEach(p=>p.t+=dt);pops=pops.filter(p=>p.t<1);
+  if(left<=0&&flyers.length===0){levelDone();return}
+  if(timeLeft<=0)finish(false)}
+
+// ---- disegno ----
+function drawCop(g,x,y,s,c,walk,dir){const sw=Math.sin(walk)*5*s;g.save();g.translate(x,y);g.lineWidth=2*s;g.strokeStyle='#1f1d2b';
+  g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.ellipse(0,24*s,14*s,4*s,0,0,7);g.fill();
+  g.fillStyle=c.pants;g.fillRect(-8*s,6*s+0,6*s,16*s+sw*.4);g.fillRect(2*s,6*s,6*s,16*s-sw*.4);
+  g.fillStyle='#1f1d2b';g.fillRect(-10*s,20*s+sw*.4,9*s,4*s);g.fillRect(1*s,20*s-sw*.4,9*s,4*s);
+  g.fillStyle=c.coat;g.beginPath();g.roundRect(-11*s,-10*s,22*s,19*s,4*s);g.fill();g.stroke();
+  g.fillStyle='#ffd23f';g.beginPath();g.arc(5*s,-4*s,2.6*s,0,7);g.fill();// distintivo
+  g.fillStyle=c.skin;g.beginPath();g.arc(0,-18*s,9*s,0,7);g.fill();g.stroke();
+  if(c.braid){g.fillStyle=c.hair;g.beginPath();g.ellipse(-dir*9*s,-12*s,3.5*s,7*s,0,0,7);g.fill()}
+  g.fillStyle='#1f1d2b';g.beginPath();g.arc(dir*3*s,-19*s,1.3*s,0,7);g.arc(dir*-2*s,-19*s,1.3*s,0,7);g.fill();
+  g.strokeStyle='#b33';g.lineWidth=1.4*s;g.beginPath();g.arc(dir*1*s,-16*s,3*s,.2,Math.PI-.2);g.stroke();
+  g.strokeStyle='#1f1d2b';g.lineWidth=2*s;g.fillStyle='#2a2d8f';g.beginPath();g.moveTo(-10*s,-23*s);g.lineTo(10*s,-23*s);g.lineTo(8*s,-31*s);g.lineTo(-8*s,-31*s);g.closePath();g.fill();g.stroke();
+  g.fillStyle='#111';g.fillRect(-11*s+(dir>0?6*s:0),-24*s,16*s,3*s);
+  g.fillStyle='#ffd23f';g.beginPath();g.arc(0,-27*s,2.2*s,0,7);g.fill();g.restore()}
+function drawRobber(g,x,y,s,walk,dir){const sw=Math.sin(walk)*5*s;g.save();g.translate(x,y);g.lineWidth=2*s;g.strokeStyle='#1f1d2b';
+  g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.ellipse(0,24*s,14*s,4*s,0,0,7);g.fill();
+  g.fillStyle='#222';g.fillRect(-8*s,6*s,6*s,16*s+sw*.4);g.fillRect(2*s,6*s,6*s,16*s-sw*.4);
+  g.fillStyle='#ff8a2a';g.beginPath();g.roundRect(-11*s,-10*s,22*s,19*s,4*s);g.fill();g.stroke();
+  g.fillStyle='#f3c79a';g.beginPath();g.arc(0,-18*s,9*s,0,7);g.fill();g.stroke();
+  g.fillStyle='#1f1d2b';g.fillRect(-9*s,-21*s,18*s,4.5*s);g.fillStyle='#fff';g.beginPath();g.arc(dir*3*s,-19*s,1.3*s,0,7);g.arc(dir*-2.5*s,-19*s,1.3*s,0,7);g.fill();
+  g.fillStyle='#3036a8';g.beginPath();g.arc(0,-24*s,8.5*s,Math.PI,0);g.fill();g.stroke();
+  // sacco di monete
+  g.save();g.translate(-dir*13*s,-2*s);g.fillStyle='#e9d9a8';g.beginPath();g.ellipse(0,2*s,8*s,9*s,0,0,7);g.fill();g.stroke();
+  g.fillStyle='#c9a227';g.font='bold '+(10*s)+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('€',0,3*s);g.restore();
+  g.restore()}
+function drawJeep(g,j,s){g.save();g.translate(j.x,j.y);g.rotate(j.ang);g.lineWidth=2*s;g.strokeStyle='#1f1d2b';
+  g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(2*s,4*s,34*s,20*s,0,0,7);g.fill();
+  g.fillStyle='#222';[[-20,-18],[14,-18],[-20,14],[14,14]].forEach(w=>{g.fillRect(w[0]*s,w[1]*s,10*s,5*s)});
+  g.fillStyle=j.stopped?'#8a8f74':'#6f7d3a';g.beginPath();g.roundRect(-30*s,-15*s,60*s,30*s,6*s);g.fill();g.stroke();
+  g.fillStyle='#bfe3ff';g.fillRect(8*s,-12*s,7*s,24*s);g.strokeRect(8*s,-12*s,7*s,24*s);
+  g.fillStyle='#ffe066';g.fillRect(27*s,-12*s,4*s,6*s);g.fillRect(27*s,6*s,4*s,6*s);
+  if(!j.stopped){g.fillStyle='#ff8a2a';g.beginPath();g.arc(-2*s,0,7*s,0,7);g.fill();g.stroke();g.fillStyle='#3036a8';g.beginPath();g.arc(-2*s,0,4.5*s,0,7);g.fill()}
+  g.fillStyle='#e9d9a8';g.beginPath();g.arc(-20*s,-4*s,5*s,0,7);g.arc(-20*s,6*s,5*s,0,7);g.fill();
+  g.restore();
+  if(j.stopped&&j.t<1.2){g.save();g.font='bold '+(16*s)+'px sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('STOP',j.x,j.y-26*s);g.restore()}}
+
+function drawWorld(){const a=arena();
+  cx.fillStyle='#7cc36a';cx.fillRect(0,0,W,H);
+  // ciuffi d'erba
+  cx.fillStyle='#6ab25a';for(let i=0;i<60;i++){const x=(i*137.5)%W,y=a.y0+((i*89.3)%(a.y1-a.y0));cx.fillRect(x,y,4,9)}
+  // strada ad anello
+  const r=roadLoop(),rw=44*S;cx.strokeStyle='#8e939a';cx.lineWidth=rw;cx.lineJoin='round';cx.strokeRect(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
+  cx.strokeStyle='#fff';cx.lineWidth=3;cx.setLineDash([14,14]);cx.strokeRect(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);cx.setLineDash([]);
+  // banca al centro
+  const bx=(r.x0+r.x1)/2,by=(r.y0+r.y1)/2,bw=Math.min(120*S,(r.x1-r.x0)*.5),bh=Math.min(70*S,(r.y1-r.y0)*.35);
+  cx.fillStyle='#f1ead8';cx.strokeStyle='#1f1d2b';cx.lineWidth=3;cx.fillRect(bx-bw/2,by-bh/2,bw,bh);cx.strokeRect(bx-bw/2,by-bh/2,bw,bh);
+  cx.fillStyle='#c9a227';cx.beginPath();cx.moveTo(bx-bw/2-6,by-bh/2);cx.lineTo(bx,by-bh/2-24*S);cx.lineTo(bx+bw/2+6,by-bh/2);cx.closePath();cx.fill();cx.stroke();
+  cx.fillStyle='#1f1d2b';cx.font='bold '+(14*S)+'px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText('BANCA',bx,by);
+  // stazione di polizia (porta marrone come nel disegno)
+  const s=stationBox();cx.fillStyle='#8a5a2b';cx.fillRect(s.x,s.y,s.w,s.h);cx.strokeRect(s.x,s.y,s.w,s.h);
+  cx.fillStyle='#e8f1ff';cx.fillRect(s.x+8*S,s.y+22*S,s.w*.38,s.h-30*S);cx.fillStyle='#1b1b1b';cx.fillRect(s.x+s.w*.52,s.y+22*S,s.w*.38,s.h-30*S);
+  cx.fillStyle='#2a2d8f';cx.fillRect(s.x,s.y,s.w,18*S);cx.fillStyle='#fff';cx.font='bold '+(11*S)+'px sans-serif';cx.fillText('POLIZIA',s.x+s.w/2,s.y+9*S);
+  // prigione con le sbarre
+  const j=jailBox();cx.fillStyle='#d9d2c3';cx.fillRect(j.x,j.y,j.w,j.h);
+  for(let i=0;i<jailed;i++){drawRobber(cx,j.x+14*S+(i%5)*(j.w-28*S)/4,j.y+j.h*.55+(i>4?8*S:0),.7*S,0,1)}
+  cx.strokeStyle='#1f1d2b';cx.lineWidth=3;for(let i=0;i<=10;i++){const x=j.x+i*j.w/10;cx.beginPath();cx.moveTo(x,j.y);cx.lineTo(x,j.y+j.h);cx.stroke()}
+  cx.strokeRect(j.x,j.y,j.w,j.h);cx.fillStyle='#6b3e1a';cx.fillRect(j.x-4,j.y+j.h-6,j.w+8,8);
+  cx.fillStyle='#1f1d2b';cx.font='bold '+(11*S)+'px sans-serif';cx.fillText('PRIGIONE',j.x+j.w/2,j.y+j.h+12*S)}
+
+function draw(){drawWorld();if(st==='ready'||!cop)return;
+  jeeps.forEach(j=>{if(!j.stopped||j.t<3)drawJeep(cx,j,S)});
+  const ents=robbers.map(r=>({y:r.y,f:()=>drawRobber(cx,r.x,r.y,1.05*S,r.walk,r.dir)}));
+  ents.push({y:cop.y,f:()=>drawCop(cx,cop.x,cop.y,1.15*S,COPS[copIdx],cop.walk,cop.dir)});
+  ents.sort((p,q)=>p.y-q.y).forEach(e=>e.f());
+  flyers.forEach(f=>{const e=f.t*f.t*(3-2*f.t),x=f.x+(f.tx-f.x)*e,y=f.y+(f.ty-f.y)*e-Math.sin(f.t*Math.PI)*80*S;drawRobber(cx,x,y,(1-.3*f.t)*S,0,1)});
+  pops.forEach(p=>{cx.globalAlpha=1-p.t;cx.fillStyle='#fff';cx.strokeStyle='#1f1d2b';cx.lineWidth=4;cx.font='bold '+(24*S)+'px sans-serif';cx.textAlign='center';
+    cx.strokeText(p.txt,p.x,p.y-30*S-p.t*30);cx.fillText(p.txt,p.x,p.y-30*S-p.t*30);cx.globalAlpha=1})}
+
+function frame(now){const dt=Math.min(.05,(now-last)/1000||0);last=now;if(st==='play')update(dt);draw();requestAnimationFrame(frame)}
+last=performance.now();requestAnimationFrame(frame);
+window.__ladri=()=>({st,lvl,score,left,cop:cop&&{x:cop.x,y:cop.y},targets:(robbers||[]).map(r=>({x:r.x,y:r.y})).concat((jeeps||[]).filter(j=>!j.stopped).map(j=>({x:j.x,y:j.y})))});
+})();
+</script>
+</body></html>
