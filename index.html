@@ -51,6 +51,7 @@ h1 .b{color:#ff8a1f;background:linear-gradient(180deg,#ffd23f 10%,#ff8a1f 55%,#e
 .card.pool .play{background:#4fc3f7}
 .card.moto .play{background:#ff5a4f;color:#fff}
 .card.rock .play{background:#b07cff;color:#fff}
+.card.ladri .play{background:#2f5fd0;color:#fff}
 #player.pirate .close{left:max(206px,calc(50% - 26px));bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:52px;height:52px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
 #player.pirate .close::after{content:"⌂";font-size:26px;line-height:1}
 #player.train .close,#player.pool .close,#player.moto .close,#player.rock .close{left:calc(50% - 22px);top:calc(env(safe-area-inset-top,0px) + 8px);bottom:auto;width:44px;height:44px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
@@ -77,6 +78,8 @@ footer{font-size:15px;color:var(--muted);font-weight:600}
 #player{position:fixed;inset:0;background:#000;z-index:10;display:flex;flex-direction:column}
 #player iframe{flex:1;width:100%;border:0;display:block;background:#000}
 .close{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);font-family:var(--body);font-weight:800;font-size:15px;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:6px 12px;box-shadow:3px 3px 0 var(--ink);cursor:pointer;z-index:2}
+#player.cops .close{left:auto;right:16px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);width:56px;height:56px;border-radius:50%;padding:0;font-size:0;display:flex;align-items:center;justify-content:center}
+#player.cops .close::after{content:"⌂";font-size:28px;line-height:1}
 #player.race .close{left:auto;right:12px;top:calc(env(safe-area-inset-top,0px) + 176px);bottom:auto}
 body.playing{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.card{transform:none!important}}
@@ -278,6 +281,29 @@ body.playing{overflow:hidden}
         <p>Scegli la tua band e lo strumento: chitarra, batteria, microfono o tastiera. Suona le note a tempo e sfida le altre tre band: vince chi suona meglio!</p>
         <div class="chips"><span class="chip">4 band</span><span class="chip">4 strumenti</span><span class="chip">Facile</span></div>
         <button class="play" type="button" data-game="giochi/cantanti-rock.html" data-kind="rock">Gioca!</button>
+      </div>
+    </article>
+    <article class="card ladri">
+      <svg class="shot" viewBox="0 0 320 180" role="img" aria-label="Un poliziotto blu insegue un ladro con la maglia arancione e il sacco di monete, tra la stazione di polizia e la prigione">
+        <rect width="320" height="180" fill="#7cc46a"/>
+        <rect x="40" y="96" width="240" height="26" rx="6" fill="#8a8f99"/><path d="M52 109h216" stroke="#fff" stroke-width="3" stroke-dasharray="12 9"/>
+        <g stroke="#1f1d2b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+          <rect x="12" y="20" width="60" height="62" fill="#7a4a24"/><rect x="18" y="38" width="22" height="44" fill="#fff"/><rect x="42" y="38" width="22" height="44" fill="#1f1d2b"/>
+          <rect x="12" y="20" width="60" height="14" fill="#2f4fb8"/>
+          <rect x="246" y="22" width="62" height="58" fill="#fff"/><path d="M254 22v58M262 22v58M270 22v58M278 22v58M286 22v58M294 22v58M302 22v58"/><rect x="244" y="78" width="66" height="6" fill="#7a4a24"/>
+          <circle cx="120" cy="132" r="9" fill="#ffe0b8"/><path d="M110 125h20l-3-8h-14Z" fill="#2f4fb8"/><rect x="111" y="141" width="18" height="18" rx="5" fill="#2f4fb8"/><path d="M114 159v14M126 159v14" stroke="#2f4fb8" stroke-width="5"/>
+          <circle cx="200" cy="130" r="9" fill="#ffe0b8"/><path d="M191 126a9 9 0 0 1 18 0Z" fill="#3b3b8f"/><rect x="191" y="139" width="18" height="18" rx="5" fill="#ff8a3d"/><path d="M194 157v14M206 157v14" stroke="#1f1d2b" stroke-width="5"/>
+          <circle cx="222" cy="146" r="10" fill="#e9c46a"/>
+        </g>
+        <g font-family="sans-serif" font-weight="800" text-anchor="middle" fill="#fff" font-size="9"><text x="42" y="31">POLIZIA</text></g>
+        <text x="222" y="150" font-family="sans-serif" font-weight="800" font-size="11" text-anchor="middle" fill="#1f1d2b">€</text>
+        <path d="M140 140h30M150 134h20M150 146h20" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+      </svg>
+      <div class="body">
+        <h2>Ladri a più non posso</h2>
+        <p>Scegli il tuo poliziotto e porta in prigione i ladri della Banda Sacchetto. Al livello 2 devi fermare anche la loro Jeep!</p>
+        <div class="chips"><span class="chip">3 poliziotti</span><span class="chip">2 livelli</span><span class="chip">Facile</span></div>
+        <button class="play" type="button" data-game="giochi/ladri-a-piu-non-posso.html" data-kind="cops">Gioca!</button>
       </div>
     </article>
   </main>

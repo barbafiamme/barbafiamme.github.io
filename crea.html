@@ -112,6 +112,7 @@ textarea{min-height:140px;resize:vertical}
             <option value="piscina">Piscina veloce</option>
             <option value="moto-forte">Moto Forte</option>
             <option value="cantanti-rock">Cantanti Rock</option>
+            <option value="ladri-a-piu-non-posso">Ladri a più non posso</option>
           </optgroup>
         </select>
       </div>
@@ -244,7 +245,7 @@ textarea{min-height:140px;resize:vertical}
       const row={token,tipo,gioco:tipo==='modifica'?$('gioco').value:null,titolo:titolo||null,descrizione:idea,nome_bambino:autore,disegno:blob?'allegato':'nessuno',disegno_b64:b64,codice};
       const r=await fetch(cfg.url+'/rest/v1/richieste',{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},H),body:JSON.stringify(row)});
       if(!r.ok){send.disabled=false;let det='';try{const j=await r.json();det=[j.code,j.message].filter(Boolean).join(' ')}catch(_){}
-        const rls=/row-level security/i.test(det),ago=tipo==='modifica'&&['pirati','granpremio','squadriglia','trenini','piscina','moto-forte','cantanti-rock'].includes($('gioco').value);
+        const rls=/row-level security/i.test(det),ago=tipo==='modifica'&&['pirati','granpremio','squadriglia','trenini','piscina','moto-forte','cantanti-rock','ladri-a-piu-non-posso'].includes($('gioco').value);
         const msg=rls?(ago?'Per cambiare i giochi di Barbafiamme serve il codice di Agostino.':'Il codice segreto non è giusto. Controllalo e riprova.'):'La richiesta non è stata salvata. Riprova tra poco.';
         return say(msg+(det&&!rls?' (dettaglio: '+det+')':''),'err')}
       try{localStorage.setItem('bf_artista',autore);localStorage.setItem('bf_codice',codice);

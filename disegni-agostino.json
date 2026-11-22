@@ -82,5 +82,12 @@
   "gioco": "Cantanti Rock",
   "descrizione": "Il chitarrista coi capelli lunghi, l'amplificatore, il batterista e il cantante col mantello. Da qui è nato Cantanti Rock.",
   "alt": "Disegno a matita di una band sul palco: un chitarrista con i capelli lunghi accanto all'amplificatore, un batterista con i piatti e un cantante con il microfono"
+ },
+ {
+  "src": "disegni/ladri-a-piu-non-posso.jpg",
+  "titolo": "Il poliziotto e la prigione",
+  "gioco": "Ladri a più non posso",
+  "descrizione": "Il poliziotto col cappello blu sulla porta della stazione di polizia e il ladro arancione dietro le sbarre. Da qui è nato Ladri a più non posso.",
+  "alt": "Disegno a pennarello: a sinistra un poliziotto blu nella porta marrone della stazione di polizia, a destra un ladro con la maglia arancione dietro le sbarre della prigione"
  }
 ]
